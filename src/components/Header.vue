@@ -4,9 +4,8 @@
             <!-- Logo -->
             <div class="nav-brand">
                 <router-link to="/" class="brand-logo">
-                    <!-- <span class="logo-bracket">&lt;</span> -->
-                    <span class="logo-text">PGNLZ MAX</span>
-                    <!-- <span class="logo-bracket">/&gt;</span> -->
+                    <img src="/asset/images/logo/pgnlz-logo.png" alt="PGNLZ Logo" class="logo-img">
+                    <!-- <span class="logo-text">PGNLZ MAX</span> -->
                 </router-link>
             </div>
 
@@ -17,7 +16,8 @@
 
             <!-- Right Actions -->
             <div class="nav-controls">
-                <!-- Wallet Connect -->
+                <!-- Wallet Connect (Hidden temporarily) -->
+                <!-- 
                 <a v-if="!walletState.isConnected" href="#" @click.prevent="openModal" class="btn connect-btn gradient-border">
                     <i class="fas fa-wallet"></i>
                     <span>{{ t('header.connectWallet') || 'Connect Wallet' }}</span>
@@ -26,6 +26,7 @@
                     <span class="status-dot"></span>
                     <span class="address-text">{{ formattedAddress }}</span>
                 </a>
+                -->
 
                 <!-- Language Selector -->
                 <button class="lang-toggle" @click="openLanguageModal" title="Change Language">
@@ -118,8 +119,13 @@ export default {
     color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.5rem;
     text-decoration: none;
+}
+
+.logo-img {
+    height: 35px;
+    width: auto;
 }
 
 .logo-bracket {
@@ -150,15 +156,15 @@ export default {
     background: var(--bg-card);
     border: 1px solid var(--border);
     color: var(--text-primary);
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     border-radius: 12px;
     cursor: pointer;
     transition: all var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .lang-toggle:hover {

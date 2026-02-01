@@ -4,16 +4,17 @@
             <div class="footer-content">
                 <div class="brand-social-wrapper">
                     <div class="brand-logo-large">
-                        <span class="logo-text">PGNLZ MAX</span>
+                        <img src="/asset/images/logo/pgnlz-logo.png" alt="PGNLZ Logo" class="footer-logo-img">
+                        <!-- <span class="logo-text">PGNLZ MAX</span> -->
                     </div>
                     <div class="footer-social-row">
-                        <a href="https://t.me/your_telegram" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Telegram">
+                        <a href="https://t.me/RsPGNLZ" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Telegram">
                             <i class="fab fa-telegram-plane"></i>
                         </a>
-                        <a href="https://twitter.com/your_twitter" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Twitter">
+                        <a href="https://x.com/wttpp81197815?s=11&t=eP2dub4o-vYMAx8asgwuPw" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Twitter">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="footer-social-btn" title="Whitepaper">
+                        <a href="https://pgnlz.com/PGNLZbook.pdf" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Whitepaper">
                             <i class="fas fa-file-alt"></i>
                         </a>
                     </div>
@@ -21,12 +22,13 @@
             </div>
 
             <div class="footer-bottom-bar">
-                <div class="copyright-section">
-                    © 2026 PGNLZ MAX. ALL RIGHTS RESERVED.
-                </div>
-                <div class="version-badge">
-                    <span class="env-label">Env: {{ envLabel }}</span>
-                    <span class="ver-label">v1.0.0</span>
+                <div class="copyright-group">
+                    <div class="copyright-section">
+                        © 2026 PGNLZ MAX. ALL RIGHTS RESERVED.
+                    </div>
+                    <div class="version-badge">
+                        <span class="ver-label">v1.0.0</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,7 +52,7 @@ export default {
 .main-footer {
     background: var(--bg-darker);
     border-top: 1px solid var(--border);
-    padding: 2rem 0 1rem; /* Compressed padding */
+    padding: 3rem 0 1.5rem;
     margin-top: auto;
     position: relative;
     overflow: hidden;
@@ -73,7 +75,7 @@ export default {
 .footer-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     position: relative;
     z-index: 1;
 }
@@ -82,24 +84,37 @@ export default {
     display: flex;
     flex-direction: column;
     margin-bottom: 2rem;
+    /* Removed padding/margin that might cause centering visual issues */
 }
 
 .brand-social-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
+    gap: 1.5rem;
+    align-items: flex-start; /* Strictly Left Aligned */
+    padding-left: 0; /* Ensure no left padding */
+}
+
+.brand-logo-large {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.footer-logo-img {
+    height: 30px;
+    width: auto;
 }
 
 .brand-logo-large .logo-text {
     font-family: var(--font-code);
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 800;
     background: var(--gradient-1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    letter-spacing: -1px;
+    letter-spacing: -0.5px;
 }
 
 .footer-social-row {
@@ -108,18 +123,18 @@ export default {
 }
 
 .footer-social-btn {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg-card);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     color: var(--text-secondary);
     text-decoration: none;
     transition: all var(--transition);
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 .footer-social-btn:hover {
@@ -133,49 +148,54 @@ export default {
 /* Bottom Bar */
 .footer-bottom-bar {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 1rem;
+    padding-top: 1.5rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.8rem;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.85rem;
+}
+
+.copyright-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
 }
 
 .copyright-section {
     color: var(--text-muted);
     font-family: var(--font-code);
+    text-align: left;
 }
 
 .version-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: transparent;
+    padding: 0;
+    border: none;
     font-family: var(--font-code);
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+    opacity: 0.5;
 }
 
 .env-label {
-    color: var(--text-secondary);
+    display: none;
 }
 
 .ver-label {
-    opacity: 0.6;
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
     .brand-social-wrapper {
-        align-items: center;
-        text-align: center;
+        align-items: flex-start; 
+        text-align: left;
     }
     
     .footer-bottom-bar {
-        flex-direction: column;
-        gap: 0.8rem;
-        text-align: center;
+        padding-top: 1rem;
     }
 }
 </style>
