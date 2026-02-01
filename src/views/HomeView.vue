@@ -147,7 +147,7 @@ export default {
   font-size: 1.5rem;
   font-weight: 800;
   margin-bottom: 1.25rem;
-  line-height: 1.3;
+  line-height: 1.5;
   font-family: var(--font-primary);
 }
 
