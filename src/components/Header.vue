@@ -4,9 +4,9 @@
             <!-- Logo -->
             <div class="nav-brand">
                 <router-link to="/" class="brand-logo">
-                    <span class="logo-bracket">&lt;</span>
+                    <!-- <span class="logo-bracket">&lt;</span> -->
                     <span class="logo-text">PGNLZ MAX</span>
-                    <span class="logo-bracket">/&gt;</span>
+                    <!-- <span class="logo-bracket">/&gt;</span> -->
                 </router-link>
             </div>
 

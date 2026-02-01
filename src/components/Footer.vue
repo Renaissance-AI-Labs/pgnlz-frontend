@@ -2,9 +2,11 @@
     <footer class="main-footer">
         <div class="footer-container">
             <div class="footer-content">
-                <!-- Left Side: Social & Brand -->
-                <div class="footer-primary">
-                    <div class="footer-social-column">
+                <div class="brand-social-wrapper">
+                    <div class="brand-logo-large">
+                        <span class="logo-text">PGNLZ MAX</span>
+                    </div>
+                    <div class="footer-social-row">
                         <a href="https://t.me/your_telegram" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Telegram">
                             <i class="fab fa-telegram-plane"></i>
                         </a>
@@ -15,18 +17,6 @@
                             <i class="fas fa-file-alt"></i>
                         </a>
                     </div>
-                    
-                    <div class="footer-brand-section">
-                        <div class="brand-logo-large">
-                            <span class="logo-text">PGNLZ MAX</span>
-                        </div>
-                        <p class="brand-slogan">Mobile First Web3 Experience</p>
-                    </div>
-                </div>
-
-                <!-- Right Side: Links (Optional, can be used for Whitepaper text link if preferred) -->
-                <div class="footer-links">
-                     <a href="#" class="footer-nav-link">Whitepaper</a>
                 </div>
             </div>
 
@@ -60,13 +50,12 @@ export default {
 .main-footer {
     background: var(--bg-darker);
     border-top: 1px solid var(--border);
-    padding: 4rem 0 2rem;
+    padding: 2rem 0 1rem; /* Compressed padding */
     margin-top: auto;
     position: relative;
     overflow: hidden;
 }
 
-/* Subtle grid background effect */
 .main-footer::before {
     content: '';
     position: absolute;
@@ -91,55 +80,20 @@ export default {
 
 .footer-content {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 4rem;
+    flex-direction: column;
+    margin-bottom: 2rem;
 }
 
-.footer-primary {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-}
-
-.footer-social-column {
+.brand-social-wrapper {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-
-.footer-social-btn {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: all var(--transition);
-    font-size: 1.1rem;
-}
-
-.footer-social-btn:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-    transform: translateX(5px);
-    box-shadow: 0 5px 15px rgba(192, 132, 252, 0.2);
-}
-
-.footer-brand-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: flex-start;
 }
 
 .brand-logo-large .logo-text {
     font-family: var(--font-code);
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 800;
     background: var(--gradient-1);
     -webkit-background-clip: text;
@@ -148,53 +102,42 @@ export default {
     letter-spacing: -1px;
 }
 
-.brand-slogan {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.footer-links {
+.footer-social-row {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
 }
 
-.footer-nav-link {
+.footer-social-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     color: var(--text-secondary);
     text-decoration: none;
-    font-weight: 500;
-    transition: color var(--transition);
-    position: relative;
+    transition: all var(--transition);
+    font-size: 1rem;
 }
 
-.footer-nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
+.footer-social-btn:hover {
     background: var(--primary);
-    transition: width var(--transition);
-}
-
-.footer-nav-link:hover {
-    color: var(--primary);
-}
-
-.footer-nav-link:hover::after {
-    width: 100%;
+    border-color: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(192, 132, 252, 0.2);
 }
 
 /* Bottom Bar */
 .footer-bottom-bar {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 2rem;
+    padding-top: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .copyright-section {
@@ -207,12 +150,12 @@ export default {
     align-items: center;
     gap: 0.5rem;
     background: rgba(255, 255, 255, 0.03);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     font-family: var(--font-code);
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 .env-label {
@@ -224,29 +167,14 @@ export default {
 }
 
 @media (max-width: 768px) {
-    .footer-content {
-        flex-direction: column;
-        gap: 3rem;
+    .brand-social-wrapper {
         align-items: center;
         text-align: center;
     }
     
-    .footer-primary {
-        flex-direction: column;
-        gap: 2rem;
-    }
-    
-    .footer-social-column {
-        flex-direction: row;
-    }
-    
-    .footer-social-btn:hover {
-        transform: translateY(-5px);
-    }
-    
     .footer-bottom-bar {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.8rem;
         text-align: center;
     }
 }
