@@ -1,6 +1,6 @@
 /* Reset global styles */
 :root {
-  --header-height: 80px;
+  --header-height: 64px;
 
   /* Theme Colors */
   --primary: #c084fc;

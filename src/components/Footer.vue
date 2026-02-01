@@ -2,25 +2,41 @@
     <footer class="main-footer">
         <div class="footer-container">
             <div class="footer-content">
-                <div class="footer-text-wrapper">
-                    <p class="footer-text">
-                        <span class="footer-copyright">© 2026 PGNLZ MAX. ALL RIGHTS RESERVED.</span>
-                        <span class="footer-divider">•</span>
-                        <span class="footer-built">
-                            Env: {{ envLabel }} - v1.0.0
-                        </span>
-                    </p>
-                    <div class="footer-links-row">
-                        <a href="#" class="footer-link">Whitepaper</a>
+                <!-- Left Side: Social & Brand -->
+                <div class="footer-primary">
+                    <div class="footer-social-column">
+                        <a href="https://t.me/your_telegram" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Telegram">
+                            <i class="fab fa-telegram-plane"></i>
+                        </a>
+                        <a href="https://twitter.com/your_twitter" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="footer-social-btn" title="Whitepaper">
+                            <i class="fas fa-file-alt"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="footer-brand-section">
+                        <div class="brand-logo-large">
+                            <span class="logo-text">PGNLZ MAX</span>
+                        </div>
+                        <p class="brand-slogan">Mobile First Web3 Experience</p>
                     </div>
                 </div>
-                <div class="footer-social">
-                    <a href="https://t.me/your_telegram" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Telegram">
-                        <i class="fab fa-telegram-plane"></i>
-                    </a>
-                    <a href="https://twitter.com/your_twitter" target="_blank" rel="noopener noreferrer" class="footer-social-link" title="Twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a>
+
+                <!-- Right Side: Links (Optional, can be used for Whitepaper text link if preferred) -->
+                <div class="footer-links">
+                     <a href="#" class="footer-nav-link">Whitepaper</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom-bar">
+                <div class="copyright-section">
+                    © 2026 PGNLZ MAX. ALL RIGHTS RESERVED.
+                </div>
+                <div class="version-badge">
+                    <span class="env-label">Env: {{ envLabel }}</span>
+                    <span class="ver-label">v1.0.0</span>
                 </div>
             </div>
         </div>
@@ -34,7 +50,6 @@ export default {
     name: 'Footer',
     computed: {
         envLabel() {
-            // "测试用B，正式环境用A"
             return APP_ENV === 'PROD' ? 'A' : 'B';
         }
     }
@@ -43,118 +58,196 @@ export default {
 
 <style scoped lang="scss">
 .main-footer {
-    background: var(--bg-card);
+    background: var(--bg-darker);
     border-top: 1px solid var(--border);
-    padding: 3rem 0;
-    margin-top: auto; /* Ensure it pushes down */
+    padding: 4rem 0 2rem;
+    margin-top: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle grid background effect */
+.main-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(192, 132, 252, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(192, 132, 252, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
 }
 
 .footer-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .footer-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    margin-bottom: 4rem;
 }
 
-.footer-text-wrapper {
+.footer-primary {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.footer-social-column {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-}
-
-.footer-text {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0;
-}
-
-.footer-copyright {
-    font-family: var(--font-code);
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-.footer-divider {
-    color: var(--text-muted);
-}
-
-.footer-built {
-    font-family: var(--font-code);
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    background: var(--bg-darker);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-}
-
-.footer-links-row {
-    margin-top: 0.5rem;
-}
-
-.footer-link {
-    color: var(--primary);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color var(--transition);
-    
-    &:hover {
-        color: var(--cyan);
-        text-decoration: underline;
-    }
-}
-
-.footer-social {
-    display: flex;
     gap: 1rem;
 }
 
-.footer-social-link {
+.footer-social-btn {
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg-darker);
+    background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 50%;
+    border-radius: 10px;
     color: var(--text-secondary);
     text-decoration: none;
     transition: all var(--transition);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
-.footer-social-link:hover {
+.footer-social-btn:hover {
     background: var(--primary);
     border-color: var(--primary);
     color: white;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-glow);
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(192, 132, 252, 0.2);
+}
+
+.footer-brand-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.brand-logo-large .logo-text {
+    font-family: var(--font-code);
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+}
+
+.brand-slogan {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.footer-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.footer-nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition);
+    position: relative;
+}
+
+.footer-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: width var(--transition);
+}
+
+.footer-nav-link:hover {
+    color: var(--primary);
+}
+
+.footer-nav-link:hover::after {
+    width: 100%;
+}
+
+/* Bottom Bar */
+.footer-bottom-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.copyright-section {
+    color: var(--text-muted);
+    font-family: var(--font-code);
+}
+
+.version-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-family: var(--font-code);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.env-label {
+    color: var(--text-secondary);
+}
+
+.ver-label {
+    opacity: 0.6;
 }
 
 @media (max-width: 768px) {
     .footer-content {
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 3rem;
+        align-items: center;
         text-align: center;
     }
     
-    .footer-text {
-        justify-content: center;
+    .footer-primary {
         flex-direction: column;
+        gap: 2rem;
     }
     
-    .footer-divider {
-        display: none;
+    .footer-social-column {
+        flex-direction: row;
+    }
+    
+    .footer-social-btn:hover {
+        transform: translateY(-5px);
+    }
+    
+    .footer-bottom-bar {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
     }
 }
 </style>

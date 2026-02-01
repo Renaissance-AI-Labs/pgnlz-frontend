@@ -18,11 +18,11 @@
             <!-- Right Actions -->
             <div class="nav-controls">
                 <!-- Wallet Connect -->
-                <a v-if="!walletState.isConnected" href="#" @click.prevent="openModal" class="btn btn-primary connect-btn">
+                <a v-if="!walletState.isConnected" href="#" @click.prevent="openModal" class="btn connect-btn gradient-border">
                     <i class="fas fa-wallet"></i>
                     <span>{{ t('header.connectWallet') || 'Connect Wallet' }}</span>
                 </a>
-                <a v-else href="#" @click.prevent="openModal" class="btn btn-secondary connect-btn connected">
+                <a v-else href="#" @click.prevent="openModal" class="btn connect-btn connected">
                     <span class="status-dot"></span>
                     <span class="address-text">{{ formattedAddress }}</span>
                 </a>
@@ -99,7 +99,7 @@ export default {
 .nav-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     height: 100%;
     display: flex;
     justify-content: space-between;
@@ -113,7 +113,7 @@ export default {
 
 .brand-logo {
     font-family: var(--font-code);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--primary);
     display: flex;
@@ -131,6 +131,7 @@ export default {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    display: inline-block;
 }
 
 .nav-menu {
@@ -170,15 +171,32 @@ export default {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    height: 44px;
-    padding: 0 1.5rem;
-    font-size: 0.9rem;
+    height: 38px;
+    padding: 0 1rem;
+    font-size: 0.85rem;
+    transition: all var(--transition);
+}
+
+.connect-btn.gradient-border {
+    position: relative;
+    background: linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+                var(--gradient-1) border-box;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: var(--text-primary);
+}
+
+.connect-btn.gradient-border:hover {
+    box-shadow: 0 0 15px rgba(192, 132, 252, 0.4);
+    transform: translateY(-2px);
+    color: white;
 }
 
 .connect-btn.connected {
     background: var(--bg-card);
-    border-color: var(--border);
+    border: 1px solid var(--border);
     color: var(--text-secondary);
+    border-radius: 12px;
 }
 
 .connect-btn.connected:hover {
