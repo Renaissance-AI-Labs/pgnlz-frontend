@@ -11,6 +11,8 @@
     </div>
     
     <Footer />
+
+    <BottomNav />
     
     <transition name="modal">
       <ConnectWalletModal v-if="isModalVisible" @close="closeModal" />
@@ -25,6 +27,7 @@
 <script>
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
+import BottomNav from './components/BottomNav.vue';
 import ConnectWalletModal from './components/ConnectWalletModal.vue';
 import LanguageModal from './components/LanguageModal.vue';
 import ToastNotification from './components/ToastNotification.vue';
@@ -36,6 +39,7 @@ export default {
   components: {
     Header,
     Footer,
+    BottomNav,
     ConnectWalletModal,
     LanguageModal,
     ToastNotification
