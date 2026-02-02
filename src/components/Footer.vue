@@ -14,9 +14,9 @@
                         <a href="https://x.com/wttpp81197815?s=11&t=eP2dub4o-vYMAx8asgwuPw" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Twitter">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://pgnlz.com/PGNLZbook.pdf" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Whitepaper">
+                        <!-- <a href="https://pgnlz.com/PGNLZbook.pdf" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Whitepaper">
                             <i class="fas fa-file-alt"></i>
-                        </a>
+                        </a> -->
                     </div>
                 </div>
             </div>
