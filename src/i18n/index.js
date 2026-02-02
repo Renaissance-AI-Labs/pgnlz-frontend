@@ -25,6 +25,8 @@ const languagePacks = {
     'wallet.disconnect': 'Disconnect',
     'wallet.noWalletDetected': 'No wallet detected',
     'language.switchTitle': 'Select Language',
+    'nav.home': 'Home',
+    'nav.nft': 'NFT',
     
     // Announcement
     'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
@@ -52,6 +54,8 @@ const languagePacks = {
      'wallet.disconnect': '断开连接',
      'wallet.noWalletDetected': '未检测到钱包',
      'language.switchTitle': '选择语言',
+     'nav.home': '首页',
+     'nav.nft': 'NFT',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX系统加急升级公告',
@@ -79,6 +83,8 @@ const languagePacks = {
      'wallet.disconnect': '斷開連接',
      'wallet.noWalletDetected': '未檢測到錢包',
      'language.switchTitle': '選擇語言',
+     'nav.home': '首頁',
+     'nav.nft': 'NFT',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 系統加急升級公告',
@@ -106,6 +112,8 @@ const languagePacks = {
      'wallet.disconnect': '切断',
      'wallet.noWalletDetected': 'ウォレットが検出されませんでした',
      'language.switchTitle': '言語を選択',
+     'nav.home': 'ホーム',
+     'nav.nft': 'NFT',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAXシステムアップグレードに関する緊急のお知らせ',
@@ -133,6 +141,8 @@ const languagePacks = {
      'wallet.disconnect': '연결 해제',
      'wallet.noWalletDetected': '지갑이 감지되지 않았습니다',
      'language.switchTitle': '언어 선택',
+     'nav.home': '홈',
+     'nav.nft': 'NFT',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 시스템 업그레이드에 관한 긴급 공지',
