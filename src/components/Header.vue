@@ -17,6 +17,7 @@
             <!-- Right Actions -->
             <div class="nav-controls">
                 <!-- Wallet Connect (Hidden temporarily) -->
+                <!-- 
                 <a v-if="!walletState.isConnected" href="#" @click.prevent="openModal" class="btn connect-btn gradient-border">
                     <i class="fas fa-wallet"></i>
                     <span>{{ t('header.connectWallet') || 'Connect Wallet' }}</span>
@@ -25,6 +26,7 @@
                     <span class="status-dot"></span>
                     <span class="address-text">{{ formattedAddress }}</span>
                 </a>
+                -->
 
                 <!-- Language Selector -->
                 <button class="lang-toggle" @click="openLanguageModal" title="Change Language">

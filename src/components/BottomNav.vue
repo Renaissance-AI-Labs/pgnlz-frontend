@@ -76,7 +76,7 @@ export default {
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 0.8rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   display: flex;
   justify-content: space-around;
   align-items: center;
