@@ -9,7 +9,7 @@
       <div class="header-section">
         <h2 class="page-title" data-text="< NFT NODE />">&lt; NFT NODE /&gt;</h2>
         <p class="page-intro">
-          持有 PGNLZ NODE NFT，解锁生态治理权与每日能源空投。
+          持有PGNLZ MAX NODE NFT，可获得网络质押收益及代币交易税收入分成。
         </p>
       </div>
 
@@ -225,7 +225,7 @@ export default {
     0 4px 24px -1px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(192, 132, 252, 0.05);
   border-radius: 24px;
-  padding: 1rem 2rem 2rem 2rem;
+  padding: 1rem 1rem 1rem 1.5rem;
   position: relative;
   overflow: hidden;
   /* Tilt effect for the container */
@@ -342,8 +342,8 @@ export default {
 
 .nft-card-container {
   position: relative;
-  width: 260px;
-  height: 260px;
+  width: 220px;
+  height: 220px;
   perspective: 1500px;
 }
 
@@ -369,26 +369,26 @@ export default {
 .nft-balance-badge {
   position: absolute;
   left: 50%;
-  width: 50%;
+  width: auto;
+  min-width: 90px;
   transform: translateX(-50%) translateZ(30px);
   z-index: 10;
-  min-width: 140px;
-  bottom: -50px;
+  bottom: -40px;
   background: rgba(15, 23, 42, 0.9);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(192, 132, 252, 0.3);
-  border-radius: 16px;
-  padding: 10px 20px;
+  border-radius: 12px;
+  padding: 6px 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .nft-balance-badge .balance-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -397,7 +397,7 @@ export default {
 .nft-balance-badge .balance-value {
   color: #fff;
   font-family: var(--font-code);
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
   line-height: 1;
@@ -606,8 +606,8 @@ h1 {
   }
 
   .nft-card-container {
-    width: 380px; /* Larger NFT on PC */
-    height: 380px;
+    width: 300px; /* Larger NFT on PC */
+    height: 300px;
   }
   
   h1 {
