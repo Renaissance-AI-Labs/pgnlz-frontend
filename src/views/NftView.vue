@@ -8,7 +8,7 @@
     <div class="nft-showcase">
       <div class="nft-card-container">
         <div class="nft-card">
-          <img src="/asset/images/nft/nft.png" alt="Exclusive NFT" class="nft-image">
+          <img src="/asset/images/nft/pgnlz-node.png" alt="Exclusive NFT" class="nft-image">
           <div class="card-reflection"></div>
           
           <!-- Balance Badge -->
