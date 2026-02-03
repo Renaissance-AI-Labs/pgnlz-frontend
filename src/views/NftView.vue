@@ -156,7 +156,7 @@ export default {
 .page-content {
   z-index: 1;
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px; /* Increased from 900px for PC */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -561,30 +561,72 @@ h1 {
   opacity: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .page-content {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start; /* Align to top for better balance */
     justify-content: space-between;
-    /* gap: 4rem; */
+    gap: 6rem; /* Increased gap */
+    padding-top: 4rem; /* Add some top padding */
   }
   
   .header-section {
-    width: 45%;
+    width: 40%;
     margin-bottom: 0;
+    position: sticky;
+    top: 100px; /* Sticky effect for scrolling if needed */
+    padding-top: 2rem;
+  }
+
+  .page-title {
+    font-size: 5rem; /* Larger title on PC */
+    margin-bottom: 2rem;
+  }
+
+  .page-intro {
+    font-size: 1.2rem;
+    max-width: 100%;
   }
   
+  .right-section {
+    width: 55%;
+    gap: 3rem;
+  }
+
   .nft-showcase {
-    width: 50%;
+    padding: 4rem 3rem; /* More padding inside card */
+    transform: perspective(1000px) rotateY(-5deg); /* Stronger tilt initially */
+  }
+  
+  .nft-showcase:hover {
+    transform: perspective(1000px) rotateY(0deg) scale(1.02); /* Slight scale on hover */
+    box-shadow: 
+      0 10px 40px -5px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(192, 132, 252, 0.1);
   }
 
   .nft-card-container {
-    width: 340px;
-    height: 340px;
+    width: 380px; /* Larger NFT on PC */
+    height: 380px;
   }
   
   h1 {
-    font-size: 3.5rem;
+    font-size: 4rem;
+  }
+
+  .coming-soon-section {
+    flex-direction: row;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .divider {
+    width: auto;
+    flex: 1;
+    margin: 0 2rem;
   }
 }
 </style>
