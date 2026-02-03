@@ -56,6 +56,7 @@
 
 <script>
 import { walletState } from '@/services/wallet.js';
+import { getContractAddress } from '@/services/contracts.js';
 import { onMounted, ref, watch } from 'vue';
 import { ethers } from 'ethers';
 import nodeNFTAbi from '@/abis/nodeNFT.json';
@@ -69,7 +70,6 @@ export default {
   setup() {
     const nftBalance = ref(0);
     const isModalVisible = ref(false);
-    const contractAddress = '0xAfa9f8df415eDe1410Efc2c4E551C78f91Dc8EB9';
 
     const openModal = () => {
       isModalVisible.value = true;
@@ -86,6 +86,7 @@ export default {
       }
 
       try {
+        const contractAddress = getContractAddress('nodeNFT');
         const contract = new ethers.Contract(contractAddress, nodeNFTAbi, walletState.signer);
         const balance = await contract.balanceOf(walletState.address);
         nftBalance.value = balance.toString();
