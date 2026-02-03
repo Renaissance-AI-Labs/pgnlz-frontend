@@ -307,7 +307,7 @@ export default {
     background: var(--bg-dark);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 1rem;
+    padding: 0 1rem;
     margin-bottom: 1.5rem;
 }
 
