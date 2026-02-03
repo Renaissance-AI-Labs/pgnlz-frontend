@@ -5,37 +5,112 @@
       <div class="floating-particles" id="particles-nft"></div>
     </div>
 
-    <div class="nft-showcase">
-      <div class="nft-card-container">
-        <div class="nft-card">
-          <img src="/asset/images/nft/pgnlz-node.png" alt="Exclusive NFT" class="nft-image">
-          <div class="card-reflection"></div>
+    <div class="page-content">
+      <div class="header-section">
+        <h2 class="page-title" data-text="< NFT NODE />">&lt; NFT NODE /&gt;</h2>
+        <p class="page-intro">
+          持有 PGNLZ NODE NFT，解锁生态治理权与每日能源空投。
+        </p>
+      </div>
+
+      <div class="right-section">
+        <div class="nft-showcase">
+          <div class="showcase-header">我的 NODE NFT</div>
           
-          <!-- Balance Badge -->
-          <div class="nft-balance-badge" v-if="walletState.isConnected">
-            <div class="balance-content">12</div>
+          <div class="nft-card-container">
+            <div class="nft-card">
+              <img src="/asset/images/nft/pgnlz-node.png" alt="Exclusive NFT" class="nft-image">
+              <div class="card-reflection"></div>
+              
+              <!-- Balance Badge -->
+              <div class="nft-balance-badge" v-if="walletState.isConnected">
+                <span class="balance-label">当前持有</span>
+                <span class="balance-value">{{ nftBalance }}</span>
+              </div>
+            </div>
+            <div class="nft-shadow"></div>
+          </div>
+          
+          <div class="nft-info">
+            <!-- <h1>NODE</h1>
+            <p class="subtitle">Energy Burst NFT</p> -->
           </div>
         </div>
-        <div class="nft-shadow"></div>
-      </div>
-      
-      <div class="nft-info">
-        <h1>NODE</h1>
-        <p class="subtitle">Energy Burst NFT</p>
-        <p class="coming-soon">COMING SOON</p>
+
+        <div class="coming-soon-section">
+          <div class="divider">
+            <div class="line"></div>
+            <div class="icon-separator">◆</div>
+            <div class="line"></div>
+          </div>
+          <p class="coming-soon">COMING SOON</p>
+        </div>
       </div>
     </div>
+
+    <transition name="modal">
+      <ConnectWalletModal v-if="isModalVisible" @close="closeModal" />
+    </transition>
   </div>
 </template>
 
 <script>
 import { walletState } from '@/services/wallet.js';
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
+import { ethers } from 'ethers';
+import nodeNFTAbi from '@/abis/nodeNFT.json';
+import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
 
 export default {
   name: 'NftView',
+  components: {
+    ConnectWalletModal
+  },
   setup() {
+    const nftBalance = ref(0);
+    const isModalVisible = ref(false);
+    const contractAddress = '0xAfa9f8df415eDe1410Efc2c4E551C78f91Dc8EB9';
+
+    const openModal = () => {
+      isModalVisible.value = true;
+    };
+
+    const closeModal = () => {
+      isModalVisible.value = false;
+    };
+
+    const fetchBalance = async () => {
+      if (!walletState.isConnected || !walletState.signer || !walletState.address) {
+        nftBalance.value = 0;
+        return;
+      }
+
+      try {
+        const contract = new ethers.Contract(contractAddress, nodeNFTAbi, walletState.signer);
+        const balance = await contract.balanceOf(walletState.address);
+        nftBalance.value = balance.toString();
+        console.log('NFT Balance fetched:', balance.toString());
+      } catch (error) {
+        console.error('Failed to fetch NFT balance:', error);
+        nftBalance.value = 0;
+      }
+    };
+
+    // Watch for wallet connection changes
+    watch(
+      () => [walletState.isConnected, walletState.address],
+      ([isConnected, address]) => {
+        if (isConnected && address) {
+          fetchBalance();
+        } else {
+          nftBalance.value = 0;
+        }
+      },
+      { immediate: true }
+    );
+
     onMounted(() => {
+        fetchBalance();
         // Simple particle generator logic
         const particlesContainer = document.getElementById('particles-nft');
         if (particlesContainer && particlesContainer.childElementCount === 0) {
@@ -55,7 +130,11 @@ export default {
     });
 
     return {
-      walletState
+      walletState,
+      nftBalance,
+      isModalVisible,
+      openModal,
+      closeModal
     };
   }
 }
@@ -67,11 +146,131 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 40px 20px;
   perspective: 1000px;
   overflow: hidden;
   position: relative;
+  flex-direction: column;
 }
+
+.page-content {
+  z-index: 1;
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  /* padding: 0 1.5rem; */
+}
+
+.header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.page-title {
+  font-family: var(--font-code);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  text-align: left;
+  position: relative;
+  text-shadow: 
+    0 0 20px rgba(192, 132, 252, 0.6);
+  letter-spacing: -1px;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-intro {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  text-align: left;
+  max-width: 480px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 0 0 10px;
+  font-weight: 400;
+  border-left: 3px solid var(--primary);
+  opacity: 0.9;
+}
+
+.right-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.nft-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(192, 132, 252, 0.1);
+  box-shadow: 
+    0 4px 24px -1px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(192, 132, 252, 0.05);
+  border-radius: 24px;
+  padding: 1rem 2rem 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+  /* Tilt effect for the container */
+  transform: perspective(1000px) rotateY(-2deg);
+  transition: transform 0.3s ease;
+}
+
+.nft-showcase:hover {
+  transform: perspective(1000px) rotateY(0deg);
+}
+
+/* Remove old sections styles */
+/* .nft-section-1 { ... } */
+/* .nft-section-2 { ... } */
+
+.coming-soon-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  opacity: 0.8;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+  opacity: 0.3;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+.icon-separator {
+  color: var(--primary);
+  font-size: 0.8rem;
+}
+
+/* Remove unused styles */
+/* .nft-section-2 { ... } */
 
 .background-animation {
   position: absolute;
@@ -127,6 +326,20 @@ export default {
   z-index: 1;
 }
 
+.showcase-header {
+  font-family: var(--font-code);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+  letter-spacing: 1px;
+  padding: 0.5rem 1.5rem;
+  border-bottom: 1px solid rgba(192, 132, 252, 0.2);
+  width: 100%;
+}
+
 .nft-card-container {
   position: relative;
   width: 260px;
@@ -155,26 +368,39 @@ export default {
 
 .nft-balance-badge {
   position: absolute;
-  bottom: 0;
   left: 50%;
-  transform: translate(-50%, 50%) translateZ(30px);
-  padding: 2px; /* Border width */
-  border-radius: 16px;
-  background: var(--gradient-1); /* Gradient border color */
-  box-shadow: 0 0 20px rgba(192, 132, 252, 0.5);
+  width: 50%;
+  transform: translateX(-50%) translateZ(30px);
   z-index: 10;
+  min-width: 140px;
+  bottom: -50px;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  border-radius: 16px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
-.balance-content {
-  background: var(--bg-dark);
-  padding: 6px 24px;
-  border-radius: 14px;
+.nft-balance-badge .balance-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.nft-balance-badge .balance-value {
   color: #fff;
   font-family: var(--font-code);
-  font-size: 1.3rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  min-width: 40px;
-  text-align: center;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+  line-height: 1;
 }
 
 /* Enhancing the glow on hover or via animation */
@@ -324,7 +550,34 @@ h1 {
   50% { opacity: 0.5; }
 }
 
+/* Modal Transition */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
 @media (min-width: 768px) {
+  .page-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    /* gap: 4rem; */
+  }
+  
+  .header-section {
+    width: 45%;
+    margin-bottom: 0;
+  }
+  
+  .nft-showcase {
+    width: 50%;
+  }
+
   .nft-card-container {
     width: 340px;
     height: 340px;
