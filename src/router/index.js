@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import NftView from '../views/NftView.vue';
+import TeamView from '../views/TeamView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { walletState } from '../services/wallet';
 
@@ -14,6 +15,11 @@ const routes = [
     path: '/nft',
     name: 'NFT',
     component: NftView,
+  },
+  {
+    path: '/team',
+    name: 'Team',
+    component: TeamView,
   },
   {
     path: '/:pathMatch(.*)*',

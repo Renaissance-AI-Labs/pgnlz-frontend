@@ -27,6 +27,7 @@ const languagePacks = {
     'language.switchTitle': 'Select Language',
     'nav.home': 'Home',
     'nav.nft': 'NFT',
+    'nav.team': 'Team',
     
     // Announcement
     'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
@@ -56,6 +57,7 @@ const languagePacks = {
      'language.switchTitle': '选择语言',
      'nav.home': '首页',
      'nav.nft': 'NFT',
+     'nav.team': '团队',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX系统加急升级公告',
@@ -85,6 +87,7 @@ const languagePacks = {
      'language.switchTitle': '選擇語言',
      'nav.home': '首頁',
      'nav.nft': 'NFT',
+     'nav.team': '團隊',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 系統加急升級公告',
@@ -114,6 +117,7 @@ const languagePacks = {
      'language.switchTitle': '言語を選択',
      'nav.home': 'ホーム',
      'nav.nft': 'NFT',
+     'nav.team': 'チーム',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAXシステムアップグレードに関する緊急のお知らせ',
@@ -143,6 +147,7 @@ const languagePacks = {
      'language.switchTitle': '언어 선택',
      'nav.home': '홈',
      'nav.nft': 'NFT',
+     'nav.team': '팀',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 시스템 업그레이드에 관한 긴급 공지',
