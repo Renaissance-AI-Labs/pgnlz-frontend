@@ -19,7 +19,7 @@
         <div class="icon-container">
           <i class="fas fa-users"></i>
         </div>
-        <span class="nav-label">{{ t('nav.team') || '团队' }}</span>
+        <span class="nav-label">{{ t('nav.team') || '好友' }}</span>
       </router-link>
     </nav>
   </div>

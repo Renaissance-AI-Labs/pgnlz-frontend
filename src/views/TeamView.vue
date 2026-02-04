@@ -7,9 +7,9 @@
 
     <div class="page-content">
       <div class="header-section">
-        <h2 class="page-title" data-text="< 团队 />">&lt; 团队 /&gt;</h2>
+        <h2 class="page-title" :data-text="t('team.pageTitle')">{{ t('team.pageTitle') }}</h2>
         <p class="page-intro">
-          加入PGNLZ MAX，共建未来去中心化生态。
+          {{ t('team.intro') }}
         </p>
       </div>
 
@@ -22,14 +22,14 @@
               :class="{ active: activeTab === 'friends' }" 
               @click="activeTab = 'friends'"
             >
-              我的好友
+              {{ t('team.tab.myFriends') }}
             </button>
             <button 
               class="tab-btn" 
               :class="{ active: activeTab === 'team' }" 
               @click="activeTab = 'team'"
             >
-              我的推荐
+              {{ t('team.tab.myReferrals') }}
             </button>
           </div>
 
@@ -39,17 +39,17 @@
             <!-- Tab 1: My Friends (Previously My Team - List of children) -->
             <div v-if="activeTab === 'friends'" class="team-tab fade-in">
               <div class="stats-card">
-                <span class="label">好友人数</span>
-                <span class="value">{{ referralCount }} <span class="unit">人</span></span>
+                <span class="label">{{ t('team.friendsCount') }}</span>
+                <span class="value">{{ referralCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
               </div>
 
               <div class="children-list-container">
                 <div class="list-header">
-                  <span>好友列表</span>
+                  <span>{{ t('team.friendsList') }}</span>
                 </div>
                 
                 <div v-if="childrenList.length === 0 && !loadingChildren" class="empty-state">
-                  暂无好友
+                  {{ t('team.noFriends') }}
                 </div>
 
                 <div class="children-list">
@@ -63,7 +63,7 @@
                 </div>
 
                 <div v-if="loadingChildren" class="loading-state">
-                  <div class="spinner"></div> 加载中...
+                  <div class="spinner"></div> {{ t('team.loading') }}
                 </div>
 
                 <button 
@@ -71,7 +71,7 @@
                   class="load-more-btn"
                   @click="loadChildren(false)"
                 >
-                  加载更多
+                  {{ t('team.loadMore') }}
                 </button>
               </div>
             </div>
@@ -81,8 +81,8 @@
               
               <!-- Section: My Referral Link -->
               <div class="friend-section">
-                <h3 class="section-title">我的邀请链接</h3>
-                <p class="section-desc">复制您的专属链接，邀请好友加入。</p>
+                <h3 class="section-title">{{ t('team.myReferralLink') }}</h3>
+                <p class="section-desc">{{ t('team.referralLinkDesc') }}</p>
                 <div class="input-box">
                   <input type="text" :value="myReferralLink" readonly class="code-input" :class="{ 'disabled': !isBound || !walletState.isConnected }" />
                   <button 
@@ -90,7 +90,7 @@
                     @click="copyText(myReferralLink)"
                     :disabled="!walletState.isConnected || !isBound"
                   >
-                    复制
+                    {{ t('team.copy') }}
                   </button>
                 </div>
               </div>
@@ -99,16 +99,16 @@
 
               <!-- Section: My Referrer -->
               <div class="friend-section">
-                <h3 class="section-title">我的推荐人</h3>
-                <p class="section-desc" v-if="!isBound">绑定推荐人地址，建立互动联系。</p>
-                <p class="section-desc success-text" v-else>已成功绑定上级。</p>
+                <h3 class="section-title">{{ t('team.myReferrer') }}</h3>
+                <p class="section-desc" v-if="!isBound">{{ t('team.bindReferrerDesc') }}</p>
+                <p class="section-desc success-text" v-else>{{ t('team.bindSuccessDesc') }}</p>
 
                 <div class="input-box">
                   <input 
                     type="text" 
-                    :value="referrerInput" 
+                    :value="isBound ? formatAddress(referrerInput) : referrerInput" 
                     readonly 
-                    :placeholder="walletState.isConnected ? '请通过邀请链接访问以自动填充' : '请先连接钱包'"
+                    :placeholder="walletState.isConnected ? t('team.inputPlaceholder.autoFill') : t('team.inputPlaceholder.connectWallet')"
                     class="code-input disabled"
                   />
                   <button 
@@ -117,8 +117,8 @@
                     @click="handleBindReferral"
                     :disabled="bindingReferrer || !walletState.isConnected || !referrerInput"
                   >
-                    <span v-if="bindingReferrer">绑定中...</span>
-                    <span v-else>绑定</span>
+                    <span v-if="bindingReferrer">{{ t('team.binding') }}</span>
+                    <span v-else>{{ t('team.bind') }}</span>
                   </button>
                 </div>
               </div>
@@ -138,20 +138,20 @@
       <div v-if="isConfirmModalVisible" class="modal-mask">
         <div class="modal-container">
           <div class="modal-header">
-            <h3>绑定推荐人</h3>
+            <h3>{{ t('team.modal.bindTitle') }}</h3>
           </div>
           <div class="modal-body">
-            <p class="warning-text">请仔细确认推荐人地址，绑定后不可更换。</p>
+            <p class="warning-text">{{ t('team.modal.warning') }}</p>
             <div class="confirm-address">{{ confirmAddress }}</div>
           </div>
           <div class="modal-footer">
-            <button class="modal-btn cancel" @click="closeConfirmModal">取消</button>
+            <button class="modal-btn cancel" @click="closeConfirmModal">{{ t('team.modal.cancel') }}</button>
             <button 
               class="modal-btn confirm" 
               :disabled="confirmCountdown > 0"
               @click="executeBind"
             >
-              {{ confirmCountdown > 0 ? `确认 (${confirmCountdown}s)` : '确认' }}
+              {{ confirmCountdown > 0 ? `${t('team.modal.confirm')} (${confirmCountdown}s)` : t('team.modal.confirm') }}
             </button>
           </div>
         </div>
@@ -169,6 +169,7 @@ import { ethers } from 'ethers';
 import referralAbi from '@/abis/referral.json';
 import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
 import { useRoute } from 'vue-router'; // We might need router for query params, but window.location is safer without router setup check
+import { t } from '@/i18n/index.js';
 
 export default {
   name: 'TeamView',
@@ -201,8 +202,8 @@ export default {
 
     // --- Computed ---
     const myReferralLink = computed(() => {
-      if (!walletState.address) return '请先连接钱包';
-      if (!isBound.value) return '绑定推荐人地址后可用'; // 新增逻辑：未绑定时显示提示
+      if (!walletState.address) return t('team.inputPlaceholder.connectWallet');
+      if (!isBound.value) return t('team.link.bindFirst'); // Logic added: Show hint when not bound
       const baseUrl = window.location.origin + window.location.pathname;
       return `${baseUrl}?ref=${walletState.address}`;
     });
@@ -274,13 +275,6 @@ export default {
        const urlParams = new URLSearchParams(window.location.search);
        const refParam = urlParams.get('ref');
        
-       // 如果没有连接钱包，且有 ref 参数，也应该显示在输入框中（根据需求调整）
-       // 根据您的最新反馈“钱包未连接，推荐人输入框不应该还填着地址”，
-       // 这里的理解可能是：如果之前填了（比如从绑定状态退出），应该清空。
-       // 但如果是通过邀请链接进来的（未连接钱包），通常是希望显示推荐人的。
-       // 
-       // 如果您的意思是“只有在已连接钱包且未绑定的情况下，才自动填充”，那么修改如下：
-       
        if (!walletState.isConnected) {
            referrerInput.value = ''; // 未连接钱包时，始终清空，不预填充
            return;
@@ -288,10 +282,9 @@ export default {
 
        if (refParam && ethers.isAddress(refParam)) {
            // Prevent self-ref in input if connected
-           // 如果识别到是自己的地址，则不填入
            if (walletState.address && refParam.toLowerCase() === walletState.address.toLowerCase()) {
                console.log("Self-referral detected in URL, ignoring.");
-               referrerInput.value = ''; // 清空，或者保持空
+               referrerInput.value = '';
                return;
            }
            referrerInput.value = refParam;
@@ -376,17 +369,17 @@ export default {
 
         // Validation
         if (!inputAddress || inputAddress === ethers.ZeroAddress) {
-            showToast("请输入有效的推荐人地址");
+            showToast(t('team.toast.invalidAddress'));
             return;
         }
 
         if (!ethers.isAddress(inputAddress)) {
-            showToast("地址格式不正确");
+            showToast(t('team.toast.formatError'));
             return;
         }
 
         if (inputAddress.toLowerCase() === currentAccount.toLowerCase()) {
-            showToast("不能绑定自己作为上级");
+            showToast(t('team.toast.selfBindError'));
             return;
         }
         
@@ -410,18 +403,18 @@ export default {
             const isValidReferrer = await contract.isBindReferral(inputAddress);
             
             if (!isValidReferrer) {
-                showToast("无效的推荐人：该地址尚未加入邀请系统");
+                showToast(t('team.toast.referrerNotJoined'));
                 bindingReferrer.value = false;
                 return;
             }
 
             // Bind
             const tx = await contract.bindReferral(inputAddress);
-            showToast("交易已提交，请等待确认...");
+            showToast(t('team.toast.txSubmitted'));
             
             await tx.wait();
             
-            showToast("绑定成功！");
+            showToast(t('team.toast.bindSuccess'));
             isBound.value = true;
             
             // Refresh data
@@ -430,11 +423,11 @@ export default {
         } catch (error) {
             console.error("Binding failed:", error);
             if (error.reason) {
-                 showToast("绑定失败: " + error.reason);
+                 showToast(t('team.toast.bindFailed') + error.reason);
             } else if (error.message && error.message.includes("User already has a referral")) {
-                 showToast("绑定失败：您已经有上级了");
+                 showToast(t('team.toast.alreadyBound'));
             } else {
-                 showToast("绑定失败，请检查网络或地址");
+                 showToast(t('team.toast.checkNetwork'));
             }
         } finally {
             bindingReferrer.value = false;
@@ -443,40 +436,43 @@ export default {
 
     // Helper: Copy
     const copyText = async (text) => {
-        if (!text || text.includes('请先连接钱包') || text.includes('绑定推荐人地址后可用')) return;
+        // Updated check to use keys or check against t() output
+        // It's safer to just check if text is a valid copyable string.
+        // If it equals the placeholder "Please connect wallet" etc., don't copy.
+        if (!text || text === t('team.inputPlaceholder.connectWallet') || text === t('team.link.bindFirst')) return;
         try {
             await navigator.clipboard.writeText(text);
-            showToast("已复制到剪贴板");
+            showToast(t('team.toast.copySuccess'));
         } catch (err) {
             console.error('Failed to copy: ', err);
-            showToast("复制失败");
+            showToast(t('team.toast.copyFailed'));
         }
     };
 
     // Watchers
     watch(() => [walletState.isConnected, walletState.address], ([newConnected, newAddress], [oldConnected, oldAddress]) => {
-        // 如果断开连接
+        // If disconnected
         if (!newConnected) {
             referralCount.value = 0;
             childrenList.value = [];
             childrenCursor.value = 0;
             hasMoreChildren.value = false;
             isBound.value = false;
-            referrerInput.value = ''; // 确保清空输入框
-            checkUrlParam(); // 断开后重新检查 URL 参数，如果有 ref 参数，则填入；如果没有，则保持空
+            referrerInput.value = ''; // Ensure input is cleared
+            checkUrlParam(); // Re-check URL param after disconnect. If ref param exists, fill it; otherwise keep empty
             return;
         }
 
-        // 如果连接状态改变 或 地址改变
+        // If connection state changes or address changes
         if (newConnected && newAddress) {
-            // 如果只是地址变了，或者刚连接上，都重新获取
+            // If just address changed, or just connected, re-fetch
              if (newAddress !== oldAddress || !oldConnected) {
-                // 重置列表状态
+                // Reset list state
                 childrenList.value = [];
                 childrenCursor.value = 0;
                 hasMoreChildren.value = false;
                 
-                // 重新获取数据
+                // Re-fetch data
                 fetchReferralData();
              }
         }
@@ -515,6 +511,7 @@ export default {
     });
 
     return {
+      t,
       walletState,
       formatAddress,
       isModalVisible,
@@ -575,21 +572,22 @@ export default {
   transition: all 0.3s ease;
 }
 
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start; /* Align content to left */
+  text-align: left; /* Align text to left */
+}
+
 .modal-header h3 {
   margin: 0;
   color: #fff;
   font-family: var(--font-code);
   font-size: 1.2rem;
-  text-align: center;
+  text-align: left; /* Align title to left */
   text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  text-align: center;
+  width: 100%;
 }
 
 .warning-text {
@@ -608,6 +606,8 @@ export default {
   border-radius: 8px;
   word-break: break-all;
   border: 1px solid rgba(192, 132, 252, 0.2);
+  width: 100%; /* Ensure address box takes full width */
+  box-sizing: border-box; /* Include padding */
 }
 
 .modal-footer {
@@ -625,6 +625,7 @@ export default {
   cursor: pointer;
   transition: all 0.2s;
   border: none;
+  line-height: normal;
 }
 
 .modal-btn.cancel {
@@ -671,7 +672,7 @@ export default {
   max-width: 1200px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* 确保整体内容（包括标题）左对齐 */
+  align-items: flex-start; /* Ensure overall content (including title) aligns left */
   gap: 2rem;
 }
 
@@ -680,7 +681,7 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* 确保标题文字左对齐 */
+  align-items: flex-start; /* Ensure title text aligns left */
   text-align: left;
   gap: 1rem;
 }
@@ -784,11 +785,11 @@ export default {
   background: rgba(192, 132, 252, 0.05);
   border: 1px solid rgba(192, 132, 252, 0.1);
   border-radius: 16px;
-  padding: 1rem 1.5rem; /* 减少垂直 padding */
+  padding: 1rem 1.5rem; /* Decrease vertical padding */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem; /* 减少底部 margin */
+  margin-bottom: 1rem; /* Decrease bottom margin */
 }
 
 .stats-card .label {
@@ -943,14 +944,14 @@ export default {
 
 .input-box {
   display: flex;
-  align-items: center; /* 确保子元素垂直居中 */
+  align-items: center; /* Ensure child elements are vertically centered */
   gap: 0.3rem;
   background: rgba(0, 0, 0, 0.3);
   padding: 0.5rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  height: auto; /* 让内容决定高度，或设置固定高度 */
-  min-height: 3.5rem; /* 最小高度 */
+  height: auto; /* Let content determine height, or set fixed height */
+  min-height: 3.5rem; /* Minimum height */
 }
 
 .code-input {
@@ -966,51 +967,51 @@ export default {
 }
 
 .code-input.disabled {
-  color: #fff !important; /* 强制白色文字 */
-  -webkit-text-fill-color: #fff !important; /* 兼容 Safari 输入框禁用状态 */
+  color: #fff !important; /* Force white text */
+  -webkit-text-fill-color: #fff !important; /* Safari input disabled state compatibility */
   cursor: not-allowed;
-  opacity: 1 !important; /* 强制不透明 */
+  opacity: 1 !important; /* Force opacity */
 }
 
-/* 按钮通用样式 */
+/* Button Common Styles */
 .btn-copy,
 .btn-bind {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 2.5rem; /* 固定高度 */
-  padding: 0 1rem; /* 增加水平 padding 以增加宽度 */
-  min-width: 80px; /* 设置最小宽度 */
+  height: 2.5rem; /* Fixed height */
+  padding: 0 1rem; /* Increase horizontal padding to increase width */
+  min-width: 80px; /* Set minimum width */
   border-radius: 10px;
   
-  /* 样式调整：透明背景，紫色边框，白色文字 */
+  /* Style adjustment: Transparent background, purple border, white text */
   background: transparent;
-  border: 2px solid var(--primary); /* 加粗边框至 2px */
+  border: 2px solid var(--primary); /* Thicken border to 2px */
   color: #fff;
   
   font-weight: 600;
   font-size: 0.9rem;
-  line-height: 1; /* 显式设置 line-height 为 1 或 normal，避免继承过大行高 */
+  line-height: 1; /* Explicitly set line-height to 1 or normal to avoid inheritance */
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap; /* 防止文字换行 */
+  white-space: nowrap; /* Prevent text wrapping */
   line-height: normal;
 }
 
-/* Hover 效果 */
+/* Hover Effect */
 .btn-copy:hover:not(:disabled),
 .btn-bind:hover:not(:disabled) {
-  background: rgba(192, 132, 252, 0.1); /* 悬停时轻微紫色背景 */
+  background: rgba(192, 132, 252, 0.1); /* Slight purple background on hover */
   box-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
 }
 
-/* 禁用状态 (未连接钱包) */
+/* Disabled State (Wallet not connected) */
 .btn-copy:disabled,
 .btn-bind:disabled {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.2); /* 灰色边框 */
-  border-width: 2px; /* 确保禁用状态边框宽度也为 2px */
-  color: rgba(255, 255, 255, 0.4); /* 灰色文字 */
+  border-color: rgba(255, 255, 255, 0.2); /* Gray border */
+  border-width: 2px; /* Ensure disabled state border width is also 2px */
+  color: rgba(255, 255, 255, 0.4); /* Gray text */
   cursor: not-allowed;
   box-shadow: none;
 }
