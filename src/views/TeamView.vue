@@ -38,48 +38,80 @@
             
             <!-- Tab 1: My Friends (Previously My Team - List of children) -->
             <div v-if="activeTab === 'friends'" class="team-tab fade-in">
-              <div class="stats-card">
-                <div class="stat-item">
-                  <span class="label">{{ t('team.friendsCount') }}</span>
-                  <span class="value">{{ referralCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                  <span class="label">{{ t('team.teamCount') }}</span>
-                  <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
-                </div>
+              
+              <!-- State: Wallet Not Connected -->
+              <div v-if="!walletState.isConnected" class="connect-wallet-state">
+                  <div class="connect-box">
+                      <p class="connect-msg">{{ t('team.inputPlaceholder.connectWallet') }}</p>
+                  </div>
               </div>
 
-              <div class="children-list-container">
-                <div class="list-header">
-                  <span>{{ t('team.friendsList') }}</span>
-                </div>
-                
-                <div v-if="childrenList.length === 0 && !loadingChildren" class="empty-state">
-                  {{ t('team.noFriends') }}
-                </div>
-
-                <div class="children-list">
-                  <div v-for="(child, index) in childrenList" :key="index" class="child-item">
-                    <span class="index">#{{ index + 1 }}</span>
-                    <span class="address">{{ formatAddress(child) }}</span>
-                    <!-- <div class="copy-icon" @click="copyText(child)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </div> -->
+              <!-- State: Wallet Connected -->
+              <div v-else>
+                  <div class="stats-card">
+                    <div class="stat-item">
+                      <span class="label">{{ t('team.friendsCount') }}</span>
+                      <span class="value">{{ referralCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                      <span class="label">{{ t('team.teamCount') }}</span>
+                      <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                    </div>
                   </div>
-                </div>
 
-                <div v-if="loadingChildren" class="loading-state">
-                  <div class="spinner"></div> {{ t('team.loading') }}
-                </div>
+                  <div class="children-list-container">
+                    <div class="list-header">
+                      <span>{{ t('team.friendsList') }}</span>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div v-if="loadingChildren" class="loading-state">
+                      <div class="spinner"></div> {{ t('team.loading') }}
+                    </div>
 
-                <button 
-                  v-if="hasMoreChildren && !loadingChildren" 
-                  class="load-more-btn"
-                  @click="loadChildren(false)"
-                >
-                  {{ t('team.loadMore') }}
-                </button>
+                    <!-- Empty State (Only show if NOT loading and list is empty) -->
+                    <div v-else-if="childrenList.length === 0" class="empty-state">
+                      {{ t('team.noFriends') }}
+                    </div>
+
+                    <!-- Carousel View (Show if list has items) -->
+                    <div v-else class="carousel-view">
+                        <div class="card-viewport">
+                            <transition name="slide-fade" mode="out-in">
+                                <div :key="currentCardIndex" class="friend-card" v-if="currentChild">
+                                    <div class="card-address" @click="copyText(currentChild.address)">
+                                        {{ formatAddress(currentChild.address) }}
+                                    </div>
+                                    
+                                    <div class="card-divider"></div>
+
+                                    <div class="card-stats">
+                                        <span class="stat-label">{{ t('team.teamCount') }}</span>
+                                        <span class="stat-value">
+                                            <span v-if="currentChild.teamCount !== null">{{ currentChild.teamCount }}</span>
+                                            <span v-else class="loading-dots">...</span>
+                                            <span class="unit">{{ t('team.peopleUnit') }}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </transition>
+                        </div>
+
+                        <div class="pagination-controls">
+                            <button class="nav-btn prev" @click="prevCard" :disabled="currentCardIndex === 0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                            </button>
+                            
+                            <span class="page-indicator">{{ currentCardIndex + 1 }} / {{ referralCount }}</span>
+
+                            <button class="nav-btn next" @click="nextCard" :disabled="!hasMoreChildren && currentCardIndex === childrenList.length - 1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                  </div>
               </div>
             </div>
 
@@ -192,6 +224,7 @@ export default {
     const referralCount = ref(0);
     const teamCount = ref(0);
     const childrenList = ref([]);
+    const currentCardIndex = ref(0);
     const childrenCursor = ref(0);
     const loadingChildren = ref(false);
     const hasMoreChildren = ref(false);
@@ -208,7 +241,12 @@ export default {
     const confirmTimer = ref(null);
     const confirmAddress = ref('');
 
-    // --- Computed ---
+    // Computed
+    const currentChild = computed(() => {
+        if (childrenList.value.length === 0) return null;
+        return childrenList.value[currentCardIndex.value];
+    });
+
     const myReferralLink = computed(() => {
       if (!walletState.address) return t('team.inputPlaceholder.connectWallet');
       if (!isBound.value) return t('team.link.bindFirst'); // Logic added: Show hint when not bound
@@ -313,6 +351,7 @@ export default {
       if (reset) {
         childrenCursor.value = 0;
         childrenList.value = [];
+        currentCardIndex.value = 0;
         hasMoreChildren.value = true; // reset assumption
       }
 
@@ -334,9 +373,20 @@ export default {
         if (newChildren && newChildren.length > 0) {
             // Filter out empty addresses if any (solidity static array return might include empty if not careful, but dynamic array should be fine)
             const validChildren = newChildren.filter(addr => addr !== ethers.ZeroAddress);
-            childrenList.value = [...childrenList.value, ...validChildren];
+            // Map to objects
+            const childObjects = validChildren.map(addr => ({
+                address: addr,
+                teamCount: null // Init as null
+            }));
+            
+            childrenList.value = [...childrenList.value, ...childObjects];
             childrenCursor.value = Number(newCursor);
             
+            // If this is the first load (or reset), fetch the first child's team count immediately
+            if (reset && childrenList.value.length > 0) {
+                fetchChildTeamCount(0);
+            }
+
             if (newChildren.length < pageSize) {
                 hasMoreChildren.value = false;
             }
@@ -351,6 +401,50 @@ export default {
         loadingChildren.value = false;
       }
     };
+
+    // 5. Fetch Team Count for a Child
+    const fetchChildTeamCount = async (index) => {
+        const child = childrenList.value[index];
+        if (!child || child.teamCount !== null) return; // Already fetched or invalid
+
+        try {
+            const contract = await getReferralContractReadOnly();
+            if (!contract) return;
+            const tCount = await contract.getTeamCount(child.address);
+            child.teamCount = tCount.toString();
+        } catch (error) {
+            console.error(`Error fetching team count for ${child.address}:`, error);
+            child.teamCount = '0'; // Fallback
+        }
+    };
+
+    // 6. Carousel Navigation
+    const prevCard = () => {
+        if (currentCardIndex.value > 0) {
+            currentCardIndex.value--;
+        }
+    };
+
+    const nextCard = () => {
+        if (currentCardIndex.value < childrenList.value.length - 1) {
+            currentCardIndex.value++;
+        } else if (hasMoreChildren.value && !loadingChildren.value) {
+            // Load more if at the end
+            loadChildren(false).then(() => {
+                // If new items were added, move next
+                if (currentCardIndex.value < childrenList.value.length - 1) {
+                    currentCardIndex.value++;
+                }
+            });
+        }
+    };
+
+    // Watch current index to fetch team count
+    watch(currentCardIndex, (newIndex) => {
+        if (newIndex >= 0 && newIndex < childrenList.value.length) {
+            fetchChildTeamCount(newIndex);
+        }
+    });
 
     const closeConfirmModal = () => {
       isConfirmModalVisible.value = false;
@@ -468,6 +562,7 @@ export default {
             referralCount.value = 0;
             teamCount.value = 0;
             childrenList.value = [];
+            currentCardIndex.value = 0;
             childrenCursor.value = 0;
             hasMoreChildren.value = false;
             isBound.value = false;
@@ -482,6 +577,7 @@ export default {
              if (newAddress !== oldAddress || !oldConnected) {
                 // Reset list state
                 childrenList.value = [];
+                currentCardIndex.value = 0;
                 childrenCursor.value = 0;
                 hasMoreChildren.value = false;
                 
@@ -543,6 +639,11 @@ export default {
       bindingReferrer,
       handleBindReferral,
       copyText,
+      // Carousel
+      currentCardIndex,
+      currentChild,
+      prevCard,
+      nextCard,
       // Confirm Modal
       isConfirmModalVisible,
       confirmCountdown,
@@ -687,7 +788,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* Ensure overall content (including title) aligns left */
-  gap: 2rem;
+  gap: 1rem;
 }
 
 /* Header Styles */
@@ -746,32 +847,32 @@ export default {
   backdrop-filter: blur(12px);
   /* border: 1px solid rgba(192, 132, 252, 0.1); */
   border-radius: 24px;
-  padding: 1.5rem 0;
+  padding: 1rem 0; /* Reduced padding from 1.5rem */
   box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
 }
 
 .tabs-nav {
   display: flex;
-  gap: 0; /* Remove gap to make them touch if needed, or keep small gap */
-  margin-bottom: 2rem;
+  gap: 0; 
+  margin-bottom: 1.5rem; /* Reduced margin from 2rem */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0; /* Move border to bottom of buttons */
+  padding-bottom: 0; 
 }
 
 .tab-btn {
-  flex: 1; /* Make tabs take full width */
+  flex: 1; 
   text-align: center;
   background: transparent;
   border: none;
   color: var(--text-secondary);
   font-family: var(--font-code);
   font-size: 1rem;
-  padding: 1rem 0.5rem; /* Increase vertical padding */
+  padding: 0.8rem 0.5rem; /* Reduced padding from 1rem */
   cursor: pointer;
   transition: all 0.3s;
   position: relative;
-  border-bottom: 2px solid transparent; /* Prepare for active state */
-  margin-bottom: -1px; /* Overlap the container border */
+  border-bottom: 2px solid transparent; 
+  margin-bottom: -1px; 
 }
 
 .tab-btn.active {
@@ -794,40 +895,84 @@ export default {
   min-height: 300px;
 }
 
+/* Connect Wallet Box */
+.connect-wallet-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* Reduced min-height from 200px */
+}
+
+.connect-box {
+    background: rgba(192, 132, 252, 0.05);
+    border: 1px solid rgba(192, 132, 252, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem; /* Reduced padding from 2rem */
+    text-align: center;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem; /* Reduced gap from 1rem */
+}
+
+.connect-msg {
+    color: var(--text-secondary);
+    font-size: 0.95rem; /* Slightly smaller font */
+    margin: 0;
+}
+
+.btn-connect-action {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-code);
+}
+
+.btn-connect-action:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 15px rgba(192, 132, 252, 0.4);
+}
+
 /* Stats Card */
 .stats-card {
   background: rgba(192, 132, 252, 0.05);
   border: 1px solid rgba(192, 132, 252, 0.1);
   border-radius: 16px;
-  padding: 1rem 1.5rem; /* Decrease vertical padding */
+  padding: 0.8rem 1rem; /* Reduced padding from 1rem 1.5rem */
   display: flex;
   justify-content: space-around; /* Distribute items evenly */
   align-items: center;
-  margin-bottom: 1rem; /* Decrease bottom margin */
+  margin-bottom: 0.8rem; /* Reduced margin from 1rem */
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.1rem; /* Reduced gap from 0.2rem */
 }
 
 .stat-divider {
   width: 1px;
-  height: 40px;
+  height: 30px; /* Reduced height from 40px */
   background: rgba(255, 255, 255, 0.1);
 }
 
 .stats-card .label {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* Slightly smaller font */
 }
 
 .stats-card .value {
   color: #fff;
   font-family: var(--font-code);
-  font-size: 1.8rem;
+  font-size: 1.5rem; /* Reduced font size from 1.8rem */
   font-weight: 700;
 }
 
@@ -837,111 +982,189 @@ export default {
   font-weight: 400;
 }
 
-/* Children List */
-.children-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.list-header {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
+/* Empty State */
 .empty-state {
   text-align: center;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding: 2rem;
-  font-style: italic;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
+  background: rgba(192, 132, 252, 0.05);
+  border: 1px solid rgba(192, 132, 252, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  margin-top: 1rem;
+  font-family: var(--font-code);
 }
 
-.children-list {
+/* Carousel Styles */
+.carousel-view {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.child-item {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  transition: background 0.2s;
+  gap: 1rem; /* Reduced gap from 1.5rem */
+  margin-top: 0.8rem; /* Reduced margin from 1rem */
+  width: 100%;
 }
 
-.child-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.child-item .index {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  width: 40px;
-  font-family: var(--font-code);
-}
-
-.child-item .address {
-  flex: 1;
-  color: var(--text-primary);
-  font-family: var(--font-code);
-  font-size: 0.95rem;
-}
-
-.copy-icon {
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.copy-icon:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.loading-state {
-  text-align: center;
-  padding: 1rem;
-  color: var(--text-secondary);
+.card-viewport {
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 10px;
+  position: relative;
+  min-height: 120px; /* Reduced height from 160px */
 }
 
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem; /* Reduced gap from 1.5rem */
+    width: 100%;
 }
 
+.page-indicator {
+    font-family: var(--font-code);
+    color: var(--text-secondary);
+    font-size: 0.9rem; /* Slightly smaller font */
+    font-weight: 500;
+}
+
+.friend-card {
+  background: rgba(192, 132, 252, 0.05);
+  border: 1px solid rgba(192, 132, 252, 0.1);
+  border-radius: 16px; /* Slightly smaller radius */
+  padding: 1rem; /* Reduced padding from 1.5rem */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem; /* Reduced gap from 0.8rem */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.3rem; /* Reduced margin from 0.5rem */
+}
+
+.card-header .index {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px; /* Smaller padding */
+    border-radius: 4px;
+    font-size: 0.75rem; /* Smaller font */
+    color: var(--text-secondary);
+    font-family: var(--font-code);
+}
+
+.card-address {
+    font-family: var(--font-code);
+    font-size: 1.1rem; /* Slightly smaller font */
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.card-address:hover {
+    color: var(--primary);
+}
+
+.card-divider {
+    width: 80%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0.3rem 0; /* Reduced margin from 0.5rem */
+}
+
+.card-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem; /* Reduced gap from 0.2rem */
+}
+
+.stat-label {
+    font-size: 0.85rem; /* Smaller font */
+    color: var(--text-secondary);
+}
+
+.stat-value {
+    font-size: 1.3rem; /* Reduced font size from 1.5rem */
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--font-code);
+}
+
+.stat-value .unit {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: 4px;
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background: rgba(192, 132, 252, 0.2);
+    border-color: rgba(192, 132, 252, 0.3);
+    transform: scale(1.1);
+}
+
+.nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: transparent;
+}
+
+/* Transitions */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Loading Dots */
+.loading-dots:after {
+  content: '.';
+  animation: dots 1.5s steps(5, end) infinite;
+}
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60% { content: '...'; }
+  80%, 100% { content: ''; }
+}
+
+/* Clean up old list styles if needed, but keeping them doesn't hurt */
+.children-list {
+  display: none; /* Hide old list if styles persist */
+}
 .load-more-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  padding: 0.8rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 0.9rem;
-}
-
-.load-more-btn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+    display: none;
 }
 
 /* Friends Tab */
