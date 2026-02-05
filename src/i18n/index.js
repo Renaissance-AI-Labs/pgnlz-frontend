@@ -27,7 +27,7 @@ const languagePacks = {
     'language.switchTitle': 'Select Language',
     'nav.home': 'Home',
     'nav.nft': 'NFT',
-    'nav.team': 'Team',
+    'nav.team': 'Friends',
     
     // Announcement
     'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
@@ -53,7 +53,7 @@ const languagePacks = {
     'nft.comingSoon': 'COMING SOON',
 
     // Team / Friend Page
-    'team.pageTitle': '< Team />',
+    'team.pageTitle': '< Friends />',
     'team.intro': 'Join PGNLZ MAX to build the future decentralized ecosystem',
     'team.tab.myFriends': 'My Friends',
     'team.tab.myReferrals': 'My Referrals',
@@ -179,7 +179,7 @@ const languagePacks = {
      'language.switchTitle': '選擇語言',
      'nav.home': '首頁',
      'nav.nft': 'NFT',
-     'nav.team': '團隊',
+     'nav.team': '好友',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 系統加急升級公告',
@@ -255,7 +255,7 @@ const languagePacks = {
      'language.switchTitle': '言語を選択',
      'nav.home': 'ホーム',
      'nav.nft': 'NFT',
-     'nav.team': 'チーム',
+     'nav.team': '友達',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAXシステムアップグレードに関する緊急のお知らせ',
@@ -281,7 +281,7 @@ const languagePacks = {
      'nft.comingSoon': '近日公開',
 
      // Team / Friend Page
-     'team.pageTitle': '< チーム />',
+     'team.pageTitle': '< 友達 />',
      'team.intro': 'PGNLZ MAXに参加して、未来の分散型エコシステムを共に築きましょう',
      'team.tab.myFriends': '私の友達',
      'team.tab.myReferrals': '私の紹介',
@@ -331,7 +331,7 @@ const languagePacks = {
      'language.switchTitle': '언어 선택',
      'nav.home': '홈',
      'nav.nft': 'NFT',
-     'nav.team': '팀',
+     'nav.team': '친구',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 시스템 업그레이드에 관한 긴급 공지',
@@ -357,7 +357,7 @@ const languagePacks = {
      'nft.comingSoon': '출시 예정',
 
      // Team / Friend Page
-     'team.pageTitle': '< 팀 />',
+     'team.pageTitle': '< 친구 />',
      'team.intro': 'PGNLZ MAX에 참여하여 미래의 탈중앙화 생태계를 함께 구축하세요',
      'team.tab.myFriends': '내 친구',
      'team.tab.myReferrals': '내 추천',

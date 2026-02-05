@@ -847,7 +847,7 @@ export default {
   backdrop-filter: blur(12px);
   /* border: 1px solid rgba(192, 132, 252, 0.1); */
   border-radius: 24px;
-  padding: 1rem 0; /* Reduced padding from 1.5rem */
+  padding: 1rem 0.5rem; /* Reduced padding from 1.5rem */
   box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
 }
 
