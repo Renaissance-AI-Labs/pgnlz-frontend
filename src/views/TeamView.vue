@@ -39,8 +39,15 @@
             <!-- Tab 1: My Friends (Previously My Team - List of children) -->
             <div v-if="activeTab === 'friends'" class="team-tab fade-in">
               <div class="stats-card">
-                <span class="label">{{ t('team.friendsCount') }}</span>
-                <span class="value">{{ referralCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                <div class="stat-item">
+                  <span class="label">{{ t('team.friendsCount') }}</span>
+                  <span class="value">{{ referralCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <span class="label">{{ t('team.teamCount') }}</span>
+                  <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                </div>
               </div>
 
               <div class="children-list-container">
@@ -56,9 +63,9 @@
                   <div v-for="(child, index) in childrenList" :key="index" class="child-item">
                     <span class="index">#{{ index + 1 }}</span>
                     <span class="address">{{ formatAddress(child) }}</span>
-                    <div class="copy-icon" @click="copyText(child)">
+                    <!-- <div class="copy-icon" @click="copyText(child)">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
 
@@ -183,6 +190,7 @@ export default {
     
     // Data State
     const referralCount = ref(0);
+    const teamCount = ref(0);
     const childrenList = ref([]);
     const childrenCursor = ref(0);
     const loadingChildren = ref(false);
@@ -247,6 +255,10 @@ export default {
         // Get Count
         const count = await contract.getReferralCount(walletState.address);
         referralCount.value = count.toString();
+
+        // Get Team Count
+        const tCount = await contract.getTeamCount(walletState.address);
+        teamCount.value = tCount.toString();
 
         // Get Current Referrer
         const referrer = await contract.getReferral(walletState.address);
@@ -454,6 +466,7 @@ export default {
         // If disconnected
         if (!newConnected) {
             referralCount.value = 0;
+            teamCount.value = 0;
             childrenList.value = [];
             childrenCursor.value = 0;
             hasMoreChildren.value = false;
@@ -519,6 +532,7 @@ export default {
       closeModal,
       activeTab,
       referralCount,
+      teamCount,
       childrenList,
       loadingChildren,
       hasMoreChildren,
@@ -787,14 +801,27 @@ export default {
   border-radius: 16px;
   padding: 1rem 1.5rem; /* Decrease vertical padding */
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around; /* Distribute items evenly */
   align-items: center;
   margin-bottom: 1rem; /* Decrease bottom margin */
 }
 
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .stats-card .label {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .stats-card .value {
