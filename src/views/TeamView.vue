@@ -237,7 +237,7 @@ export default {
     
     // Confirm Modal State
     const isConfirmModalVisible = ref(false);
-    const confirmCountdown = ref(10);
+    const confirmCountdown = ref(5);
     const confirmTimer = ref(null);
     const confirmAddress = ref('');
 
@@ -452,7 +452,7 @@ export default {
     };
 
     const startConfirmCountdown = () => {
-      confirmCountdown.value = 10;
+      confirmCountdown.value = 5;
       if (confirmTimer.value) clearInterval(confirmTimer.value);
       confirmTimer.value = setInterval(() => {
         if (confirmCountdown.value > 0) {
