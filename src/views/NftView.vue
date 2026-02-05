@@ -7,15 +7,15 @@
 
     <div class="page-content">
       <div class="header-section">
-        <h2 class="page-title" data-text="< NFT NODE />">&lt; NFT NODE /&gt;</h2>
+        <h2 class="page-title" :data-text="t('nft.pageTitle')">{{ t('nft.pageTitle') }}</h2>
         <p class="page-intro">
-          持有PGNLZ MAX NODE NFT，可获得网络质押收益及代币交易税收入分成。
+          {{ t('nft.intro') }}
         </p>
       </div>
 
       <div class="right-section">
         <div class="nft-showcase">
-          <div class="showcase-header">我的 NODE NFT</div>
+          <div class="showcase-header">{{ t('nft.myNodeNft') }}</div>
           
           <div class="nft-card-container">
             <div class="nft-card">
@@ -24,7 +24,7 @@
               
               <!-- Balance Badge -->
               <div class="nft-balance-badge" v-if="walletState.isConnected">
-                <span class="balance-label">当前持有</span>
+                <span class="balance-label">{{ t('nft.currentHolding') }}</span>
                 <span class="balance-value">{{ nftBalance }}</span>
               </div>
             </div>
@@ -43,7 +43,7 @@
             <div class="icon-separator">◆</div>
             <div class="line"></div>
           </div>
-          <p class="coming-soon">COMING SOON</p>
+          <p class="coming-soon">{{ t('nft.comingSoon') }}</p>
         </div>
       </div>
     </div>
@@ -61,6 +61,7 @@ import { onMounted, ref, watch } from 'vue';
 import { ethers } from 'ethers';
 import nodeNFTAbi from '@/abis/nodeNFT.json';
 import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
+import { t } from '@/i18n/index.js';
 
 export default {
   name: 'NftView',
@@ -131,6 +132,7 @@ export default {
     });
 
     return {
+      t,
       walletState,
       nftBalance,
       isModalVisible,

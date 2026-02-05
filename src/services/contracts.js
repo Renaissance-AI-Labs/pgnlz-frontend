@@ -11,7 +11,7 @@ const CONTRACT_ADDRESSES = {
   },
   referral: {
     development: '0xa537AC02437e17515139f92256cab43D85B6A9E3',
-    production: '',
+    production: '0xD717165648576e2222b42759b7efCDc108fc3F30',
   },
 };
 
