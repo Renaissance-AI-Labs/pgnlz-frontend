@@ -898,7 +898,7 @@ export default {
   max-width: 600px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem; /* Reduced gap from 1.5rem */
 }
 
 .team-container {
@@ -1004,11 +1004,11 @@ export default {
   background: rgba(192, 132, 252, 0.05);
   border: 1px solid rgba(192, 132, 252, 0.1);
   border-radius: 16px;
-  padding: 0.8rem 1rem; /* Reduced padding from 1rem 1.5rem */
+  padding: 0.6rem 1rem; /* Reduced padding */
   display: flex;
   justify-content: space-around; /* Distribute items evenly */
   align-items: center;
-  margin-bottom: 0.8rem; /* Reduced margin from 1rem */
+  margin-bottom: 0.6rem; /* Reduced margin */
 }
 
 .stat-item {
@@ -1020,7 +1020,7 @@ export default {
 
 .stat-divider {
   width: 1px;
-  height: 30px; /* Reduced height from 40px */
+  height: 24px; /* Reduced height */
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -1032,7 +1032,7 @@ export default {
 .stats-card .value {
   color: #fff;
   font-family: var(--font-code);
-  font-size: 1.5rem; /* Reduced font size from 1.8rem */
+  font-size: 1.3rem; /* Reduced font size */
   font-weight: 700;
 }
 
@@ -1060,8 +1060,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem; /* Reduced gap from 1.5rem */
-  margin-top: 0.8rem; /* Reduced margin from 1rem */
+  gap: 0.8rem; /* Reduced gap */
+  margin-top: 0.6rem; /* Reduced margin */
   width: 100%;
 }
 
@@ -1070,7 +1070,7 @@ export default {
   display: flex;
   justify-content: center;
   position: relative;
-  min-height: 120px; /* Reduced height from 160px */
+  min-height: 100px; /* Reduced height */
 }
 
 .pagination-controls {
@@ -1092,12 +1092,12 @@ export default {
   background: rgba(192, 132, 252, 0.05);
   border: 1px solid rgba(192, 132, 252, 0.1);
   border-radius: 16px; /* Slightly smaller radius */
-  padding: 1rem; /* Reduced padding from 1.5rem */
+  padding: 0.8rem; /* Reduced padding */
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem; /* Reduced gap from 0.8rem */
+  gap: 0.4rem; /* Reduced gap */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
 }
@@ -1106,7 +1106,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.3rem; /* Reduced margin from 0.5rem */
+    margin-bottom: 0.2rem; /* Reduced margin */
 }
 
 .card-header .index {
@@ -1135,7 +1135,7 @@ export default {
     width: 80%;
     height: 1px;
     background: rgba(255, 255, 255, 0.1);
-    margin: 0.3rem 0; /* Reduced margin from 0.5rem */
+    margin: 0.2rem 0; /* Reduced margin */
 }
 
 .card-stats {
@@ -1151,7 +1151,7 @@ export default {
 }
 
 .stat-value {
-    font-size: 1.3rem; /* Reduced font size from 1.5rem */
+    font-size: 1.2rem; /* Reduced font size */
     font-weight: 700;
     color: #fff;
     font-family: var(--font-code);
@@ -1168,8 +1168,8 @@ export default {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 32px; /* Reduced size */
+    height: 32px; /* Reduced size */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1231,8 +1231,8 @@ export default {
 .friend-section {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.8rem; /* Reduced gap */
+  margin-bottom: 1.5rem; /* Reduced margin */
 }
 
 .section-title {
