@@ -14,6 +14,13 @@
         </div>
         <span class="nav-label">{{ t('nav.nft') || 'NFT' }}</span>
       </router-link>
+
+      <router-link to="/team" class="nav-item" active-class="active">
+        <div class="icon-container">
+          <i class="fas fa-users"></i>
+        </div>
+        <span class="nav-label">{{ t('nav.team') || '好友' }}</span>
+      </router-link>
     </nav>
   </div>
 </template>

@@ -6,9 +6,13 @@ import { APP_ENV } from './environment';
 // Organized by Contract Name -> Environment
 const CONTRACT_ADDRESSES = {
   nodeNFT: {
-    development: '0xAfa9f8df415eDe1410Efc2c4E551C78f91Dc8EB9', // BSC Testnet (97)
-    production: '0x4ED60EB0efC7fe323684939bb6614442209379f9',  // BSC Mainnet (56)
-  }
+    development: '0xAfa9f8df415eDe1410Efc2c4E551C78f91Dc8EB9',
+    production: '0x4ED60EB0efC7fe323684939bb6614442209379f9',
+  },
+  referral: {
+    development: '0xa537AC02437e17515139f92256cab43D85B6A9E3',
+    production: '0xD717165648576e2222b42759b7efCDc108fc3F30',
+  },
 };
 
 /**

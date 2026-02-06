@@ -19,7 +19,7 @@ const networks = {
       symbol: 'BNB',
       decimals: 18
     },
-    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+    rpcUrls: ['https://bsc-rpc.publicnode.com'],
     blockExplorerUrls: ['https://bscscan.com']
   },
   bscTestnet: {
@@ -30,7 +30,7 @@ const networks = {
       symbol: 'tBNB',
       decimals: 18
     },
-    rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+    rpcUrls: ['https://bsc-testnet-rpc.publicnode.com'],
     blockExplorerUrls: ['https://testnet.bscscan.com']
   }
 };
@@ -62,7 +62,7 @@ export const formatAddress = (address) => {
 
 // Authentication function for EVM
 const authenticateWallet = async (address, signer) => {
-  const authTokenKey = `osp_authToken_${address}`;
+  const authTokenKey = `pgnlz_authToken_${address}`;
   const storedToken = localStorage.getItem(authTokenKey);
 
   if (storedToken) {
@@ -80,7 +80,7 @@ const authenticateWallet = async (address, signer) => {
   }
 
   try {
-    const message = "Welcome to the OSP platform. Please sign this message to verify your wallet.";
+    const message = "Welcome to the PGNLZ MAX platform. Please sign this message to verify your wallet.";
     
     // Request signature
     const signature = await signer.signMessage(message);
@@ -213,8 +213,8 @@ export const connectWallet = async (walletType) => {
     walletState.chainId = network.chainId;
 
     // Save to localStorage
-    localStorage.setItem('osp_walletAddress', address);
-    localStorage.setItem('osp_walletType', walletType);
+    localStorage.setItem('pgnlz_walletAddress', address);
+    localStorage.setItem('pgnlz_walletType', walletType);
 
     // Initialize Contracts
     await initializeContracts();
@@ -254,11 +254,11 @@ export const disconnectWallet = () => {
   walletState.isNewUser = null; 
   walletState.hasClaimableRewards = false;
   
-  localStorage.removeItem('osp_walletAddress');
-  localStorage.removeItem('osp_walletType');
+  localStorage.removeItem('pgnlz_walletAddress');
+  localStorage.removeItem('pgnlz_walletType');
   
   if (address) {
-    const authTokenKey = `osp_authToken_${address}`;
+    const authTokenKey = `pgnlz_authToken_${address}`;
     localStorage.removeItem(authTokenKey); 
   }
 
@@ -267,8 +267,8 @@ export const disconnectWallet = () => {
 
 // Function to automatically connect if previously connected
 export const autoConnectWallet = async () => {
-    const savedAddress = localStorage.getItem('osp_walletAddress');
-    const savedWalletType = localStorage.getItem('osp_walletType');
+    const savedAddress = localStorage.getItem('pgnlz_walletAddress');
+    const savedWalletType = localStorage.getItem('pgnlz_walletType');
     
     if (savedAddress && savedWalletType && window.ethereum) {
           console.log(`Attempting to auto-connect with ${savedWalletType}...`);
@@ -307,7 +307,7 @@ const handleAccountsChanged = async (newAddress) => {
     walletState.isAuthenticated = false;
     walletState.contractsInitialized = false;
     
-    const authTokenKey = `osp_authToken_${walletState.address}`; // old address
+    const authTokenKey = `pgnlz_authToken_${walletState.address}`; // old address
     // The key depends on address, so we check new address
     
     const browserProvider = new ethers.BrowserProvider(window.ethereum); // Assume same provider

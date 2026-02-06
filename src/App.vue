@@ -67,6 +67,18 @@ export default {
   mounted() {
     initializeLanguage();
     autoConnectWallet();
+
+    // 如果 URL 中包含 ref 参数，且当前不是团队页面，则跳转到团队页面
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    if (ref) {
+      // 使用 router.push 并保留 query 参数
+      // 检查当前路由是否已经是 Team，避免重复跳转 (虽然 router.push 也会处理)
+      // 注意：此时 this.$route 可能还未完全解析完成，直接检查 pathname 或者在 nextTick
+      if (this.$router && this.$route.path !== '/team') {
+         this.$router.push({ path: '/team', query: { ref } });
+      }
+    }
   }
 }
 </script>
