@@ -545,17 +545,40 @@ export default {
     };
 
     // Helper: Copy
-    const copyText = async (text) => {
-        // Updated check to use keys or check against t() output
-        // It's safer to just check if text is a valid copyable string.
-        // If it equals the placeholder "Please connect wallet" etc., don't copy.
+    const copyText = (text) => {
         if (!text || text === t('team.inputPlaceholder.connectWallet') || text === t('team.link.bindFirst')) return;
+        
         try {
-            await navigator.clipboard.writeText(text);
-            showToast(t('team.toast.copySuccess'));
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            
+            // Ensure textarea is not visible but part of DOM to avoid layout shifts
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            textArea.style.top = '0';
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            if (successful) {
+                showToast(t('team.toast.copySuccess'));
+            } else {
+                throw new Error('execCommand returned false');
+            }
         } catch (err) {
-            console.error('Failed to copy: ', err);
-            showToast(t('team.toast.copyFailed'));
+            console.error('Copy failed (fallback): ', err);
+            // Try navigator.clipboard as backup if available
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showToast(t('team.toast.copySuccess')))
+                    .catch(() => showToast(t('team.toast.copyFailed')));
+            } else {
+                showToast(t('team.toast.copyFailed'));
+            }
         }
     };
 
