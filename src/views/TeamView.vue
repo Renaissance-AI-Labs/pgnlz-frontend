@@ -132,6 +132,10 @@
                     {{ t('team.copy') }}
                   </button>
                 </div>
+                <div class="section-hint">
+                  <i class="fas fa-exclamation-circle hint-icon"></i>
+                  <span v-html="t('team.link.copyHint')"></span>
+                </div>
               </div>
 
               <!-- <div class="divider-horizontal"></div> -->
@@ -1186,6 +1190,27 @@ export default {
   color: var(--text-secondary);
   margin: -0.5rem 0 0.5rem;
   line-height: 1.4;
+}
+
+.section-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+  opacity: 0.9;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.8rem;
+  border-radius: 8px;
+}
+
+.hint-icon {
+  color: var(--primary); /* Use primary color or warning color like #f59e0b */
+  font-size: 0.9rem;
+  margin-top: 0.2rem; /* Align icon with first line of text */
+  flex-shrink: 0;
 }
 
 .success-text {
