@@ -89,7 +89,7 @@ const languagePacks = {
     'team.toast.checkNetwork': 'Binding failed, please check network or address',
     'team.toast.copySuccess': 'Copied to clipboard',
     'team.toast.copyFailed': 'Copy failed',
-    'team.link.bindFirst': 'Available after binding a referrer'
+    'team.link.copyHint': 'Please check if the last 4 characters match your address after copying.<br>If copy fails, long press to select all and copy.',
   },
   'zh-cn': {
      'header.connectWallet': '连接钱包',
@@ -165,7 +165,8 @@ const languagePacks = {
      'team.toast.checkNetwork': '绑定失败，请检查网络或地址',
      'team.toast.copySuccess': '已复制到剪贴板',
      'team.toast.copyFailed': '复制失败',
-     'team.link.bindFirst': '绑定推荐人地址后可用'
+     'team.link.bindFirst': '绑定推荐人地址后可用',
+     'team.link.copyHint': '请复制后核对邀请链接结尾是否为本人地址，若复制失败长按地址全选复制'
   },
   'zh-tw': {
      'header.connectWallet': '連接錢包',
@@ -241,7 +242,8 @@ const languagePacks = {
      'team.toast.checkNetwork': '綁定失敗，請檢查網絡或地址',
      'team.toast.copySuccess': '已複製到剪貼板',
      'team.toast.copyFailed': '複製失敗',
-     'team.link.bindFirst': '綁定推薦人地址後可用'
+     'team.link.bindFirst': '綁定推薦人地址後可用',
+     'team.link.copyHint': '請複製後核對邀請鏈接結尾是否為本人地址，若複製失敗長按地址全选複製'
   },
   'ja': {
      'header.connectWallet': 'ウォレット接続',
@@ -317,7 +319,8 @@ const languagePacks = {
      'team.toast.checkNetwork': 'バインド失敗。ネットワークまたはアドレスを確認してください',
      'team.toast.copySuccess': 'クリップボードにコピーしました',
      'team.toast.copyFailed': 'コピーに失敗しました',
-     'team.link.bindFirst': '紹介者をバインドした後に利用可能'
+     'team.link.bindFirst': '紹介者をバインドした後に利用可能',
+     'team.link.copyHint': 'コピー後、リンクの末尾が自分のアドレスと一致するか確認してください<br>失敗した場合は、長押ししてすべて選択してコピーしてください'
   },
   'ko': {
      'header.connectWallet': '지갑 연결',
@@ -393,7 +396,8 @@ const languagePacks = {
      'team.toast.checkNetwork': '바인딩 실패, 네트워크 또는 주소를 확인하세요',
      'team.toast.copySuccess': '클립보드에 복사되었습니다',
      'team.toast.copyFailed': '복사 실패',
-     'team.link.bindFirst': '추천인을 바인딩한 후 사용 가능'
+     'team.link.bindFirst': '추천인을 바인딩한 후 사용 가능',
+     'team.link.copyHint': '복사 후 링크 끝이 본인 주소인지 확인하세요<br>복사 실패 시 길게 눌러 전체 선택 후 복사하세요'
   }
 };
 
