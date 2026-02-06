@@ -122,7 +122,7 @@
               <div class="friend-section">
                 <h3 class="section-title">{{ t('team.myReferralLink') }}</h3>
                 <p class="section-desc">{{ t('team.referralLinkDesc') }}</p>
-                <div class="input-box referral-box">
+                <div class="input-box" :class="{ 'referral-box': walletState.isConnected && isBound }">
                   <textarea 
                     :value="myReferralLink" 
                     readonly 
@@ -634,6 +634,13 @@ export default {
 
     watch(myReferralLink, () => {
         adjustTextareaHeight();
+    });
+
+    watch(activeTab, async (newTab) => {
+      if (newTab === 'team') {
+        await nextTick();
+        adjustTextareaHeight();
+      }
     });
 
     onMounted(() => {
@@ -1459,6 +1466,7 @@ export default {
   white-space: pre-wrap;
   line-height: 1.5;
   height: auto;
+  overflow: hidden; /* Hide scrollbar */
   /* Remove min-height to allow vertical centering by flex container */
   /* Remove flex properties from textarea */
 }
