@@ -122,8 +122,15 @@
               <div class="friend-section">
                 <h3 class="section-title">{{ t('team.myReferralLink') }}</h3>
                 <p class="section-desc">{{ t('team.referralLinkDesc') }}</p>
-                <div class="input-box">
-                  <input type="text" :value="myReferralLink" readonly class="code-input" :class="{ 'disabled': !isBound || !walletState.isConnected }" />
+                <div class="input-box referral-box">
+                  <textarea 
+                    :value="myReferralLink" 
+                    readonly 
+                    class="code-input code-textarea" 
+                    :class="{ 'disabled': !isBound || !walletState.isConnected }"
+                    @focus="$event.target.select()"
+                    rows="3"
+                  ></textarea>
                   <button 
                     class="btn-copy" 
                     @click="copyText(myReferralLink)"
@@ -1417,5 +1424,23 @@ export default {
     width: 55%;
     gap: 3rem;
   }
+}
+
+/* Textarea styles for referral link */
+.input-box.referral-box {
+  height: auto;
+  min-height: 80px;
+  padding: 0.8rem;
+  align-items: center; /* Center button vertically */
+}
+
+.code-textarea {
+  resize: none;
+  word-break: break-all;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  height: auto;
+  min-height: 60px;
+  /* Remove flex properties from textarea */
 }
 </style>
