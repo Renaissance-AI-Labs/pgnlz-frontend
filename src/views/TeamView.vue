@@ -122,14 +122,15 @@
               <div class="friend-section">
                 <h3 class="section-title">{{ t('team.myReferralLink') }}</h3>
                 <p class="section-desc">{{ t('team.referralLinkDesc') }}</p>
-                <div class="input-box referral-box">
+                <div class="input-box" :class="{ 'referral-box': walletState.isConnected && isBound }">
                   <textarea 
                     :value="myReferralLink" 
                     readonly 
                     class="code-input code-textarea" 
                     :class="{ 'disabled': !isBound || !walletState.isConnected }"
                     @focus="$event.target.select()"
-                    rows="3"
+                    rows="1"
+                    ref="referralTextarea"
                   ></textarea>
                   <button 
                     class="btn-copy" 
@@ -214,7 +215,7 @@
 import { walletState, formatAddress } from '@/services/wallet.js';
 import { getContractAddress } from '@/services/contracts.js';
 import { showToast } from '@/services/notification.js';
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed, watch, nextTick } from 'vue';
 import { ethers } from 'ethers';
 import referralAbi from '@/abis/referral.json';
 import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
@@ -251,6 +252,7 @@ export default {
     const confirmCountdown = ref(5);
     const confirmTimer = ref(null);
     const confirmAddress = ref('');
+    const referralTextarea = ref(null);
 
     // Computed
     const currentChild = computed(() => {
@@ -589,6 +591,15 @@ export default {
         }
     };
 
+    const adjustTextareaHeight = async () => {
+        await nextTick();
+        const el = referralTextarea.value;
+        if (el) {
+            el.style.height = 'auto'; // Reset height
+            el.style.height = el.scrollHeight + 'px'; // Set to content height
+        }
+    };
+
     // Watchers
     watch(() => [walletState.isConnected, walletState.address], ([newConnected, newAddress], [oldConnected, oldAddress]) => {
         // If disconnected
@@ -621,7 +632,21 @@ export default {
         }
     });
 
+    watch(myReferralLink, () => {
+        adjustTextareaHeight();
+    });
+
+    watch(activeTab, async (newTab) => {
+      if (newTab === 'team') {
+        await nextTick();
+        adjustTextareaHeight();
+      }
+    });
+
     onMounted(() => {
+        // Adjust height initially
+        adjustTextareaHeight();
+
         // Init particles
         const particlesContainer = document.getElementById('particles-team');
         if (particlesContainer && particlesContainer.childElementCount === 0) {
@@ -683,7 +708,8 @@ export default {
       confirmCountdown,
       closeConfirmModal,
       executeBind,
-      confirmAddress
+      confirmAddress,
+      referralTextarea
     };
   }
 }
@@ -1440,7 +1466,8 @@ export default {
   white-space: pre-wrap;
   line-height: 1.5;
   height: auto;
-  min-height: 60px;
+  overflow: hidden; /* Hide scrollbar */
+  /* Remove min-height to allow vertical centering by flex container */
   /* Remove flex properties from textarea */
 }
 </style>
