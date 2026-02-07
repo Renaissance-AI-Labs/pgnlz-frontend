@@ -117,7 +117,35 @@
 
             <!-- Tab 2: My Referral (Previously My Friends - Bind & Link) -->
             <div v-if="activeTab === 'team'" class="friends-tab fade-in">
+
+              <!-- Section: My Referrer -->
+              <div class="friend-section">
+                <h3 class="section-title">{{ t('team.myReferrer') }}</h3>
+                <p class="section-desc" v-if="!isBound">{{ t('team.bindReferrerDesc') }}</p>
+                <p class="section-desc success-text" v-else>{{ t('team.bindSuccessDesc') }}</p>
+
+                <div class="input-box">
+                  <input 
+                    type="text" 
+                    :value="isBound ? formatAddress(referrerInput) : referrerInput" 
+                    readonly 
+                    :placeholder="walletState.isConnected ? t('team.inputPlaceholder.autoFill') : t('team.inputPlaceholder.connectWallet')"
+                    class="code-input disabled"
+                  />
+                  <button 
+                    v-if="!isBound"
+                    class="btn-bind" 
+                    @click="handleBindReferral"
+                    :disabled="bindingReferrer || !walletState.isConnected || !referrerInput"
+                  >
+                    <span v-if="bindingReferrer">{{ t('team.binding') }}</span>
+                    <span v-else>{{ t('team.bind') }}</span>
+                  </button>
+                </div>
+              </div>
               
+              <!-- <div class="divider-horizontal"></div> -->
+
               <!-- Section: My Referral Link -->
               <div class="friend-section">
                 <h3 class="section-title">{{ t('team.myReferralLink') }}</h3>
@@ -143,34 +171,6 @@
                 <div class="section-hint">
                   <i class="fas fa-exclamation-circle hint-icon"></i>
                   <span v-html="t('team.link.copyHint')"></span>
-                </div>
-              </div>
-
-              <!-- <div class="divider-horizontal"></div> -->
-
-              <!-- Section: My Referrer -->
-              <div class="friend-section">
-                <h3 class="section-title">{{ t('team.myReferrer') }}</h3>
-                <p class="section-desc" v-if="!isBound">{{ t('team.bindReferrerDesc') }}</p>
-                <p class="section-desc success-text" v-else>{{ t('team.bindSuccessDesc') }}</p>
-
-                <div class="input-box">
-                  <input 
-                    type="text" 
-                    :value="isBound ? formatAddress(referrerInput) : referrerInput" 
-                    readonly 
-                    :placeholder="walletState.isConnected ? t('team.inputPlaceholder.autoFill') : t('team.inputPlaceholder.connectWallet')"
-                    class="code-input disabled"
-                  />
-                  <button 
-                    v-if="!isBound"
-                    class="btn-bind" 
-                    @click="handleBindReferral"
-                    :disabled="bindingReferrer || !walletState.isConnected || !referrerInput"
-                  >
-                    <span v-if="bindingReferrer">{{ t('team.binding') }}</span>
-                    <span v-else>{{ t('team.bind') }}</span>
-                  </button>
                 </div>
               </div>
 
@@ -1295,6 +1295,7 @@ export default {
   padding: 0.5rem;
   outline: none;
   height: 100%;
+  min-width: 0;
 }
 
 .code-input.disabled {
@@ -1327,6 +1328,7 @@ export default {
   transition: all 0.2s ease;
   white-space: nowrap; /* Prevent text wrapping */
   line-height: normal;
+  flex-shrink: 0;
 }
 
 /* Hover Effect */
