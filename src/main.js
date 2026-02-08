@@ -5,6 +5,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { APP_ENV, DISABLE_CONSOLE_IN_PROD } from './services/environment'
+import VConsole from 'vconsole'
 
 // Disable console logs in production environment
 if (APP_ENV === 'PROD' && DISABLE_CONSOLE_IN_PROD) {
@@ -12,6 +13,9 @@ if (APP_ENV === 'PROD' && DISABLE_CONSOLE_IN_PROD) {
   console.debug = () => {};
   console.info = () => {};
   // Keep console.warn and console.error for important messages
+} else if (APP_ENV !== 'PROD') {
+  // Initialize vConsole in non-production environments (DEV, TEST)
+  new VConsole();
 }
 
 // Log environment variables on startup (will only show in dev/test)
