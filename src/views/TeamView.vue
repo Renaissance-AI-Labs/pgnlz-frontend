@@ -488,17 +488,17 @@ export default {
 
         // Validation
         if (!inputAddress || inputAddress === ethers.ZeroAddress) {
-            showToast(t('team.toast.invalidAddress'));
+            showToast(t('team.toast.invalidAddress'), 'error');
             return;
         }
 
         if (!ethers.isAddress(inputAddress)) {
-            showToast(t('team.toast.formatError'));
+            showToast(t('team.toast.formatError'), 'error');
             return;
         }
 
         if (inputAddress.toLowerCase() === currentAccount.toLowerCase()) {
-            showToast(t('team.toast.selfBindError'));
+            showToast(t('team.toast.selfBindError'), 'error');
             return;
         }
         
@@ -522,18 +522,18 @@ export default {
             const isValidReferrer = await contract.isBindReferral(inputAddress);
             
             if (!isValidReferrer) {
-                showToast(t('team.toast.referrerNotJoined'));
+                showToast(t('team.toast.referrerNotJoined'), 'error');
                 bindingReferrer.value = false;
                 return;
             }
 
             // Bind
             const tx = await contract.bindReferral(inputAddress);
-            showToast(t('team.toast.txSubmitted'));
+            showToast(t('team.toast.txSubmitted'), 'success');
             
             await tx.wait();
             
-            showToast(t('team.toast.bindSuccess'));
+            showToast(t('team.toast.bindSuccess'), 'success');
             isBound.value = true;
             
             // Refresh data
@@ -541,12 +541,18 @@ export default {
 
         } catch (error) {
             console.error("Binding failed:", error);
+            
+            // User rejected check
+            if (error.code === 4001 || error.code === 'ACTION_REJECTED' || (error.reason && error.reason.includes('rejected'))) {
+                return;
+            }
+
             if (error.reason) {
-                 showToast(t('team.toast.bindFailed') + error.reason);
+                 showToast(t('team.toast.bindFailed') + error.reason, 'error');
             } else if (error.message && error.message.includes("User already has a referral")) {
-                 showToast(t('team.toast.alreadyBound'));
+                 showToast(t('team.toast.alreadyBound'), 'error');
             } else {
-                 showToast(t('team.toast.checkNetwork'));
+                 showToast(t('team.toast.checkNetwork'), 'error');
             }
         } finally {
             bindingReferrer.value = false;
@@ -574,7 +580,7 @@ export default {
             document.body.removeChild(textArea);
             
             if (successful) {
-                showToast(t('team.toast.copySuccess'));
+                showToast(t('team.toast.copySuccess'), 'success');
             } else {
                 throw new Error('execCommand returned false');
             }
@@ -583,10 +589,10 @@ export default {
             // Try navigator.clipboard as backup if available
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text)
-                    .then(() => showToast(t('team.toast.copySuccess')))
-                    .catch(() => showToast(t('team.toast.copyFailed')));
+                    .then(() => showToast(t('team.toast.copySuccess'), 'success'))
+                    .catch(() => showToast(t('team.toast.copyFailed'), 'error'));
             } else {
-                showToast(t('team.toast.copyFailed'));
+                showToast(t('team.toast.copyFailed'), 'error');
             }
         }
     };
@@ -666,7 +672,7 @@ export default {
 
         // Check param for Tab Switching
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('ref')) {
+        if (urlParams.get('ref') || urlParams.get('tab') === 'team') {
             activeTab.value = 'team'; // 'team' key now corresponds to "我的推荐" (Bind & Link)
         }
 

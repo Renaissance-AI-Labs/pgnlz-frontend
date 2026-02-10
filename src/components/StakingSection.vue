@@ -5,9 +5,19 @@
     <div class="stake-card">
       <div class="amount-display">
         <span class="label">{{ t('staking.amountLabel') }}</span>
-        <div class="value-row">
-          <span class="value">{{ fixedAmount }}</span>
-          <span class="currency">USDT</span>
+        
+        <!-- Amount Selection Buttons -->
+        <div v-if="allowedAmounts.length > 0" class="amount-selection">
+            <button 
+                v-for="(amount, index) in allowedAmounts" 
+                :key="index"
+                class="amount-btn"
+                :class="{ active: rawFixedAmount === amount }"
+                @click="selectAmount(amount)"
+            >
+                <span class="amount-value">{{ formatAmount(amount) }}</span>
+                <span class="amount-currency">USDT</span>
+            </button>
         </div>
       </div>
 
@@ -17,11 +27,20 @@
         </div>
         
         <template v-else>
+          <!-- Bind Referrer Hint Button -->
+          <button 
+            v-if="!isBound && !checkingReferrer" 
+            class="btn btn-primary action-btn"
+            @click="$router.push('/team?tab=team')"
+          >
+            {{ t('staking.bindReferrerFirst') }}
+          </button>
+
           <!-- Approve Button -->
           <button 
-            v-if="needsApproval" 
+            v-else-if="needsApproval" 
             class="btn btn-primary action-btn"
-            :disabled="loading || processing"
+            :disabled="loading || processing || checkingReferrer"
             @click="handleApprove"
           >
             <span v-if="processing" class="spinner"></span>
@@ -32,15 +51,16 @@
           <button 
             v-else 
             class="btn btn-primary action-btn"
-            :disabled="loading || processing || insufficientBalance"
+            :disabled="loading || processing || insufficientBalance || checkingReferrer"
             @click="handleStake"
           >
             <span v-if="processing" class="spinner"></span>
-            {{ processing ? t('staking.staking') : t('staking.stake') }}
+            <template v-else>
+                {{ insufficientBalance ? t('staking.insufficientBalance') : t('staking.stake') }}
+            </template>
           </button>
         </template>
         
-        <p v-if="insufficientBalance" class="error-text">{{ t('staking.insufficientBalance') }}</p>
       </div>
     </div>
 
@@ -72,8 +92,10 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { ethers } from 'ethers';
 import { t } from '@/i18n';
-import { walletState } from '@/services/wallet';
+import { walletState, networks } from '@/services/wallet';
 import { getContractAddress } from '@/services/contracts';
+import { APP_ENV } from '@/services/environment';
+import referralAbi from '@/abis/referral.json';
 import StakingABI from '@/abis/staking.json';
 import { showToast } from '@/services/notification';
 
@@ -86,59 +108,145 @@ const ERC20_ABI = [
 
 const fixedAmount = ref('100'); // Display value
 const rawFixedAmount = ref(BigInt(0)); // BigInt value from contract
+const currentAllowance = ref(BigInt(0)); // Current allowance from contract
+const allowedAmounts = ref([]); // List of allowed stake amounts
 const loading = ref(false);
 const processing = ref(false);
-const needsApproval = ref(true);
 const userBalance = ref(BigInt(0));
 const queueStatus = ref(null);
+const isBound = ref(false); // New state for referrer check
+const checkingReferrer = ref(false); // Loading state for referrer check
+
+const needsApproval = computed(() => {
+  if (currentAllowance.value === BigInt(0) && rawFixedAmount.value === BigInt(0)) return false;
+  return currentAllowance.value < rawFixedAmount.value;
+});
 
 const insufficientBalance = computed(() => {
   if (rawFixedAmount.value === BigInt(0)) return false;
   return userBalance.value < rawFixedAmount.value;
 });
 
+const selectAmount = (amount) => {
+    rawFixedAmount.value = amount;
+    fixedAmount.value = ethers.formatEther(amount).split('.')[0];
+};
+
+const formatAmount = (amount) => {
+    return ethers.formatEther(amount).split('.')[0];
+};
+
 const updateData = async () => {
   if (!walletState.isConnected || !walletState.address) {
       // If not connected, we can still fetch fixedStakeAmount from a read-only provider
       // But for now, let's just reset
-      needsApproval.value = true;
+      currentAllowance.value = BigInt(0);
       return;
   }
   
   loading.value = true;
+  checkingReferrer.value = true;
   try {
-    const provider = walletState.provider;
-    const signer = walletState.signer;
-    const userAddress = walletState.address;
+    let provider = walletState.provider;
+    let signer = walletState.signer;
+    const userAddress = walletState.address || ethers.ZeroAddress; 
+
+    // Read-only fallback if not connected
+    if (!provider) {
+       const isProduction = APP_ENV === 'PROD';
+       const rpcUrl = isProduction ? networks.bscMainnet.rpcUrls[0] : networks.bscTestnet.rpcUrls[0];
+       provider = new ethers.JsonRpcProvider(rpcUrl);
+       // Signer is null in read-only
+       signer = null;
+    }
 
     const stakingAddress = getContractAddress('Staking');
     const usdtAddress = getContractAddress('USDT');
+    const referralAddress = getContractAddress('referral');
 
-    if (!stakingAddress || !usdtAddress) return;
+    if (!stakingAddress || !usdtAddress || !referralAddress) return;
 
     const stakingContract = new ethers.Contract(stakingAddress, StakingABI, provider);
-    const usdtContract = new ethers.Contract(usdtAddress, ERC20_ABI, provider);
+    
+    // 1. Get Allowed Stake Amounts (Read-only)
+    const amounts = [];
+    let index = 0;
+    try {
+        while (true) {
+            try {
+                // Try to fetch amount at index
+                const amount = await stakingContract.allowedStakeAmounts(index);
+                // Check if amount is 0 (some contracts return 0 for out of bounds instead of reverting, though unlikely for public array getter)
+                // But usually public getter reverts if out of bounds.
+                amounts.push(amount);
+                index++;
+                if (index > 20) break; // Safety break
+            } catch (e) {
+                // Assuming revert means end of array
+                break;
+            }
+        }
+    } catch (e) {
+        console.warn("Error fetching allowed amounts", e);
+    }
 
-    // 1. Get Fixed Stake Amount
-    const amount = await stakingContract.fixedStakeAmount();
-    rawFixedAmount.value = amount;
-    fixedAmount.value = ethers.formatEther(amount).split('.')[0]; // Assuming integer 100
+    if (amounts.length > 0) {
+        allowedAmounts.value = amounts;
+        // Default to first amount if current amount is 0 or not in list
+        const currentInList = amounts.find(a => a === rawFixedAmount.value);
+        if (!currentInList) {
+            selectAmount(amounts[0]);
+        }
+    } else {
+        // Fallback to fixedStakeAmount if no allowed amounts found (backward compatibility)
+        try {
+            const amount = await stakingContract.fixedStakeAmount();
+            allowedAmounts.value = [amount];
+            selectAmount(amount);
+        } catch (e) {
+            console.warn("Fallback fixedStakeAmount failed", e);
+        }
+    }
 
-    // 2. Check Balance
-    const balance = await usdtContract.balanceOf(userAddress);
-    userBalance.value = balance;
+    // Only proceed with user-specific checks if we have a valid user address
+    if (walletState.isConnected && userAddress) {
+        const usdtContract = new ethers.Contract(usdtAddress, ERC20_ABI, provider);
+        const referralContract = new ethers.Contract(referralAddress, referralAbi, provider);
 
-    // 3. Check Allowance
-    const allowance = await usdtContract.allowance(userAddress, stakingAddress);
-    needsApproval.value = allowance < amount;
+        // 2. Check Balance
+        const balance = await usdtContract.balanceOf(userAddress);
+        userBalance.value = balance;
 
-    // 4. Check Queue Status (Find latest queued order)
-    await checkQueueStatus(stakingContract, userAddress);
+        // 3. Check Allowance
+        const allowance = await usdtContract.allowance(userAddress, stakingAddress);
+        currentAllowance.value = allowance;
+
+        // 4. Check Queue Status
+        await checkQueueStatus(stakingContract, userAddress);
+
+        // 5. Check Referrer Bind Status
+        try {
+            const referrer = await referralContract.getReferral(userAddress);
+            isBound.value = (referrer && referrer !== ethers.ZeroAddress);
+            console.log("Referrer check for", userAddress, ":", referrer, "Bound:", isBound.value);
+        } catch (e) {
+            console.error("Failed to check referrer:", e);
+            isBound.value = false; // Safe default
+        }
+
+    } else {
+        // Reset user state if not connected
+        userBalance.value = BigInt(0);
+        currentAllowance.value = BigInt(0);
+        queueStatus.value = null;
+        isBound.value = false;
+    }
 
   } catch (error) {
     console.error("Error updating staking data:", error);
   } finally {
     loading.value = false;
+    checkingReferrer.value = false;
   }
 };
 
@@ -215,9 +323,18 @@ const handleApprove = async () => {
     await tx.wait();
     
     showToast(t('staking.approveSuccess'), 'success');
-    needsApproval.value = false;
+    
+    // Update allowance immediately to reflect change in UI
+    currentAllowance.value = rawFixedAmount.value; 
+    // Optionally refresh real data
+    // await updateData();
   } catch (error) {
     console.error(error);
+    // ACTION_REJECTED code is 4001 or 'ACTION_REJECTED'
+    if (error.code === 4001 || error.code === 'ACTION_REJECTED' || (error.reason && error.reason.includes('rejected'))) {
+       // User rejected, no toast needed
+       return;
+    }
     showToast(t('staking.approveFailed'), 'error');
   } finally {
     processing.value = false;
@@ -231,10 +348,17 @@ const handleStake = async () => {
   try {
     const signer = walletState.signer;
     const stakingAddress = getContractAddress('Staking');
+    const usdtAddress = getContractAddress('USDT');
     const stakingContract = new ethers.Contract(stakingAddress, StakingABI, signer);
     
-    // Call stake() - no args based on ABI, it uses fixedStakeAmount
-    const tx = await stakingContract.stake();
+    // Call stake() - with amount
+    // Logging for debug
+    console.log('--- Staking Info ---');
+    console.log('Staking Contract:', stakingAddress);
+    console.log('USDT Contract:', usdtAddress);
+    console.log("Staking initiated for amount:", fixedAmount.value, "(Raw:", rawFixedAmount.value.toString(), ")");
+    console.log('--------------------');
+    const tx = await stakingContract.stake(rawFixedAmount.value);
     await tx.wait();
     
     showToast(t('staking.stakeSuccess'), 'success');
@@ -244,6 +368,11 @@ const handleStake = async () => {
     
   } catch (error) {
     console.error(error);
+    // User rejected check
+    if (error.code === 4001 || error.code === 'ACTION_REJECTED' || (error.reason && error.reason.includes('rejected'))) {
+       return;
+    }
+
     // Parse error if possible
     let msg = t('staking.stakeFailed');
     if (error.reason) msg += `: ${error.reason}`;
@@ -265,66 +394,92 @@ watch(() => walletState.isConnected, () => {
 <style scoped>
 .staking-container {
   width: 100%;
-  max-width: 800px; /* Narrower than dashboard */
-  margin: 0 auto 2rem;
-  padding: 2rem;
-  border-radius: 20px;
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
+  padding: 1.5rem;
+  border-radius: 16px;
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(192, 132, 252, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
+  backdrop-filter: blur(10px);
 }
 
 .section-title {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
   font-family: var(--font-primary);
+  letter-spacing: 0.05em;
 }
 
 .stake-card {
   width: 100%;
   max-width: 400px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-  padding: 2rem;
+  border-radius: 12px;
+  padding: 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.2rem;
 }
 
 .amount-display {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.2rem;
 }
 
 .label {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
-.value-row {
+.amount-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin: 0.8rem 0;
+}
+
+.amount-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-family: var(--font-code);
+  cursor: pointer;
+  transition: all 0.2s;
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: 0.3rem;
 }
 
-.value {
-  font-family: var(--font-code);
-  font-size: 3rem;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1;
+.amount-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.currency {
-  font-size: 1.2rem;
+.amount-btn.active {
+  background: rgba(255, 255, 255, 0.05);
   color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+}
+
+.amount-value {
+  font-size: 1.1rem;
   font-weight: 600;
+}
+
+.amount-currency {
+  font-size: 0.8rem;
+  opacity: 0.8;
 }
 
 .action-area {
@@ -332,14 +487,14 @@ watch(() => walletState.isConnected, () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .action-btn {
   width: 100%;
-  height: 50px;
-  font-size: 1.1rem;
-  border-radius: 12px;
+  height: 44px;
+  font-size: 1rem;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,17 +503,17 @@ watch(() => walletState.isConnected, () => {
 
 .connect-hint {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .error-text {
   color: #ef4444;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border: 2px solid rgba(255,255,255,0.3);
   border-top-color: #fff;
   border-radius: 50%;
@@ -371,31 +526,32 @@ watch(() => walletState.isConnected, () => {
 
 /* Queue Status */
 .queue-status-card {
-  margin-top: 2rem;
+  margin-top: 1rem;
   width: 100%;
   max-width: 400px;
   background: rgba(103, 232, 249, 0.05);
   border: 1px solid rgba(103, 232, 249, 0.2);
-  border-radius: 12px;
-  padding: 1rem;
+  border-radius: 10px;
+  padding: 0.8rem;
 }
 
 .status-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.4rem;
   font-weight: 600;
   color: var(--cyan);
-  margin-bottom: 0.8rem;
-  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: var(--cyan);
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
 }
 
 .pulsing {
@@ -410,19 +566,53 @@ watch(() => walletState.isConnected, () => {
 
 .status-details {
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  font-size: 0.9rem;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
 .detail-row {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.detail-row span:first-child {
+  font-size: 0.7rem;
+  opacity: 0.8;
 }
 
 .highlight {
   color: #fff;
   font-family: var(--font-code);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .staking-container {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .stake-card {
+    padding: 1rem;
+    gap: 0.8rem;
+  }
+  
+  .action-btn {
+    height: 40px;
+    font-size: 0.95rem;
+  }
+  
+  .status-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align: center;
+  }
 }
 </style>

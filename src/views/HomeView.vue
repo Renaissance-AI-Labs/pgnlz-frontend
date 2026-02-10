@@ -93,7 +93,7 @@
           </div> -->
           
           <div class="hero-title">
-            <span class="title-prefix">//</span>
+            <!-- <span class="title-prefix">//</span> -->
             <span class="title-text">与PGNLZ MAX一起打造去中心化世界</span>
           </div>
           
@@ -126,6 +126,7 @@
 
 <script>
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router'; // Add this
 import { t } from '@/i18n';
 import GlobalDashboard from '@/components/GlobalDashboard.vue';
 import StakingSection from '@/components/StakingSection.vue';
@@ -138,6 +139,7 @@ export default {
   },
   setup() {
     const showModal = ref(false);
+    const router = useRouter(); // Add this
 
     const closeModal = () => {
       showModal.value = false;
@@ -180,7 +182,7 @@ export default {
   /* display: flex;  Removed to allow block flow for hero section */
   /* justify-content: center; */
   /* align-items: center; */
-  /* padding: 4rem 1rem; */
+  padding: 0rem 1rem;
   overflow-x: hidden;
 }
 

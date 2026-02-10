@@ -26,14 +26,14 @@
       </div>
 
       <!-- Item 4: Queue Head/Tail -->
-      <div class="stat-item full-width-mobile">
+      <!-- <div class="stat-item full-width-mobile">
         <div class="item-label">{{ t('dashboard.queueRange') }}</div>
         <div class="item-value text-white text-sm">
           <span class="range-val"><span class="label-sub">H:</span>{{ queueInfo.headIndex }}</span>
           <span class="separator">/</span>
           <span class="range-val"><span class="label-sub">T:</span>{{ queueInfo.tailIndex }}</span>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <!-- Progress Bar -->
@@ -55,8 +55,9 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { ethers } from 'ethers';
 import { t } from '@/i18n';
-import { walletState } from '@/services/wallet';
+import { walletState, networks } from '@/services/wallet';
 import { getContractAddress } from '@/services/contracts';
+import { APP_ENV } from '@/services/environment';
 import StakingABI from '@/abis/staking.json';
 
 const loading = ref(false);
@@ -109,13 +110,8 @@ const fetchData = async () => {
     
     if (!provider) {
        // Fallback for read-only if wallet not connected
-       // Using BSC Mainnet RPC by default as per contracts.js logic implies production is mainnet
-       // But we should check environment. 
-       // For now, let's try to use a public RPC if no wallet provider.
-       // However, to keep it simple and consistent with the app's state, 
-       // we might just wait for connection or try to grab a provider.
-       // Let's assume the user might not be connected.
-       const rpcUrl = 'https://bsc-rpc.publicnode.com'; // Mainnet fallback
+       const isProduction = APP_ENV === 'PROD';
+       const rpcUrl = isProduction ? networks.bscMainnet.rpcUrls[0] : networks.bscTestnet.rpcUrls[0];
        provider = new ethers.JsonRpcProvider(rpcUrl);
     }
 
