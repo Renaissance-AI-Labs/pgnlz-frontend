@@ -97,11 +97,11 @@
             <span class="title-text">与PGNLZ MAX一起打造去中心化世界</span>
           </div>
           
-          <p class="hero-description">
+          <!-- <p class="hero-description">
             Passionate developers creating exceptional digital experiences with modern technologies.
-          </p>
+          </p> -->
           
-          <div class="hero-buttons">
+          <!-- <div class="hero-buttons">
             <a href="#contact" class="btn btn-primary">
               <span>Get In Touch</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -110,7 +110,7 @@
               <span>View Projects</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
             </a>
-          </div>
+          </div> -->
         </div>
 
       </div>
@@ -757,6 +757,7 @@ export default {
   border-radius: 20px;
   box-shadow: var(--shadow-xl);
   animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 60% !important;
 }
 
 .announcement-title {
