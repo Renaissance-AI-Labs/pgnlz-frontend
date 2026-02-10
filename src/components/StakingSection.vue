@@ -366,6 +366,11 @@ const handleStake = async () => {
     // Refresh data
     await updateData();
     
+    // Reload page after success
+    setTimeout(() => {
+        window.location.reload();
+    }, 2000);
+    
   } catch (error) {
     console.error(error);
     // User rejected check
