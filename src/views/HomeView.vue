@@ -118,6 +118,9 @@
 
     <!-- Global Dashboard -->
     <GlobalDashboard />
+
+    <!-- Staking Section -->
+    <StakingSection />
   </div>
 </template>
 
@@ -125,11 +128,13 @@
 import { onMounted, ref } from 'vue';
 import { t } from '@/i18n';
 import GlobalDashboard from '@/components/GlobalDashboard.vue';
+import StakingSection from '@/components/StakingSection.vue';
 
 export default {
   name: 'HomeView',
   components: {
-    GlobalDashboard
+    GlobalDashboard,
+    StakingSection
   },
   setup() {
     const showModal = ref(false);

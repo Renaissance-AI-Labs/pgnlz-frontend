@@ -37,8 +37,26 @@ const languagePacks = {
     'dashboard.progress': 'Progress',
     'dashboard.unlimited': 'Unlimited',
     
-    // Announcement
-    'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
+     // Announcement
+     'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
+
+     // Staking Section
+     'staking.title': 'Staking Investment',
+     'staking.amountLabel': 'Investment Amount',
+     'staking.approve': 'Approve USDT',
+     'staking.approving': 'Approving...',
+     'staking.stake': 'Stake Now',
+     'staking.staking': 'Staking...',
+     'staking.insufficientBalance': 'Insufficient USDT Balance',
+     'staking.approveSuccess': 'Approve Success',
+     'staking.approveFailed': 'Approve Failed',
+     'staking.stakeSuccess': 'Order Submitted. Check My Orders for status (may be queued)',
+     'staking.stakeFailed': 'Staking Failed',
+     'staking.queueTitle': 'Current Queue Status',
+     'staking.position': 'Position',
+     'staking.amountAhead': 'Amount Ahead',
+     'staking.waitDays': 'Est. Wait',
+     'staking.days': 'Days',
     'home.announcement.greeting': 'Dear Users,',
     'home.announcement.p1': 'To provide you with better service and an ultimate experience, we are undergoing a comprehensive brand and technical upgrade. The platform has officially been renamed PGNLZ MAX. This upgrade is supported by the core development team of the original PG public chain, ensuring the advanced nature and reliability of the underlying architecture',
     'home.announcement.bullet_intro': 'Currently, the technical team is fully advancing the following key tasks:',
@@ -123,6 +141,24 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX系统加急升级公告',
+
+     // Staking Section
+     'staking.title': '质押投资',
+     'staking.amountLabel': '投资金额',
+     'staking.approve': '授权 USDT',
+     'staking.approving': '授权中...',
+     'staking.stake': '立即质押',
+     'staking.staking': '质押中...',
+     'staking.insufficientBalance': 'USDT 余额不足',
+     'staking.approveSuccess': '授权成功',
+     'staking.approveFailed': '授权失败',
+     'staking.stakeSuccess': '订单提交成功，请在我的订单中查看状态（可能进入排队）',
+     'staking.stakeFailed': '质押失败',
+     'staking.queueTitle': '当前排队状态',
+     'staking.position': '前方人数',
+     'staking.amountAhead': '前方金额',
+     'staking.waitDays': '预计等待',
+     'staking.days': '天',
      'home.announcement.greeting': '尊敬的平台用户：\n您好！',
      'home.announcement.p1': '为向您提供更优质的服务与更极致的体验，我们正在进行全面的品牌与技术升级，平台现已正式更名为 PGNLZ MAX。本次升级得到了原PG公链核心开发团队的技术支持与合作，共同确保底层架构的先进性与可靠性',
      'home.announcement.bullet_intro': '目前，技术团队正全力推进以下关键工作：',
@@ -208,6 +244,24 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 系統加急升級公告',
+
+     // Staking Section
+     'staking.title': '質押投資',
+     'staking.amountLabel': '投資金額',
+     'staking.approve': '授權 USDT',
+     'staking.approving': '授權中...',
+     'staking.stake': '立即質押',
+     'staking.staking': '質押中...',
+     'staking.insufficientBalance': 'USDT 餘額不足',
+     'staking.approveSuccess': '授權成功',
+     'staking.approveFailed': '授權失敗',
+     'staking.stakeSuccess': '訂單提交成功，請在我的訂單中查看狀態（可能進入排隊）',
+     'staking.stakeFailed': '質押失敗',
+     'staking.queueTitle': '當前排隊狀態',
+     'staking.position': '前方人數',
+     'staking.amountAhead': '前方金額',
+     'staking.waitDays': '預計等待',
+     'staking.days': '天',
      'home.announcement.greeting': '尊敬的平台用戶：\n您好！',
      'home.announcement.p1': '為向您提供更優質的服務與更極致的體驗，我們正在進行全面的品牌與技術升級，平台現已正式更名為 PGNLZ MAX。本次升級得到了原PG公鏈核心開發團隊的技術支持與合作，共同確保底層架構的先進性與可靠性',
      'home.announcement.bullet_intro': '目前，技術團隊正全力推進以下關鍵工作：',
@@ -293,6 +347,24 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAXシステムアップグレードに関する緊急のお知らせ',
+
+     // Staking Section
+     'staking.title': 'ステーキング投資',
+     'staking.amountLabel': '投資額',
+     'staking.approve': 'USDTを承認',
+     'staking.approving': '承認中...',
+     'staking.stake': '今すぐステーキング',
+     'staking.staking': '処理中...',
+     'staking.insufficientBalance': 'USDT残高不足',
+     'staking.approveSuccess': '承認成功',
+     'staking.approveFailed': '承認失敗',
+     'staking.stakeSuccess': '注文が送信されました。ステータスを確認してください（待機中の可能性があります）',
+     'staking.stakeFailed': '失敗しました',
+     'staking.queueTitle': '現在の待機状況',
+     'staking.position': '待機順位',
+     'staking.amountAhead': '待機金額',
+     'staking.waitDays': '予想待機',
+     'staking.days': '日',
      'home.announcement.greeting': 'ユーザーの皆様へ',
      'home.announcement.p1': 'より良いサービスと最高の体験を提供するため、全面的にブランドと技術のアップグレードを行っております。プラットフォームは正式にPGNLZ MAXに名称変更されました。今回のアップグレードは、元のPGパブリックチェーンのコア開発チームからの技術サポートと協力を得て、基盤アーキテクチャの先進性と信頼性を確保しています',
      'home.announcement.bullet_intro': '現在、技術チームは以下の重要な作業を全力で進めています：',
@@ -378,6 +450,24 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 시스템 업그레이드에 관한 긴급 공지',
+
+     // Staking Section
+     'staking.title': '스테이킹 투자',
+     'staking.amountLabel': '투자 금액',
+     'staking.approve': 'USDT 승인',
+     'staking.approving': '승인 중...',
+     'staking.stake': '지금 스테이킹',
+     'staking.staking': '처리 중...',
+     'staking.insufficientBalance': 'USDT 잔액 부족',
+     'staking.approveSuccess': '승인 성공',
+     'staking.approveFailed': '승인 실패',
+     'staking.stakeSuccess': '주문이 제출되었습니다. 상태를 확인하세요 (대기 중일 수 있음)',
+     'staking.stakeFailed': '실패했습니다',
+     'staking.queueTitle': '현재 대기 상태',
+     'staking.position': '대기 순위',
+     'staking.amountAhead': '대기 금액',
+     'staking.waitDays': '예상 대기',
+     'staking.days': '일',
      'home.announcement.greeting': '존경하는 사용자 여러분,',
      'home.announcement.p1': '더 나은 서비스와 최고의 경험을 제공하기 위해 전면적인 브랜드 및 기술 업그레이드를 진행 중이며, 플랫폼 명칭이 PGNLZ MAX로 공식 변경되었습니다. 이번 업그레이드는 원 PG 퍼블릭 체인 핵심 개발팀의 기술 지원과 협력을 받아 기본 아키텍처의 선진성과 신뢰성을 공동으로 보장합니다',
      'home.announcement.bullet_intro': '현재 기술팀은 다음 주요 작업을 전력으로 추진하고 있습니다:',
