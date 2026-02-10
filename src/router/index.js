@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
+import OrdersView from '../views/OrdersView.vue';
 import NftView from '../views/NftView.vue';
 import TeamView from '../views/TeamView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
@@ -10,6 +11,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: HomeView,
+  },
+  {
+    path: '/orders',
+    name: 'Orders',
+    component: OrdersView,
   },
   {
     path: '/nft',

@@ -121,9 +121,6 @@
 
     <!-- Staking Section -->
     <StakingSection />
-
-    <!-- My Orders Section -->
-    <MyOrders />
   </div>
 </template>
 
@@ -133,14 +130,12 @@ import { useRouter } from 'vue-router'; // Add this
 import { t } from '@/i18n';
 import GlobalDashboard from '@/components/GlobalDashboard.vue';
 import StakingSection from '@/components/StakingSection.vue';
-import MyOrders from '@/components/MyOrders.vue';
 
 export default {
   name: 'HomeView',
   components: {
     GlobalDashboard,
-    StakingSection,
-    MyOrders
+    StakingSection
   },
   setup() {
     const showModal = ref(false);

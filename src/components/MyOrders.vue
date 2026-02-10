@@ -1,6 +1,5 @@
 <template>
-  <div class="orders-container glass">
-    <h2 class="section-title text-gradient">{{ t('orders.title') }}</h2>
+  <div class="orders-container">
     
     <!-- Tabs -->
     <div class="tabs">
@@ -73,7 +72,7 @@
                             <span class="value">{{ formatAmount(order.totalReceivedUsdt) }}</span>
                          </div>
                          <div class="stat-item">
-                            <span class="label">Pending</span>
+                            <span class="label">{{ t('orders.col.pending') }}</span>
                             <span class="value highlight">+{{ formatAmount(order.pendingStaticUsdt) }}</span>
                          </div>
                          <div class="stat-item">
@@ -195,11 +194,13 @@ const props = defineProps({});
 
 const activeTab = ref(0); // 0: Processing, 1: Completed
 const orders = ref([]);
+const allOrders = ref([]);
 const loading = ref(false);
 const processing = ref(false);
-const nextCursor = ref(BigInt(0));
 const hasMore = ref(false);
-const limit = 10;
+const limit = 2;
+const fetchBatchSize = 20;
+const displayCount = ref(2);
 const globalRate = ref(BigInt(100)); // Default 1%
 
 // Modal State
@@ -242,15 +243,19 @@ const switchTab = (tab) => {
     activeTab.value = tab;
     // Reset and fetch
     orders.value = [];
-    nextCursor.value = BigInt(0);
+    allOrders.value = [];
+    displayCount.value = limit;
     hasMore.value = false;
-    fetchOrders(tab, BigInt(0));
+    fetchOrders(tab);
 };
 
-const fetchOrders = async (status, cursor) => {
+const fetchOrders = async (status) => {
     if (!walletState.isConnected || !walletState.address) return;
     
     loading.value = true;
+    allOrders.value = [];
+    displayCount.value = limit;
+
     try {
         const provider = walletState.provider;
         const stakingAddress = getContractAddress('Staking');
@@ -263,123 +268,135 @@ const fetchOrders = async (status, cursor) => {
             console.warn("Failed to fetch rate, using default 1%", e);
         }
 
-        // getUserRecordInfos(user, cursor, limit, status)
-        const result = await stakingContract.getUserRecordInfos(
-            walletState.address,
-            cursor,
-            limit,
-            status
-        );
-        
-        const records = result[0];
-        const newCursor = result[1];
-        
-        // Process records
-        const processed = await Promise.all(records.map(async (item) => {
-            const r = item.record;
-            
-            // Basic data
-            const order = {
-                id: item.id.toString(),
-                amount: r.amount,
-                stakeTime: Number(r.stakeTime),
-                isQueued: r.isQueued,
-                status: r.status,
-                totalReceivedUsdt: item.totalReceivedUsdt,
-                pendingStaticUsdt: item.pendingStaticUsdt,
-                pendingTokenAmount: item.pendingTokenAmount,
-                guaranteeUsdt: item.guaranteeUsdt,
-                isUnstakeable: item.isUnstakeable,
-                
-                // For UI state
-                queuePosition: undefined,
-                queueAmountAhead: undefined,
-                queueWait: undefined,
-                outProgress: 0,
-                timeProgress: 0
-            };
-            
-            // Logic for Queued
-            if (order.isQueued) {
-                try {
-                    const qInfo = await stakingContract.getQueuePositionInfo(walletState.address, order.id);
-                    if (qInfo[0]) {
-                        order.queuePosition = Number(qInfo[1]);
-                        order.queueAmountAhead = formatAmount(qInfo[2]);
-                        order.queueWait = Number(qInfo[3]);
-                    }
-                } catch (e) {
-                    console.warn("Failed to get queue info for order", order.id);
-                }
-            } else if (!order.status) {
-                // Logic for In Progress (Not Queued)
-                
-                // Out Progress (3x)
-                // Need total received + pending static
-                const totalCurrent = BigInt(item.totalReceivedUsdt) + BigInt(item.pendingStaticUsdt);
-                // Target = Amount * 3 (Simplification based on prompt)
-                const target = BigInt(r.amount) * BigInt(3);
-                
-                // Store values for UI
-                order.outValue = formatAmount(totalCurrent);
-                order.outTarget = formatAmount(target);
-                
-                if (target > BigInt(0)) {
-                    const prog = (totalCurrent * BigInt(100)) / target;
-                    order.outProgress = Number(prog);
-                    if (order.outProgress > 100) order.outProgress = 100;
-                }
+        let currentCursor = BigInt(0);
+        let fetchedAll = false;
+        let tempOrders = [];
 
-                // Recovery Progress (New)
-                // Logic: Current = totalReceivedUsdt, Target = guaranteeUsdt
-                
-                const currentRecovery = BigInt(item.totalReceivedUsdt);
-                const targetRecovery = BigInt(item.guaranteeUsdt);
-                
-                order.recoveryValue = formatAmount(currentRecovery);
-                order.recoveryTarget = formatAmount(targetRecovery);
-                
-                if (targetRecovery > BigInt(0)) {
-                    const recProg = (currentRecovery * BigInt(100)) / targetRecovery;
-                    order.recoveryProgress = Number(recProg);
-                    if (order.recoveryProgress > 100) order.recoveryProgress = 100;
-                } else {
-                    order.recoveryProgress = 0;
-                }
-                
-                // Time Progress (100 days)
-                // (now - stakeTime) / 100 days
-                const now = Math.floor(Date.now() / 1000);
-                const elapsed = now - order.stakeTime;
-                const duration = 100 * 24 * 3600; // 100 days in seconds
-                
-                // Store values for UI
-                const daysPassed = Math.floor(elapsed / (24 * 3600));
-                order.timeValue = daysPassed > 100 ? 100 : daysPassed;
-                order.timeTarget = 100;
-
-                if (duration > 0) {
-                     const tProg = (elapsed * 100) / duration;
-                     order.timeProgress = Math.floor(tProg);
-                     if (order.timeProgress > 100) order.timeProgress = 100;
-                }
+        while (!fetchedAll) {
+            // getUserRecordInfos(user, cursor, limit, status)
+            const result = await stakingContract.getUserRecordInfos(
+                walletState.address,
+                currentCursor,
+                fetchBatchSize,
+                status
+            );
+            
+            const records = result[0];
+            const next = result[1];
+            
+            if (records.length === 0) {
+                fetchedAll = true;
+                break;
             }
+
+            // Process records
+            const processed = await Promise.all(records.map(async (item) => {
+                const r = item.record;
+                
+                // Basic data
+                const order = {
+                    id: item.id.toString(),
+                    amount: r.amount,
+                    stakeTime: Number(r.stakeTime),
+                    isQueued: r.isQueued,
+                    status: r.status,
+                    totalReceivedUsdt: item.totalReceivedUsdt,
+                    pendingStaticUsdt: item.pendingStaticUsdt,
+                    pendingTokenAmount: item.pendingTokenAmount,
+                    guaranteeUsdt: item.guaranteeUsdt,
+                    isUnstakeable: item.isUnstakeable,
+                    
+                    // For UI state
+                    queuePosition: undefined,
+                    queueAmountAhead: undefined,
+                    queueWait: undefined,
+                    outProgress: 0,
+                    timeProgress: 0
+                };
+                
+                // Logic for Queued
+                if (order.isQueued) {
+                    try {
+                        const qInfo = await stakingContract.getQueuePositionInfo(walletState.address, order.id);
+                        if (qInfo[0]) {
+                            order.queuePosition = Number(qInfo[1]);
+                            order.queueAmountAhead = formatAmount(qInfo[2]);
+                            order.queueWait = Number(qInfo[3]);
+                        }
+                    } catch (e) {
+                        console.warn("Failed to get queue info for order", order.id);
+                    }
+                } else if (!order.status) {
+                    // Logic for In Progress (Not Queued)
+                    
+                    // Out Progress (3x)
+                    // Need total received + pending static
+                    const totalCurrent = BigInt(item.totalReceivedUsdt) + BigInt(item.pendingStaticUsdt);
+                    // Target = Amount * 3 (Simplification based on prompt)
+                    const target = BigInt(r.amount) * BigInt(3);
+                    
+                    // Store values for UI
+                    order.outValue = formatAmount(totalCurrent);
+                    order.outTarget = formatAmount(target);
+                    
+                    if (target > BigInt(0)) {
+                        const prog = (totalCurrent * BigInt(100)) / target;
+                        order.outProgress = Number(prog);
+                        if (order.outProgress > 100) order.outProgress = 100;
+                    }
+
+                    // Recovery Progress (New)
+                    // Logic: Current = totalReceivedUsdt, Target = guaranteeUsdt
+                    
+                    const currentRecovery = BigInt(item.totalReceivedUsdt);
+                    const targetRecovery = BigInt(item.guaranteeUsdt);
+                    
+                    order.recoveryValue = formatAmount(currentRecovery);
+                    order.recoveryTarget = formatAmount(targetRecovery);
+                    
+                    if (targetRecovery > BigInt(0)) {
+                        const recProg = (currentRecovery * BigInt(100)) / targetRecovery;
+                        order.recoveryProgress = Number(recProg);
+                        if (order.recoveryProgress > 100) order.recoveryProgress = 100;
+                    } else {
+                        order.recoveryProgress = 0;
+                    }
+                    
+                    // Time Progress (100 days)
+                    // (now - stakeTime) / 100 days
+                    const now = Math.floor(Date.now() / 1000);
+                    const elapsed = now - order.stakeTime;
+                    const duration = 100 * 24 * 3600; // 100 days in seconds
+                    
+                    // Store values for UI
+                    const daysPassed = Math.floor(elapsed / (24 * 3600));
+                    order.timeValue = daysPassed > 100 ? 100 : daysPassed;
+                    order.timeTarget = 100;
+
+                    if (duration > 0) {
+                         const tProg = (elapsed * 100) / duration;
+                         order.timeProgress = Math.floor(tProg);
+                         if (order.timeProgress > 100) order.timeProgress = 100;
+                    }
+                }
+                
+                return order;
+            }));
             
-            return order;
-        }));
-        
-        if (cursor === BigInt(0)) {
-            orders.value = processed;
-        } else {
-            orders.value = [...orders.value, ...processed];
+            tempOrders = [...tempOrders, ...processed];
+            
+            if (records.length < fetchBatchSize || next === BigInt(0)) {
+                fetchedAll = true;
+            } else {
+                currentCursor = next;
+            }
         }
         
-        nextCursor.value = newCursor;
-        // If result count < limit, probably no more. 
-        // Or check if nextCursor is 0 (some contracts use 0 to indicate end, some use same cursor).
-        // Based on prompt: "first page 0, next page return nextCursor".
-        // Usually if returned records < limit, we are done.
-        hasMore.value = records.length === limit;
+        // Sort by ID Ascending (Small to Large)
+        tempOrders.sort((a, b) => Number(a.id) - Number(b.id));
+
+        allOrders.value = tempOrders;
+        updateDisplayedOrders();
         
     } catch (e) {
         console.error("Fetch orders error:", e);
@@ -390,7 +407,13 @@ const fetchOrders = async (status, cursor) => {
 
 const loadMore = () => {
     if (loading.value) return;
-    fetchOrders(activeTab.value, nextCursor.value);
+    displayCount.value += limit;
+    updateDisplayedOrders();
+};
+
+const updateDisplayedOrders = () => {
+    orders.value = allOrders.value.slice(0, displayCount.value);
+    hasMore.value = displayCount.value < allOrders.value.length;
 };
 
 const harvest = async (id) => {
@@ -407,7 +430,7 @@ const harvest = async (id) => {
         showToast(t('orders.harvestSuccess'), 'success');
         // Refresh
         orders.value = [];
-        fetchOrders(activeTab.value, BigInt(0));
+        fetchOrders(activeTab.value);
     } catch (e) {
         console.error(e);
         showToast(t('orders.error'), 'error');
@@ -449,7 +472,7 @@ const confirmUnstake = async () => {
         showToast(t('orders.unstakeSuccess'), 'success');
         // Refresh
         orders.value = [];
-        fetchOrders(activeTab.value, BigInt(0));
+        fetchOrders(activeTab.value);
     } catch (e) {
         console.error(e);
         // User rejected
@@ -464,16 +487,18 @@ const confirmUnstake = async () => {
 
 onMounted(() => {
     if (walletState.isConnected) {
-        fetchOrders(0, BigInt(0));
+        fetchOrders(0);
     }
 });
 
 watch(() => walletState.isConnected, (newVal) => {
     if (newVal) {
         orders.value = [];
-        fetchOrders(0, BigInt(0));
+        allOrders.value = [];
+        fetchOrders(0);
     } else {
         orders.value = [];
+        allOrders.value = [];
     }
 });
 
@@ -484,14 +509,10 @@ watch(() => walletState.isConnected, (newVal) => {
   width: 100%;
   max-width: 800px;
   margin: 0 auto 2rem;
-  padding: 1.5rem;
-  border-radius: 16px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(192, 132, 252, 0.1);
+  padding: 1.5rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  backdrop-filter: blur(10px);
 }
 
 .section-title {
@@ -807,6 +828,8 @@ watch(() => walletState.isConnected, (newVal) => {
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+    width: fit-content;
+    margin: 0 auto;
 }
 
 .load-more-btn:hover {
