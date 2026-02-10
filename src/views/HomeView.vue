@@ -115,15 +115,22 @@
 
       </div>
     </section>
+
+    <!-- Global Dashboard -->
+    <GlobalDashboard />
   </div>
 </template>
 
 <script>
 import { onMounted, ref } from 'vue';
 import { t } from '@/i18n';
+import GlobalDashboard from '@/components/GlobalDashboard.vue';
 
 export default {
   name: 'HomeView',
+  components: {
+    GlobalDashboard
+  },
   setup() {
     const showModal = ref(false);
 

@@ -29,6 +29,14 @@ const languagePacks = {
     'nav.nft': 'NFT',
     'nav.team': 'Friends',
     
+    // Dashboard
+    'dashboard.dailyQuota': 'Daily Mint Quota',
+    'dashboard.todayUsed': 'Today\'s Used Quota',
+    'dashboard.queueCount': 'Total Queued Count',
+    'dashboard.queueRange': 'Current Queue Head/Tail',
+    'dashboard.progress': 'Progress',
+    'dashboard.unlimited': 'Unlimited',
+    
     // Announcement
     'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
     'home.announcement.greeting': 'Dear Users,',
@@ -104,6 +112,14 @@ const languagePacks = {
      'nav.home': '首页',
      'nav.nft': 'NFT',
      'nav.team': '好友',
+
+     // Dashboard
+     'dashboard.dailyQuota': '今日铸币额度',
+     'dashboard.todayUsed': '今日已用额度',
+     'dashboard.queueCount': '排队中总人数',
+     'dashboard.queueRange': '当前排队头/尾',
+     'dashboard.progress': '进度',
+     'dashboard.unlimited': '不限额',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX系统加急升级公告',
@@ -182,6 +198,14 @@ const languagePacks = {
      'nav.nft': 'NFT',
      'nav.team': '好友',
 
+     // Dashboard
+     'dashboard.dailyQuota': '今日鑄幣額度',
+     'dashboard.todayUsed': '今日已用額度',
+     'dashboard.queueCount': '排隊中總人數',
+     'dashboard.queueRange': '當前排隊頭/尾',
+     'dashboard.progress': '進度',
+     'dashboard.unlimited': '不限額',
+
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 系統加急升級公告',
      'home.announcement.greeting': '尊敬的平台用戶：\n您好！',
@@ -259,6 +283,14 @@ const languagePacks = {
      'nav.nft': 'NFT',
      'nav.team': '友達',
 
+     // Dashboard
+     'dashboard.dailyQuota': '本日のミント枠',
+     'dashboard.todayUsed': '本日の使用済み枠',
+     'dashboard.queueCount': '待機中の総人数',
+     'dashboard.queueRange': '現在の待機先頭/末尾',
+     'dashboard.progress': '進捗',
+     'dashboard.unlimited': '無制限',
+
      // Announcement
      'home.announcement.title': 'PGNLZ MAXシステムアップグレードに関する緊急のお知らせ',
      'home.announcement.greeting': 'ユーザーの皆様へ',
@@ -335,6 +367,14 @@ const languagePacks = {
      'nav.home': '홈',
      'nav.nft': 'NFT',
      'nav.team': '친구',
+
+     // Dashboard
+     'dashboard.dailyQuota': '오늘의 민팅 한도',
+     'dashboard.todayUsed': '오늘 사용된 한도',
+     'dashboard.queueCount': '대기 중인 총 인원',
+     'dashboard.queueRange': '현재 대기 선두/후미',
+     'dashboard.progress': '진행 상황',
+     'dashboard.unlimited': '무제한',
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 시스템 업그레이드에 관한 긴급 공지',
