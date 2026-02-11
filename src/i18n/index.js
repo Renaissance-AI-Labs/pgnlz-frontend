@@ -130,6 +130,7 @@ const languagePacks = {
     'nft.harvestAll': 'Harvest All',
     'nft.reactivate': 'Reactivate',
     'nft.active': 'Active',
+    'nft.cycleProgress': 'Cycle Progress',
     'nft.level': 'Level',
     'nft.rewards': 'Rewards',
     'nft.status': 'Status',
@@ -145,6 +146,7 @@ const languagePacks = {
     'nft.confirm': 'Confirm',
     'nft.current': 'Current',
     'nft.activationConditionNotMet': 'Activation conditions not met',
+    'nft.activationCostTip': 'Activation cost for one NODE NFT is 500 USDT',
 
     // Team / Friend Page
     'team.pageTitle': '< Friends />',
@@ -300,6 +302,7 @@ const languagePacks = {
      'nft.harvestAll': '一键领取',
      'nft.reactivate': '激活',
      'nft.active': '生效中',
+     'nft.cycleProgress': '周期进度',
      'nft.level': '等级',
      'nft.rewards': '待领收益',
      'nft.status': '状态',
@@ -315,6 +318,7 @@ const languagePacks = {
      'nft.confirm': '确定',
      'nft.current': '当前',
      'nft.activationConditionNotMet': '未达到激活条件',
+     'nft.activationCostTip': '激活一张 NODE NFT 的费用为 500 USDT',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -471,6 +475,7 @@ const languagePacks = {
      'nft.harvestAll': '一鍵領取',
      'nft.reactivate': '激活',
      'nft.active': '生效中',
+     'nft.cycleProgress': '週期進度',
      'nft.level': '等級',
      'nft.rewards': '待領收益',
      'nft.status': '狀態',
@@ -487,6 +492,7 @@ const languagePacks = {
      'nft.current': '當前',
      'nft.required': '目標',
      'nft.activationConditionNotMet': '當前未達到激活條件',
+     'nft.activationCostTip': '激活一張 NODE NFT 的費用為 500 USDT',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -643,6 +649,7 @@ const languagePacks = {
      'nft.harvestAll': 'すべて収穫',
      'nft.reactivate': '再活性化',
      'nft.active': 'アクティブ',
+     'nft.cycleProgress': 'サイクル進度',
      'nft.level': 'レベル',
      'nft.rewards': '報酬',
      'nft.status': 'ステータス',
@@ -659,6 +666,7 @@ const languagePacks = {
      'nft.current': '現在',
      'nft.required': '目標',
      'nft.activationConditionNotMet': '現在、有効化条件を満たしていません',
+     'nft.activationCostTip': 'NODE NFT 1枚の有効化費用は 500 USDT です',
 
      // Team / Friend Page
      'team.pageTitle': '< 友達 />',
@@ -815,6 +823,7 @@ const languagePacks = {
      'nft.harvestAll': '모두 수확',
      'nft.reactivate': '활성화',
      'nft.active': '활성',
+     'nft.cycleProgress': '주기 진행률',
      'nft.level': '레벨',
      'nft.rewards': '보상',
      'nft.status': '상태',
@@ -830,6 +839,7 @@ const languagePacks = {
      'nft.confirm': '확인',
      'nft.current': '현재',
      'nft.activationConditionNotMet': '현재 활성화 조건을 충족하지 못했습니다',
+     'nft.activationCostTip': 'NODE NFT 1장 활성화 비용은 500 USDT입니다',
 
      // Team / Friend Page
      'team.pageTitle': '< 친구 />',

@@ -39,14 +39,21 @@
         <div class="nft-list-section" v-if="walletState.isConnected">
           <div class="section-header">
             <h3>{{ t('nft.systemNodes') }}</h3>
-            <button 
-              class="harvest-all-btn" 
-              :class="{ 'activate-mode': !isLoading && !hasRewards }"
-              @click="handleHarvestAll" 
-              :disabled="isLoading"
-            >
-              {{ isLoading ? t('nft.loading') : (hasRewards ? t('nft.harvestAll') : t('nft.howToActivate')) }}
-            </button>
+            <div class="header-actions">
+                <button 
+                  class="harvest-all-btn activate-mode"
+                  @click="openActivationModal"
+                >
+                  {{ t('nft.howToActivate') }}
+                </button>
+                <button 
+                  class="harvest-all-btn" 
+                  @click="handleHarvestAll" 
+                  :disabled="isLoading || !hasRewards"
+                >
+                  {{ isLoading ? t('nft.loading') : t('nft.harvestAll') }}
+                </button>
+            </div>
           </div>
           
           <div class="nft-grid-container">
@@ -60,7 +67,7 @@
                <!-- Header (PC Only) -->
                <div class="grid-header">
                  <div class="col-id">{{ t('nft.id') }}</div>
-                 <div class="col-level">{{ t('nft.level') }}</div>
+                 <div class="col-progress">{{ t('nft.cycleProgress') }}</div>
                  <div class="col-rewards">{{ t('nft.rewards') }}</div>
                  <div class="col-status">{{ t('nft.status') }}</div>
                </div>
@@ -72,10 +79,17 @@
                      <span class="mobile-label">{{ t('nft.id') }}</span>
                      <span class="value">#{{ nft.id }}</span>
                    </div>
-                   <div class="col-level">
-                     <span class="mobile-label">{{ t('nft.level') }}</span>
-                     <span class="value">LV.{{ nft.level }}</span>
-                   </div>
+                 </div>
+                 
+                 <!-- Progress Bar Section -->
+                 <div class="item-progress col-progress">
+                    <div class="progress-info">
+                        <span class="label">{{ t('nft.cycleProgress') }}</span>
+                        <span class="value">{{ formatReward(nft.harvested) }} / {{ formatReward(rewardCap) }}</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
+                    </div>
                  </div>
                  
                  <div class="item-rewards col-rewards">
@@ -128,6 +142,10 @@
           </div>
           
           <div class="modal-body">
+            <div class="activation-tip">
+                {{ t('nft.activationCostTip') }}
+            </div>
+
             <!-- Progress Bar 1: Direct Referrals -->
             <div class="progress-item">
               <div class="progress-label">
@@ -251,7 +269,22 @@ export default {
     
     const calculateProgress = (current, target) => {
       if (!target || target === 0) return 100;
-      return Math.min((current / target) * 100, 100);
+      
+      try {
+          // Handle BigInt
+          const currentBn = BigInt(current);
+          const targetBn = BigInt(target);
+          
+          if (targetBn === 0n) return 100;
+          
+          // Calculate percentage with precision
+          // (current * 10000) / target -> then divide by 100 for decimals
+          const percent = Number((currentBn * 10000n) / targetBn) / 100;
+          return Math.min(percent, 100);
+      } catch (e) {
+          // Fallback for non-BigInt numbers
+          return Math.min((Number(current) / Number(target)) * 100, 100);
+      }
     };
     
     const formatNumber = (num) => {
@@ -313,11 +346,25 @@ export default {
         const cap = await nodePoolContract.rewardCap();
         rewardCap.value = cap;
 
-        // Initialize token symbols if not cached (simplified: map known addresses)
-        // In production, might want to fetch symbol() from contract
-        tokenSymbols.value[pgnlzAddr] = 'PGNLZ';
-        tokenSymbols.value[usdtAddr] = 'USDT';
-        // For others, just use address or fetch
+        // Get PGNLZ address from Staking contract as requested
+        let pgnlzAddressFromStaking = pgnlzAddr;
+        try {
+            pgnlzAddressFromStaking = await stakingContract.PGNLZ();
+        } catch (e) {
+            console.warn('Failed to fetch PGNLZ address from Staking contract, using config address', e);
+        }
+
+        // Initialize token symbols
+        tokenSymbols.value[pgnlzAddressFromStaking.toLowerCase()] = 'PGNLZ';
+        tokenSymbols.value[pgnlzAddr.toLowerCase()] = 'PGNLZ'; // Fallback
+        tokenSymbols.value[usdtAddr.toLowerCase()] = 'USDT';
+
+        // Prepare list of tokens to query (deduplicate)
+        const tokensToQuery = new Set([
+            ...supportedTokens.map(t => t.toLowerCase()),
+            pgnlzAddressFromStaking.toLowerCase(),
+            usdtAddr.toLowerCase()
+        ]);
         
         // 3. Batch Get Rewards
         const rewardsMap = {}; // nftId -> { symbol: amount }
@@ -328,14 +375,19 @@ export default {
         });
 
         // Fetch rewards for each token
-        for (const tokenAddr of supportedTokens) {
+        for (const tokenAddr of tokensToQuery) {
             try {
                 const amounts = await nodePoolContract.getTokenRewardsBatch(nftIds, tokenAddr);
-                const symbol = tokenSymbols.value[tokenAddr] || 'Unknown';
+                // Resolve symbol (case-insensitive check)
+                const symbol = tokenSymbols.value[tokenAddr] || 
+                               (tokenAddr.toLowerCase() === pgnlzAddressFromStaking.toLowerCase() ? 'PGNLZ' : 
+                                tokenAddr.toLowerCase() === usdtAddr.toLowerCase() ? 'USDT' : 'Unknown');
                 
                 nftIds.forEach((id, index) => {
                     const amount = amounts[index];
-                    if (amount > 0) {
+                    // Store even if 0 if you want to show 0 values, but usually we filter > 0
+                    // User said "USDT is not displayed", so maybe they have rewards but it wasn't queried.
+                    if (amount > 0n) { // Use BigInt comparison
                         rewardsMap[id][symbol] = amount;
                     }
                 });
@@ -390,15 +442,19 @@ export default {
             const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
             
             const tx = await nodePoolContract.harvestAll(ids);
-            alert(t('team.toast.txSubmitted')); // Reuse submitting toast
+            showToast(t('team.toast.txSubmitted'), 'info');
             await tx.wait();
-            alert(t('nft.harvestSuccess'));
+            showToast(t('nft.harvestSuccess'), 'success');
             
             // Refresh
             fetchNftList();
         } catch (error) {
             console.error('Harvest failed:', error);
-            alert('Harvest Failed: ' + (error.reason || error.message));
+            // Don't alert if user rejected
+            if (error.code === 'ACTION_REJECTED' || (error.info && error.info.error && error.info.error.code === 4001)) {
+                return;
+            }
+            showToast('Harvest Failed: ' + (error.reason || error.message), 'error');
         } finally {
             isActionProcessing.value = false;
         }
@@ -517,7 +573,8 @@ export default {
       openActivationModal,
       closeActivationModal,
       calculateProgress,
-      formatNumber
+      formatNumber,
+      rewardCap
     };
   }
 }
@@ -591,7 +648,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
   width: 100%;
 }
 
@@ -662,13 +719,19 @@ export default {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
 }
 
 .harvest-all-btn {
   background: linear-gradient(135deg, var(--primary) 0%, var(--purple-dark) 100%);
   border: none;
   border-radius: 8px;
-  padding: 8px 20px;
+  padding: 8px 16px;
   color: #fff;
   font-family: var(--font-code);
   font-weight: 600;
@@ -678,6 +741,9 @@ export default {
   box-shadow: 0 4px 12px rgba(192, 132, 252, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap; /* Prevent line breaks */
+  min-width: 100px; /* Reduced from 120px */
+  text-align: center;
 }
 
 .harvest-all-btn:hover:not(:disabled) {
@@ -695,17 +761,17 @@ export default {
   color: var(--text-secondary);
 }
 
-/* Specific style for when it is "How to Activate" - actually we reuse the main style but handle logic */
+/* Specific style for when it is "How to Activate" */
 .harvest-all-btn.activate-mode {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(192, 132, 252, 0.3);
-  color: var(--primary);
-  box-shadow: 0 0 10px rgba(192, 132, 252, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: none;
 }
 
 .harvest-all-btn.activate-mode:hover {
-  background: rgba(192, 132, 252, 0.15);
-  box-shadow: 0 0 15px rgba(192, 132, 252, 0.2);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
@@ -722,7 +788,7 @@ export default {
 
 .grid-header {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr 1.5fr;
+  grid-template-columns: 0.8fr 1.5fr 1.5fr 1.2fr;
   padding: 0 1rem 0.6rem;
   color: var(--text-secondary);
   font-family: var(--font-code);
@@ -734,19 +800,52 @@ export default {
 
 .grid-item {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr 1.5fr;
+  grid-template-columns: 0.8fr 1.5fr 1.5fr 1.2fr;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px; /* Slightly reduced radius */
   padding: 0.8rem 1rem; /* Compact padding */
   align-items: center;
   transition: all 0.2s ease;
+  min-height: 70px; /* Ensure consistent height */
 }
 
 .grid-item:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(192, 132, 252, 0.2);
   transform: translateX(4px);
+}
+
+.item-progress {
+    padding-right: 1rem;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+    color: var(--text-secondary);
+}
+
+.progress-info .value {
+    color: #fff;
+    font-family: var(--font-code);
+}
+
+.progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #a855f7);
+    border-radius: 3px;
+    transition: width 0.5s ease;
 }
 
 .item-main {
@@ -760,15 +859,7 @@ export default {
   font-size: 0.95rem;
 }
 
-.col-level .value {
-  font-family: var(--font-code);
-  color: var(--primary);
-  font-weight: 700;
-  background: rgba(192, 132, 252, 0.1);
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-}
+/* Removed .col-level .value */
 
 .reward-list {
   display: flex;
@@ -817,29 +908,33 @@ export default {
 }
 
 .reactivate-btn {
-  background: rgba(234, 179, 8, 0.15);
-  border: 1px solid rgba(234, 179, 8, 0.3);
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.2);
   color: #facc15;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.1);
+  box-shadow: none;
 }
 
 .reactivate-btn:hover:not(:disabled) {
-  background: rgba(234, 179, 8, 0.25);
-  box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+  background: rgba(234, 179, 8, 0.2);
+  border-color: rgba(234, 179, 8, 0.4);
   transform: translateY(-1px);
 }
 
 .status-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 6px 10px;
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.2);
-  border-radius: 16px;
+  border-radius: 6px; /* Match button radius */
   font-size: 0.8rem;
   color: #4ade80;
-  font-weight: 500;
+  font-weight: 600; /* Match button weight */
+  font-family: var(--font-code); /* Match button font */
+  width: 100%; /* Match button width */
+  text-transform: uppercase;
 }
 
 .status-badge.active .dot {
@@ -872,6 +967,25 @@ export default {
   .nft-list-section {
     padding: 0.8rem;
   }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+
+  .harvest-all-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 8px;
+    font-size: 0.8rem;
+  }
   
   .grid-header {
     display: none; /* Hide header on mobile */
@@ -883,7 +997,7 @@ export default {
 
   .grid-item {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
     padding: 0.8rem 0.5rem;
@@ -909,15 +1023,13 @@ export default {
     font-size: 0.9rem;
   }
 
-  .col-level {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-  }
+  /* Removed .col-level styles */
   
-  .col-level .value {
-    font-size: 0.8rem;
-    padding: 2px 6px;
+  .item-progress {
+    width: 100%;
+    order: 3; /* Move to bottom on mobile */
+    padding-right: 0;
+    margin-top: 0.5rem;
   }
   
   .mobile-label {
@@ -977,6 +1089,8 @@ export default {
     padding: 4px 8px;
     font-size: 0.75rem;
     white-space: nowrap;
+    width: auto;
+    min-width: unset;
   }
 }
 
@@ -1187,18 +1301,6 @@ h1 {
 
 /* Removed pulse animation to make it more formal */
 
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  backdrop-filter: blur(5px);
-}
 
 .dot {
   width: 8px;
@@ -1409,6 +1511,19 @@ h1 {
   gap: 20px;
   align-items: flex-start;
   text-align: left;
+}
+
+.activation-tip {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+  line-height: normal;
 }
 
 .progress-item {

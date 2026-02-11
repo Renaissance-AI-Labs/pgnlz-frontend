@@ -58,6 +58,11 @@
                       <span class="label">{{ t('team.teamCount') }}</span>
                       <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
                     </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                      <span class="label">{{ t('nft.teamPerformance') }}</span>
+                      <span class="value highlight">{{ myTeamTotalInvestValue }} <span class="unit">U</span></span>
+                    </div>
                   </div>
 
                   <div class="children-list-container">
@@ -87,12 +92,25 @@
                                     <div class="card-divider"></div>
 
                                     <div class="card-stats">
-                                        <span class="stat-label">{{ t('team.teamCount') }}</span>
-                                        <span class="stat-value">
-                                            <span v-if="currentChild.teamCount !== null">{{ currentChild.teamCount }}</span>
-                                            <span v-else class="loading-dots">...</span>
-                                            <span class="unit">{{ t('team.peopleUnit') }}</span>
-                                        </span>
+                                        <div class="stat-group">
+                                            <span class="stat-label">{{ t('team.teamCount') }}</span>
+                                            <span class="stat-value">
+                                                <span v-if="currentChild.teamCount !== null">{{ currentChild.teamCount }}</span>
+                                                <span v-else class="loading-dots">...</span>
+                                                <span class="unit">{{ t('team.peopleUnit') }}</span>
+                                            </span>
+                                        </div>
+
+                                        <div class="stat-divider-vertical"></div>
+
+                                        <div class="stat-group">
+                                            <span class="stat-label">{{ t('nft.teamPerformance') }}</span>
+                                            <span class="stat-value highlight">
+                                                <span v-if="currentChild.teamTotalInvestValue !== null">{{ currentChild.teamTotalInvestValue }}</span>
+                                                <span v-else class="loading-dots">...</span>
+                                                <span class="unit">U</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </transition>
@@ -218,6 +236,7 @@ import { showToast } from '@/services/notification.js';
 import { onMounted, ref, computed, watch, nextTick } from 'vue';
 import { ethers } from 'ethers';
 import referralAbi from '@/abis/referral.json';
+import stakingAbi from '@/abis/staking.json';
 import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
 import { useRoute } from 'vue-router'; // We might need router for query params, but window.location is safer without router setup check
 import { t } from '@/i18n/index.js';
@@ -235,6 +254,7 @@ export default {
     // Data State
     const referralCount = ref(0);
     const teamCount = ref(0);
+    const myTeamTotalInvestValue = ref('0.0');
     const childrenList = ref([]);
     const currentCardIndex = ref(0);
     const childrenCursor = ref(0);
@@ -310,6 +330,25 @@ export default {
         // Get Team Count
         const tCount = await contract.getTeamCount(walletState.address);
         teamCount.value = tCount.toString();
+
+        // Get My Team Total Invest Value
+        try {
+            let provider = walletState.provider;
+            if (!provider && window.ethereum) {
+                 provider = new ethers.BrowserProvider(window.ethereum);
+            }
+            if (provider) {
+                const stakingAddress = getContractAddress('Staking');
+                if (stakingAddress) {
+                    const stakingContract = new ethers.Contract(stakingAddress, stakingAbi, provider);
+                    const value = await stakingContract.teamTotalInvestValue(walletState.address);
+                    myTeamTotalInvestValue.value = parseFloat(ethers.formatEther(value)).toFixed(1);
+                }
+            }
+        } catch (err) {
+            console.error("Error fetching my team total invest value:", err);
+            myTeamTotalInvestValue.value = '0.0';
+        }
 
         // Get Current Referrer
         const referrer = await contract.getReferral(walletState.address);
@@ -389,7 +428,8 @@ export default {
             // Map to objects
             const childObjects = validChildren.map(addr => ({
                 address: addr,
-                teamCount: null // Init as null
+                teamCount: null, // Init as null
+                teamTotalInvestValue: null // Init as null
             }));
             
             childrenList.value = [...childrenList.value, ...childObjects];
@@ -398,6 +438,7 @@ export default {
             // If this is the first load (or reset), fetch the first child's team count immediately
             if (reset && childrenList.value.length > 0) {
                 fetchChildTeamCount(0);
+                fetchChildStakingData(0);
             }
 
             if (newChildren.length < pageSize) {
@@ -431,6 +472,33 @@ export default {
         }
     };
 
+    const fetchChildStakingData = async (index) => {
+        const child = childrenList.value[index];
+        if (!child || child.teamTotalInvestValue !== null) return;
+
+        try {
+            // Get Staking Contract (Read Only)
+            let provider = walletState.provider;
+            if (!provider && window.ethereum) {
+                 provider = new ethers.BrowserProvider(window.ethereum);
+            }
+            if (!provider) return;
+
+            const address = getContractAddress('Staking');
+            if (!address) return;
+            
+            const contract = new ethers.Contract(address, stakingAbi, provider);
+            const value = await contract.teamTotalInvestValue(child.address);
+            
+            // Format to 1 decimal place
+            const formatted = parseFloat(ethers.formatEther(value)).toFixed(1);
+            child.teamTotalInvestValue = formatted;
+        } catch (error) {
+            console.error(`Error fetching staking data for ${child.address}:`, error);
+            child.teamTotalInvestValue = '0.0';
+        }
+    };
+
     // 6. Carousel Navigation
     const prevCard = () => {
         if (currentCardIndex.value > 0) {
@@ -456,6 +524,7 @@ export default {
     watch(currentCardIndex, (newIndex) => {
         if (newIndex >= 0 && newIndex < childrenList.value.length) {
             fetchChildTeamCount(newIndex);
+            fetchChildStakingData(newIndex);
         }
     });
 
@@ -612,6 +681,7 @@ export default {
         if (!newConnected) {
             referralCount.value = 0;
             teamCount.value = 0;
+            myTeamTotalInvestValue.value = '0.0';
             childrenList.value = [];
             currentCardIndex.value = 0;
             childrenCursor.value = 0;
@@ -694,6 +764,7 @@ export default {
       activeTab,
       referralCount,
       teamCount,
+      myTeamTotalInvestValue,
       childrenList,
       loadingChildren,
       hasMoreChildren,
@@ -1042,6 +1113,11 @@ export default {
   font-weight: 700;
 }
 
+.stats-card .value.highlight {
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+}
+
 .stats-card .unit {
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -1146,9 +1222,25 @@ export default {
 
 .card-stats {
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0.5rem 0;
+}
+
+.stat-group {
+    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.1rem; /* Reduced gap from 0.2rem */
+    gap: 0.2rem;
+}
+
+.stat-divider-vertical {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .stat-label {
@@ -1161,6 +1253,11 @@ export default {
     font-weight: 700;
     color: #fff;
     font-family: var(--font-code);
+}
+
+.stat-value.highlight {
+    color: var(--primary);
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
 }
 
 .stat-value .unit {
