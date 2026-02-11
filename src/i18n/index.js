@@ -144,7 +144,7 @@ const languagePacks = {
     'nft.teamPerformance': 'Team Total Investment',
     'nft.confirm': 'Confirm',
     'nft.current': 'Current',
-    'nft.required': 'Required',
+    'nft.activationConditionNotMet': 'Activation conditions not met',
 
     // Team / Friend Page
     'team.pageTitle': '< Friends />',
@@ -314,7 +314,7 @@ const languagePacks = {
      'nft.teamPerformance': '团队总业绩',
      'nft.confirm': '确定',
      'nft.current': '当前',
-     'nft.required': '目标',
+     'nft.activationConditionNotMet': '未达到激活条件',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -486,6 +486,7 @@ const languagePacks = {
      'nft.confirm': '確定',
      'nft.current': '當前',
      'nft.required': '目標',
+     'nft.activationConditionNotMet': '當前未達到激活條件',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -657,6 +658,7 @@ const languagePacks = {
      'nft.confirm': '確認',
      'nft.current': '現在',
      'nft.required': '目標',
+     'nft.activationConditionNotMet': '現在、有効化条件を満たしていません',
 
      // Team / Friend Page
      'team.pageTitle': '< 友達 />',
@@ -827,7 +829,7 @@ const languagePacks = {
      'nft.teamPerformance': '팀 총 투자액',
      'nft.confirm': '확인',
      'nft.current': '현재',
-     'nft.required': '목표',
+     'nft.activationConditionNotMet': '현재 활성화 조건을 충족하지 못했습니다',
 
      // Team / Friend Page
      'team.pageTitle': '< 친구 />',

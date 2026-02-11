@@ -167,6 +167,7 @@
 <script>
 import { walletState } from '@/services/wallet.js';
 import { getContractAddress } from '@/services/contracts.js';
+import { showToast } from '@/services/notification.js';
 import { onMounted, ref, watch, computed } from 'vue';
 import { ethers } from 'ethers';
 import nodeNFTAbi from '@/abis/nodeNFT.json';
@@ -418,7 +419,7 @@ export default {
             const can = await stakingContract.checkReactivate(walletState.address);
             
             if (!can) {
-                alert('Qualification check failed. Please check team performance requirements.');
+                showToast(t('nft.activationConditionNotMet'), 'error');
                 return;
             }
 
