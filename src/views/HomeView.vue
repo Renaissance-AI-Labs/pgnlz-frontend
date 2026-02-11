@@ -121,6 +121,9 @@
 
     <!-- Staking Section -->
     <StakingSection />
+
+    <!-- LP Dividend Section -->
+    <LPDividendSection />
   </div>
 </template>
 
@@ -130,12 +133,14 @@ import { useRouter } from 'vue-router'; // Add this
 import { t } from '@/i18n';
 import GlobalDashboard from '@/components/GlobalDashboard.vue';
 import StakingSection from '@/components/StakingSection.vue';
+import LPDividendSection from '@/components/LPDividendSection.vue';
 
 export default {
   name: 'HomeView',
   components: {
     GlobalDashboard,
-    StakingSection
+    StakingSection,
+    LPDividendSection
   },
   setup() {
     const showModal = ref(false);

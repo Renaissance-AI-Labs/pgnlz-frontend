@@ -58,9 +58,19 @@ const languagePacks = {
      'staking.amountAhead': 'Amount Ahead',
      'staking.waitDays': 'Est. Wait',
      'staking.days': 'Days',
-     'staking.bindReferrerFirst': 'Bind Referrer First to Stake',
+         'staking.bindReferrerFirst': 'Bind Referrer First to Stake',
+
+    // LP Dividend Section
+    'lp.title': 'LP Dividend',
+    'lp.myStake': 'My LP Stake',
+    'lp.pendingRewards': 'Pending Rewards',
+    'lp.harvest': 'Harvest',
+    'lp.harvesting': 'Harvesting...',
+    'lp.harvestSuccess': 'Harvest Successful',
+    'lp.harvestFailed': 'Harvest Failed',
+    'lp.connectWallet': 'Connect Wallet to View',
      
-     // Orders Section
+    // Orders Section
      'orders.title': 'My Orders',
      'orders.tab.processing': 'In Progress',
      'orders.tab.completed': 'Completed',
@@ -195,9 +205,19 @@ const languagePacks = {
      'staking.amountAhead': '前方金额',
      'staking.waitDays': '预计等待',
      'staking.days': '天',
-     'staking.bindReferrerFirst': '请先绑定推荐人后质押',
+         'staking.bindReferrerFirst': '请先绑定推荐人后质押',
 
-     // Orders Section
+    // LP Dividend Section
+    'lp.title': 'LP 分红',
+    'lp.myStake': '我的 LP 质押',
+    'lp.pendingRewards': '待领取收益',
+    'lp.harvest': '领取收益',
+    'lp.harvesting': '领取中...',
+    'lp.harvestSuccess': '领取成功',
+    'lp.harvestFailed': '领取失败',
+    'lp.connectWallet': '连接钱包查看',
+
+    // Orders Section
      'orders.title': '我的订单',
      'orders.tab.processing': '进行中',
      'orders.tab.completed': '已完成',
@@ -333,9 +353,19 @@ const languagePacks = {
      'staking.amountAhead': '前方金額',
      'staking.waitDays': '預計等待',
      'staking.days': '天',
-     'staking.bindReferrerFirst': '請先綁定推薦人後質押',
+         'staking.bindReferrerFirst': '請先綁定推薦人後質押',
 
-     // Orders Section
+    // LP Dividend Section
+    'lp.title': 'LP 分紅',
+    'lp.myStake': '我的 LP 質押',
+    'lp.pendingRewards': '待領取收益',
+    'lp.harvest': '領取收益',
+    'lp.harvesting': '領取中...',
+    'lp.harvestSuccess': '領取成功',
+    'lp.harvestFailed': '領取失敗',
+    'lp.connectWallet': '連接錢包查看',
+
+    // Orders Section
      'orders.title': '我的訂單',
      'orders.tab.processing': '進行中',
      'orders.tab.completed': '已完成',
@@ -471,9 +501,19 @@ const languagePacks = {
      'staking.amountAhead': '待機金額',
      'staking.waitDays': '予想待機',
      'staking.days': '日',
-     'staking.bindReferrerFirst': '紹介者をバインドしてからステーキング',
+         'staking.bindReferrerFirst': '紹介者をバインドしてからステーキング',
 
-     // Orders Section
+    // LP Dividend Section
+    'lp.title': 'LP 配当',
+    'lp.myStake': '私の LP ステーキング',
+    'lp.pendingRewards': '未受取報酬',
+    'lp.harvest': '収穫',
+    'lp.harvesting': '収穫中...',
+    'lp.harvestSuccess': '収穫成功',
+    'lp.harvestFailed': '収穫失敗',
+    'lp.connectWallet': 'ウォレットを接続して表示',
+
+    // Orders Section
      'orders.title': '私の注文',
      'orders.tab.processing': '進行中',
      'orders.tab.completed': '完了',
@@ -609,9 +649,19 @@ const languagePacks = {
      'staking.amountAhead': '대기 금액',
      'staking.waitDays': '예상 대기',
      'staking.days': '일',
-     'staking.bindReferrerFirst': '추천인 바인딩 후 스테이킹 가능',
+         'staking.bindReferrerFirst': '추천인 바인딩 후 스테이킹 가능',
 
-     // Orders Section
+    // LP Dividend Section
+    'lp.title': 'LP 배당',
+    'lp.myStake': '내 LP 스테이킹',
+    'lp.pendingRewards': '미수령 보상',
+    'lp.harvest': '수확',
+    'lp.harvesting': '수확 중...',
+    'lp.harvestSuccess': '수확 성공',
+    'lp.harvestFailed': '수확 실패',
+    'lp.connectWallet': '지갑 연결하여 보기',
+
+    // Orders Section
      'orders.title': '내 주문',
      'orders.tab.processing': '진행 중',
      'orders.tab.completed': '완료됨',
