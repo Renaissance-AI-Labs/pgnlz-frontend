@@ -17,11 +17,11 @@
         </div>
       </div>
 
-      <!-- Item 3: Total Queued Count -->
+      <!-- Item 3: Remaining Quota -->
       <div class="stat-item">
         <div class="item-label">{{ t('dashboard.queueCount') }}</div>
         <div class="item-value text-white">
-          {{ queueInfo.totalQueuedCount }}
+          {{ formattedRemainingQuota }}
         </div>
       </div>
 
@@ -44,8 +44,34 @@
           :style="{ width: progressPercentage + '%' }"
         ></div>
       </div>
-      <div class="progress-text">
-        {{ t('dashboard.progress') }}: {{ formattedTodayUsed }} / {{ formattedDailyQuota }}
+      <div class="progress-info-row">
+        <span class="p-title">{{ t('dashboard.progress') }}</span>
+        <span class="p-value">{{ formattedTodayUsed }} / {{ formattedDailyQuota }} U</span>
+      </div>
+    </div>
+    <!-- Queue Progress Bar (New) -->
+    <div class="progress-section">
+      <div class="progress-bar-bg queue-bar-container">
+        <!-- Processed Segment -->
+        <div 
+          class="bar-segment processed" 
+          :style="{ width: queueProcessedPct + '%' }"
+        ></div>
+        <!-- Waiting Segment -->
+        <div 
+          class="bar-segment waiting" 
+          :style="{ width: queueWaitingPct + '%' }"
+        ></div>
+      </div>
+      <div class="progress-info-row">
+        <span class="p-title">{{ t('dashboard.queueProgress') }}</span>
+        <span class="p-value">
+            <span class="legend-dot processed-dot"></span>
+            {{ t('dashboard.processed') }} {{ queueInfo.headIndex }} 
+            <span class="divider"> </span>
+            <span class="legend-dot waiting-dot"></span>
+            {{ t('dashboard.currentQueued') }} {{ waitingCount }}
+        </span>
       </div>
     </div>
   </div>
@@ -71,7 +97,11 @@ const queueInfo = ref({
   nextBatchSize: 0
 });
 
-// Computed properties for display
+const waitingCount = computed(() => {
+    const val = BigInt(queueInfo.value.tailIndex) - BigInt(queueInfo.value.headIndex);
+    return val > 0 ? val : 0;
+});
+
 const formattedDailyQuota = computed(() => {
   if (dailyQuota.value === ethers.MaxUint256) {
     return t('dashboard.unlimited');
@@ -81,6 +111,15 @@ const formattedDailyQuota = computed(() => {
 
 const formattedTodayUsed = computed(() => {
   return ethers.formatEther(queueInfo.value.todayUsedQuota);
+});
+
+const formattedRemainingQuota = computed(() => {
+  if (dailyQuota.value === ethers.MaxUint256) {
+    return t('dashboard.unlimited');
+  }
+  const remaining = dailyQuota.value - queueInfo.value.todayUsedQuota;
+  const val = remaining > BigInt(0) ? remaining : BigInt(0);
+  return ethers.formatEther(val);
 });
 
 const progressPercentage = computed(() => {
@@ -100,6 +139,28 @@ const progressPercentage = computed(() => {
   if (total === 0) return 0;
   const pct = (used / total) * 100;
   return Math.min(pct, 100);
+});
+
+const queueProcessedPct = computed(() => {
+    const head = queueInfo.value.headIndex;
+    const tail = queueInfo.value.tailIndex;
+    if (tail === 0) return 0;
+    if (head >= tail) return 100;
+    
+    const pct = (head / tail) * 100;
+    return Math.min(pct, 100);
+});
+
+const queueWaitingPct = computed(() => {
+    const head = queueInfo.value.headIndex;
+    const tail = queueInfo.value.tailIndex;
+    if (tail === 0) return 0;
+    
+    const waiting = tail - head;
+    if (waiting <= 0) return 0;
+    
+    const pct = (waiting / tail) * 100;
+    return Math.min(pct, 100);
 });
 
 const fetchData = async () => {
@@ -245,8 +306,8 @@ watch(() => walletState.isConnected, (newVal) => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding-top: 0.5rem;
+  gap: 0.2rem;
+  /* padding-top: 0.5rem; */
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -266,11 +327,78 @@ watch(() => walletState.isConnected, (newVal) => {
   transition: width 0.5s ease-out;
 }
 
-.progress-text {
-  text-align: right;
+.progress-bar-fill.custom-queue {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.queue-bar-container {
+    display: flex;
+    background: transparent;
+    gap: 4px;
+    overflow: visible;
+}
+
+.bar-segment {
+    height: 100%;
+    transition: width 0.5s ease-out;
+    border-radius: 999px;
+}
+
+.bar-segment.processed {
+    background: linear-gradient(90deg, #10b981, #34d399); /* Green/Emerald */
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.bar-segment.waiting {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24); /* Amber/Orange */
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 4px;
+    margin-bottom: 1px;
+}
+
+.processed-dot {
+    background-color: #34d399;
+    box-shadow: 0 0 4px rgba(52, 211, 153, 0.6);
+}
+
+.waiting-dot {
+    background-color: #fbbf24;
+    box-shadow: 0 0 4px rgba(251, 191, 36, 0.6);
+}
+
+.divider {
+    margin: 0 6px;
+    opacity: 0.3;
+}
+
+.progress-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 0.3rem;
   font-size: 0.75rem;
+}
+
+.p-title {
+  color: var(--text-secondary);
+}
+
+.p-value {
   color: var(--text-muted);
   font-family: var(--font-code);
+  text-align: right;
+}
+
+.progress-text {
+  display: none; /* Hide old text class */
 }
 
 /* Responsive */
@@ -320,7 +448,7 @@ watch(() => walletState.isConnected, (newVal) => {
   }
   
   .progress-section {
-    padding-top: 0.4rem;
+    /* padding-top: 0.4rem; */
   }
   
   .progress-text {

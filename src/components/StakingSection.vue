@@ -64,7 +64,7 @@
       </div>
 
       <!-- Queue Status Compact -->
-      <div v-if="queueStatus" class="queue-status-compact">
+      <!-- <div v-if="queueStatus" class="queue-status-compact">
         <div class="status-ticker">
             <span class="status-dot pulsing"></span>
             <span class="status-label">{{ t('staking.queueTitle') }}:</span>
@@ -72,7 +72,7 @@
             <span class="divider">|</span>
             <span class="status-value">{{ t('staking.waitDays') }} ~{{ queueStatus.estimatedWaitDays }}{{ t('staking.days') }}</span>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

@@ -31,11 +31,15 @@ const languagePacks = {
     'nav.team': 'Friends',
     
     // Dashboard
-    'dashboard.dailyQuota': 'Daily Mint Quota',
-    'dashboard.todayUsed': 'Today\'s Used Quota',
-    'dashboard.queueCount': 'Total Queued Count',
+    'dashboard.dailyQuota': 'Daily Mint Quota(U)',
+    'dashboard.todayUsed': 'Today\'s Used Quota(U)',
+    'dashboard.queueCount': 'Remaining Quota Today(U)',
     'dashboard.queueRange': 'Current Queue Head/Tail',
-    'dashboard.progress': 'Progress',
+        'dashboard.progress': 'Today\'s Quota Progress',
+    'dashboard.queueProgress': 'Global Queue Progress',
+    'dashboard.processed': 'Processed',
+    'dashboard.totalQueued': 'Total',
+    'dashboard.currentQueued': 'Waiting',
     'dashboard.unlimited': 'Unlimited',
     
      // Announcement
@@ -178,11 +182,15 @@ const languagePacks = {
      'nav.team': '好友',
 
      // Dashboard
-     'dashboard.dailyQuota': '今日铸币额度',
-     'dashboard.todayUsed': '今日已用额度',
-     'dashboard.queueCount': '排队中总人数',
+    'dashboard.dailyQuota': '今日铸币额度(U)',
+    'dashboard.todayUsed': '今日已用额度(U)',
+    'dashboard.queueCount': '今日剩余额度(U)',
      'dashboard.queueRange': '当前排队头/尾',
-     'dashboard.progress': '进度',
+         'dashboard.progress': '今日额度进度',
+    'dashboard.queueProgress': '全局排队进度',
+    'dashboard.processed': '已处理数',
+    'dashboard.totalQueued': '总排队数',
+    'dashboard.currentQueued': '排队中单数',
      'dashboard.unlimited': '不限额',
 
      // Announcement
@@ -326,11 +334,15 @@ const languagePacks = {
      'nav.team': '好友',
 
      // Dashboard
-     'dashboard.dailyQuota': '今日鑄幣額度',
-     'dashboard.todayUsed': '今日已用額度',
-     'dashboard.queueCount': '排隊中總人數',
+    'dashboard.dailyQuota': '今日鑄幣額度(U)',
+    'dashboard.todayUsed': '今日已用額度(U)',
+    'dashboard.queueCount': '今日剩餘額度(U)',
      'dashboard.queueRange': '當前排隊頭/尾',
-     'dashboard.progress': '進度',
+         'dashboard.progress': '今日額度進度',
+    'dashboard.queueProgress': '全局排隊進度',
+    'dashboard.processed': '已處理數',
+    'dashboard.totalQueued': '總排隊數',
+    'dashboard.currentQueued': '排隊中單數',
      'dashboard.unlimited': '不限額',
 
      // Announcement
@@ -474,11 +486,15 @@ const languagePacks = {
      'nav.team': '友達',
 
      // Dashboard
-     'dashboard.dailyQuota': '本日のミント枠',
-     'dashboard.todayUsed': '本日の使用済み枠',
-     'dashboard.queueCount': '待機中の総人数',
+    'dashboard.dailyQuota': '本日のミント枠(U)',
+    'dashboard.todayUsed': '本日の使用済み枠(U)',
+    'dashboard.queueCount': '本日の残り枠(U)',
      'dashboard.queueRange': '現在の待機先頭/末尾',
-     'dashboard.progress': '進捗',
+         'dashboard.progress': '本日の枠進捗',
+    'dashboard.queueProgress': '全体待機進捗',
+    'dashboard.processed': '処理済み',
+    'dashboard.totalQueued': '総待機数',
+    'dashboard.currentQueued': '待機中',
      'dashboard.unlimited': '無制限',
 
      // Announcement
@@ -622,11 +638,15 @@ const languagePacks = {
      'nav.team': '친구',
 
      // Dashboard
-     'dashboard.dailyQuota': '오늘의 민팅 한도',
-     'dashboard.todayUsed': '오늘 사용된 한도',
-     'dashboard.queueCount': '대기 중인 총 인원',
+    'dashboard.dailyQuota': '오늘의 민팅 한도(U)',
+    'dashboard.todayUsed': '오늘 사용된 한도(U)',
+    'dashboard.queueCount': '오늘 남은 한도(U)',
      'dashboard.queueRange': '현재 대기 선두/후미',
-     'dashboard.progress': '진행 상황',
+         'dashboard.progress': '오늘의 한도 진행률',
+    'dashboard.queueProgress': '전체 대기 진행률',
+    'dashboard.processed': '처리됨',
+    'dashboard.totalQueued': '총 대기',
+    'dashboard.currentQueued': '대기 중',
      'dashboard.unlimited': '무제한',
 
      // Announcement

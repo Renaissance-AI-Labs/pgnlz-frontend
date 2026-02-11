@@ -49,18 +49,31 @@
                 </div>
 
                 <!-- Queued View -->
-                <div v-if="order.isQueued" class="queued-details">
-                    <div class="detail-row">
-                        <span class="label">{{ t('orders.queue.position') }}:</span>
-                        <span class="value">{{ order.queuePosition !== undefined ? order.queuePosition : '-' }}</span>
+                <div v-if="order.isQueued" class="queue-wrapper">
+                    <div class="queued-details">
+                        <div class="detail-row">
+                            <span class="label">{{ t('orders.queue.position') }}:</span>
+                            <span class="value">{{ order.queuePosition !== undefined ? order.queuePosition : '-' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">{{ t('orders.queue.amountAhead') }}:</span>
+                            <span class="value">{{ order.queueAmountAhead || '-' }} USDT</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">{{ t('orders.queue.wait') }}:</span>
+                            <span class="value">{{ order.queueWait !== undefined ? order.queueWait : '-' }} {{ t('orders.queue.days') }}</span>
+                        </div>
                     </div>
-                    <div class="detail-row">
-                        <span class="label">{{ t('orders.queue.amountAhead') }}:</span>
-                        <span class="value">{{ order.queueAmountAhead || '-' }} USDT</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">{{ t('orders.queue.wait') }}:</span>
-                        <span class="value">{{ order.queueWait !== undefined ? order.queueWait : '-' }} {{ t('orders.queue.days') }}</span>
+                    <div class="actions-compact mt-2">
+                        <button 
+                            class="btn-icon btn-unstake" 
+                            @click="openUnstakeModal(order.id)"
+                            :disabled="processing"
+                            :title="t('orders.btn.unstake')"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            {{ t('orders.btn.unstake') }}
+                        </button>
                     </div>
                 </div>
 
@@ -131,10 +144,9 @@
                             {{ t('orders.btn.harvest') }}
                         </button>
                         <button 
-                            v-if="order.isUnstakeable" 
                             class="btn-icon btn-unstake" 
                             @click="openUnstakeModal(order.id)"
-                            :disabled="processing"
+                            :disabled="processing || !order.isUnstakeable"
                             :title="t('orders.btn.unstake')"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -340,9 +352,9 @@ const switchTab = (tab) => {
                     try {
                         const qInfo = await stakingContract.getQueuePositionInfo(walletState.address, order.id);
                         if (qInfo[0]) {
-                            order.queuePosition = Number(qInfo[1]);
+                            order.queuePosition = Number(qInfo[1]) + 1;
                             order.queueAmountAhead = formatAmount(qInfo[2]);
-                            order.queueWait = Number(qInfo[3]);
+                            order.queueWait = Number(qInfo[3]) + 1;
                         }
                     } catch (e) {
                         console.warn("Failed to get queue info for order", order.id);
@@ -894,6 +906,7 @@ watch(() => walletState.isConnected, (newVal) => {
     gap: 0.5rem;
     width: fit-content;
     margin: 0 auto;
+    line-height: normal;
 }
 
 .load-more-btn:hover {
@@ -995,5 +1008,13 @@ watch(() => walletState.isConnected, (newVal) => {
 
 .btn-danger-outline:hover {
     background: rgba(239, 68, 68, 0.1);
+}
+.mt-2 {
+    margin-top: 0.8rem;
+}
+
+.queue-wrapper {
+    display: flex;
+    flex-direction: column;
 }
 </style>
