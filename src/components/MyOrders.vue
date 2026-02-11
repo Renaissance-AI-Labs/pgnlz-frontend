@@ -38,12 +38,14 @@
                 <div class="order-header">
                     <div class="header-left">
                         <span class="order-id">#{{ Number(order.id) + 1 }}</span>
-                        <span v-if="!order.isQueued" class="order-date">{{ formatDate(order.stakeTime) }}</span>
-                        <span v-else class="order-amount">{{ formatAmount(order.amount) }} USDT</span>
+                        <span class="order-amount">{{ formatAmount(order.amount) }}<span class="unit">USDT</span></span>
                     </div>
-                    <span class="status-badge" :class="{ queued: order.isQueued, completed: activeTab === 1 }">
-                        {{ getStatusLabel(order) }}
-                    </span>
+                    <div class="header-right">
+                        <span v-if="!order.isQueued" class="order-date">{{ formatDateShort(order.stakeTime) }}</span>
+                        <span class="status-badge" :class="{ queued: order.isQueued, completed: activeTab === 1 }">
+                            {{ getStatusLabel(order) }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Queued View -->
@@ -73,11 +75,10 @@
                          </div>
                          <div class="stat-item">
                             <span class="label">{{ t('orders.col.pending') }}</span>
-                            <span class="value highlight">+{{ formatAmount(order.pendingStaticUsdt) }}</span>
-                         </div>
-                         <div class="stat-item">
-                             <span class="label">{{ t('orders.col.amount') }}</span>
-                             <span class="value">{{ formatAmount(order.amount) }}</span>
+                            <span class="value highlight">
+                                +{{ formatAmount(order.pendingStaticUsdt) }}
+                                <span class="token-equiv">({{ formatAmount(order.pendingTokenAmount) }})</span>
+                            </span>
                          </div>
                     </div>
 
@@ -87,9 +88,9 @@
                         <div class="progress-row">
                              <div class="progress-info">
                                 <span class="p-label">{{ t('orders.progress.out') }}</span>
-                                <span class="p-value">{{ order.outValue }} / {{ order.outTarget }}</span>
+                                <span class="p-value">{{ order.outValue }} / {{ order.outTarget }} U</span>
                              </div>
-                             <div class="progress-bar">
+                             <div class="progress-bar custom-out">
                                 <div class="progress-fill" :style="{ width: order.outProgress + '%' }"></div>
                              </div>
                         </div>
@@ -99,10 +100,10 @@
                              <div class="progress-info">
                                 <span class="p-label">{{ t('orders.progress.recovery') }}</span>
                                 <span class="p-value">
-                                    {{ t('orders.roi.recovered') }}: {{ order.recoveryValue }} U / {{ t('orders.roi.guarantee') }}: {{ order.recoveryTarget }} U
+                                    {{ order.recoveryValue }} / {{ order.recoveryTarget }} U
                                 </span>
                              </div>
-                             <div class="progress-bar recovery">
+                             <div class="progress-bar custom-recovery">
                                 <div class="progress-fill" :style="{ width: order.recoveryProgress + '%' }"></div>
                              </div>
                         </div>
@@ -198,9 +199,9 @@ const allOrders = ref([]);
 const loading = ref(false);
 const processing = ref(false);
 const hasMore = ref(false);
-const limit = 2;
+const limit = 5;
 const fetchBatchSize = 20;
-const displayCount = ref(2);
+const displayCount = ref(5);
 const globalRate = ref(BigInt(100)); // Default 1%
 
 // Modal State
@@ -212,6 +213,16 @@ const formatDate = (timestamp) => {
     if (!timestamp) return '-';
     const date = new Date(timestamp * 1000);
     return date.toLocaleString('zh-CN', { hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+};
+
+const formatDateShort = (timestamp) => {
+    if (!timestamp) return '-';
+    const date = new Date(timestamp * 1000);
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const d = date.getDate().toString().padStart(2, '0');
+    const h = date.getHours().toString().padStart(2, '0');
+    const min = date.getMinutes().toString().padStart(2, '0');
+    return `${m}/${d} ${h}:${min}`;
 };
 
 // Helper to format BigInt to string with 2 decimals
@@ -249,7 +260,7 @@ const switchTab = (tab) => {
     fetchOrders(tab);
 };
 
-const fetchOrders = async (status) => {
+    const fetchOrders = async (status) => {
     if (!walletState.isConnected || !walletState.address) return;
     
     loading.value = true;
@@ -261,11 +272,21 @@ const fetchOrders = async (status) => {
         const stakingAddress = getContractAddress('Staking');
         const stakingContract = new ethers.Contract(stakingAddress, StakingABI, provider);
         
-        // Fetch global rate if not already fetched (or fetch every time to be safe)
+        let spd = BigInt(86400);
+        let sd = BigInt(100 * 86400);
+
+        // Fetch global rate and config
         try {
-            globalRate.value = await stakingContract.rate();
+            const [rateVal, spdVal, sdVal] = await Promise.all([
+                stakingContract.rate(),
+                stakingContract.SECONDS_PER_DAY(),
+                stakingContract.stakeDuration()
+            ]);
+            globalRate.value = rateVal;
+            spd = spdVal;
+            sd = sdVal;
         } catch (e) {
-            console.warn("Failed to fetch rate, using default 1%", e);
+            console.warn("Failed to fetch contract config, using defaults", e);
         }
 
         let currentCursor = BigInt(0);
@@ -300,7 +321,7 @@ const fetchOrders = async (status) => {
                     stakeTime: Number(r.stakeTime),
                     isQueued: r.isQueued,
                     status: r.status,
-                    totalReceivedUsdt: item.totalReceivedUsdt,
+                    totalReceivedUsdt: r.totalStaticUsdt,
                     pendingStaticUsdt: item.pendingStaticUsdt,
                     pendingTokenAmount: item.pendingTokenAmount,
                     guaranteeUsdt: item.guaranteeUsdt,
@@ -331,7 +352,7 @@ const fetchOrders = async (status) => {
                     
                     // Out Progress (3x)
                     // Need total received + pending static
-                    const totalCurrent = BigInt(item.totalReceivedUsdt) + BigInt(item.pendingStaticUsdt);
+                    const totalCurrent = BigInt(item.totalReceivedUsdt);
                     // Target = Amount * 3 (Simplification based on prompt)
                     const target = BigInt(r.amount) * BigInt(3);
                     
@@ -362,16 +383,19 @@ const fetchOrders = async (status) => {
                         order.recoveryProgress = 0;
                     }
                     
-                    // Time Progress (100 days)
-                    // (now - stakeTime) / 100 days
+                    // Time Progress
+                    // (now - stakeTime) / SECONDS_PER_DAY
                     const now = Math.floor(Date.now() / 1000);
                     const elapsed = now - order.stakeTime;
-                    const duration = 100 * 24 * 3600; // 100 days in seconds
+                    const duration = Number(sd); // stakeDuration in seconds
+                    const secondsPerDayVal = Number(spd); // SECONDS_PER_DAY
                     
                     // Store values for UI
-                    const daysPassed = Math.floor(elapsed / (24 * 3600));
-                    order.timeValue = daysPassed > 100 ? 100 : daysPassed;
-                    order.timeTarget = 100;
+                    const daysPassed = Math.floor(elapsed / secondsPerDayVal);
+                    const totalDays = Math.floor(duration / secondsPerDayVal);
+                    
+                    order.timeValue = daysPassed > totalDays ? totalDays : daysPassed;
+                    order.timeTarget = totalDays;
 
                     if (duration > 0) {
                          const tProg = (elapsed * 100) / duration;
@@ -576,7 +600,7 @@ watch(() => walletState.isConnected, (newVal) => {
 }
 
 .order-card {
-    background: rgba(30, 41, 59, 0.4);
+    background: rgb(15 16 45 / 75%);
     border: 1px solid rgba(148, 163, 184, 0.1);
     border-radius: 12px;
     padding: 0.8rem 1rem;
@@ -596,33 +620,61 @@ watch(() => walletState.isConnected, (newVal) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 0.6rem;
+    padding-bottom: 0.8rem;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 0.5rem;
 }
 
-.header-left {
+.header-left, .header-right {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.6rem;
 }
 
 .order-id {
-    color: var(--text-muted);
-    font-size: 0.75rem;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
     font-family: var(--font-code);
-    opacity: 0.7;
 }
 
-.order-amount, .order-date {
+.order-amount {
     font-family: var(--font-code);
     font-weight: 700;
-    color: #fff;
-    font-size: 1rem;
+    color: var(--cyan);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: baseline;
+}
+
+.unit {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: 3px;
+    font-weight: 400;
 }
 
 .order-date {
-    font-size: 0.9rem;
-    color: var(--text-primary);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-code);
+    letter-spacing: -0.5px; /* 省略空间 */
+}
+
+@media (max-width: 480px) {
+    .header-left, .header-right {
+        gap: 0.4rem;
+    }
+    
+    .order-amount {
+        font-size: 1rem;
+    }
+    
+    .status-badge {
+        padding: 0.1rem 0.4rem;
+    }
 }
 
 .status-badge {
@@ -651,7 +703,7 @@ watch(() => walletState.isConnected, (newVal) => {
 /* Compact Stats Grid */
 .stats-grid-compact {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
     background: rgba(0,0,0,0.2);
     padding: 0.6rem;
@@ -681,6 +733,13 @@ watch(() => walletState.isConnected, (newVal) => {
 
 .highlight {
     color: var(--cyan) !important;
+}
+
+.token-equiv {
+    font-size: 0.7em;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 2px;
 }
 
 /* Progress Container */
@@ -728,14 +787,19 @@ watch(() => walletState.isConnected, (newVal) => {
     box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
 }
 
+.progress-bar.custom-out .progress-fill {
+    background: #c084fc; 
+    box-shadow: none;
+}
+
+.progress-bar.custom-recovery .progress-fill {
+    background: #f87171; 
+    box-shadow: none;
+}
+
 .progress-bar.secondary .progress-fill {
     background: var(--cyan);
     box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
-}
-
-.progress-bar.recovery .progress-fill {
-    background: #f59e0b; /* Amber/Orange for recovery/safety */
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
 }
 
 /* Actions Compact */
@@ -818,7 +882,7 @@ watch(() => walletState.isConnected, (newVal) => {
 
 
 .load-more-btn {
-    background: transparent;
+    background: #00000030;
     border: 1px solid rgba(255,255,255,0.1);
     color: var(--text-secondary);
     padding: 0.8rem;
