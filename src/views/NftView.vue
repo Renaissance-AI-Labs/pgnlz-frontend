@@ -585,7 +585,7 @@ export default {
   min-height: 85vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 40px 20px;
   perspective: 1000px;
   overflow: hidden;

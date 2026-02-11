@@ -16,24 +16,23 @@
             <!-- My Stake -->
             <div class="info-item row-layout">
                 <span class="label">{{ t('lp.myStake') }}</span>
-                <div class="value-group">
-                    <span class="value highlight">{{ formatAmount(userStake) }}</span>
-                    <span class="unit">LP</span>
+                <div class="value-group-vertical">
+                    <div class="value-group">
+                        <span class="value highlight">{{ formatAmount(userStake) }}</span>
+                        <span class="unit">LP</span>
+                    </div>
+                    <div class="sub-value">
+                         ≈ {{ formatAmount(usdtEquivalent) }} USDT
+                    </div>
                 </div>
             </div>
             
             <!-- Pending Rewards Combined -->
-            <div class="info-item rewards-preview">
+            <div class="info-item row-layout">
                 <span class="label">{{ t('lp.pendingRewards') }}</span>
-                <div class="mini-rewards">
-                    <div class="mini-reward">
-                        <span class="mini-val">{{ formatAmount(pendingPGNLZ) }}</span>
-                        <span class="mini-unit">PGNLZ</span>
-                    </div>
-                    <div class="mini-reward">
-                        <span class="mini-val">{{ formatAmount(pendingUSDT) }}</span>
-                        <span class="mini-unit">USDT</span>
-                    </div>
+                <div class="value-group">
+                    <span class="value highlight">{{ formatAmount(pendingUSDT) }}</span>
+                    <span class="unit">USDT</span>
                 </div>
             </div>
         </div>
@@ -41,7 +40,7 @@
         <!-- Harvest Button -->
         <button 
           class="btn btn-primary action-btn"
-          :disabled="loading || processing || (pendingPGNLZ === BigInt(0) && pendingUSDT === BigInt(0))"
+          :disabled="loading || processing || pendingUSDT === BigInt(0)"
           @click="handleHarvest"
         >
           <span v-if="processing" class="spinner"></span>
@@ -62,10 +61,15 @@ import LPPoolABI from '@/abis/LPPool.json';
 import { showToast } from '@/services/notification';
 
 const userStake = ref(BigInt(0));
-const pendingPGNLZ = ref(BigInt(0));
 const pendingUSDT = ref(BigInt(0));
+const usdtEquivalent = ref(BigInt(0));
 const loading = ref(false);
 const processing = ref(false);
+
+const ERC20_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function totalSupply() view returns (uint256)"
+];
 
 const formatAmount = (amount) => {
     if (!amount) return '0.00';
@@ -81,8 +85,8 @@ const formatAmount = (amount) => {
 const updateData = async () => {
   if (!walletState.isConnected || !walletState.address) {
       userStake.value = BigInt(0);
-      pendingPGNLZ.value = BigInt(0);
       pendingUSDT.value = BigInt(0);
+      usdtEquivalent.value = BigInt(0);
       return;
   }
   
@@ -92,21 +96,38 @@ const updateData = async () => {
     const userAddress = walletState.address;
     
     const lpPoolAddress = getContractAddress('LPPool');
-    const pgnlzAddress = getContractAddress('PGNLZ');
     const usdtAddress = getContractAddress('USDT');
+    const lpTokenAddress = getContractAddress('USDT_PGNLZ_LP');
 
-    if (!lpPoolAddress || !pgnlzAddress || !usdtAddress) return;
+    if (!lpPoolAddress || !usdtAddress || !lpTokenAddress) return;
 
     const lpPoolContract = new ethers.Contract(lpPoolAddress, LPPoolABI, provider);
+    const lpTokenContract = new ethers.Contract(lpTokenAddress, ERC20_ABI, provider);
+    const usdtContract = new ethers.Contract(usdtAddress, ERC20_ABI, provider);
     
     // 1. Get User Stake
     userStake.value = await lpPoolContract.userStakes(userAddress);
 
-    // 2. Get Pending Rewards (PGNLZ)
-    pendingPGNLZ.value = await lpPoolContract.getPendingRewards(userAddress, pgnlzAddress);
-
-    // 3. Get Pending Rewards (USDT)
+    // 2. Get Pending Rewards (USDT)
     pendingUSDT.value = await lpPoolContract.getPendingRewards(userAddress, usdtAddress);
+
+    // 3. Calculate USDT Equivalent
+    // Formula: userStake / totalLP * lpUsdtBalance
+    try {
+        const [totalSupply, lpUsdtBalance] = await Promise.all([
+            lpTokenContract.totalSupply(),
+            usdtContract.balanceOf(lpTokenAddress)
+        ]);
+
+        if (totalSupply > BigInt(0)) {
+            usdtEquivalent.value = (userStake.value * lpUsdtBalance) / totalSupply;
+        } else {
+            usdtEquivalent.value = BigInt(0);
+        }
+    } catch (e) {
+        console.error("Error calculating LP value:", e);
+        usdtEquivalent.value = BigInt(0);
+    }
 
   } catch (error) {
     console.error("Error updating LP Pool data:", error);
@@ -155,10 +176,10 @@ watch(() => walletState.isConnected, () => {
 <style scoped>
 .lp-container {
   width: 100%;
-  max-width: 600px; /* Match StakingSection width */
-  margin: 0 auto 2rem;
-  padding: 1.2rem;
-  border-radius: 20px;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  padding: 1rem;
+  border-radius: 16px;
   background: rgba(15, 23, 42, 0.4);
   border: 1px solid rgba(192, 132, 252, 0.1);
   display: flex;
@@ -172,11 +193,11 @@ watch(() => walletState.isConnected, () => {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
 }
 
 .section-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-family: var(--font-primary);
   letter-spacing: 0.05em;
   font-weight: 700;
@@ -187,42 +208,42 @@ watch(() => walletState.isConnected, () => {
 .lp-card {
   width: 100%;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-radius: 16px;
-  padding: 1rem;
+  border-radius: 12px;
+  padding: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .connect-hint {
   color: var(--text-muted);
   font-size: 0.85rem;
-  padding: 0.5rem 0;
+  padding: 0.2rem 0;
 }
 
 .lp-content {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .info-grid {
     display: grid;
-    grid-template-columns: 1fr 1.2fr; /* Give more space to rewards */
-    gap: 0.8rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
     width: 100%;
 }
 
 .info-item {
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
-    padding: 0.8rem;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.2rem;
     border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
@@ -239,6 +260,19 @@ watch(() => walletState.isConnected, () => {
   letter-spacing: 0.05em;
 }
 
+.value-group-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.sub-value {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-code);
+    margin-top: 2px;
+}
+
 .value-group {
     display: flex;
     align-items: baseline;
@@ -249,7 +283,7 @@ watch(() => walletState.isConnected, () => {
   color: #fff;
   font-family: var(--font-code);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .unit {
@@ -257,36 +291,12 @@ watch(() => walletState.isConnected, () => {
   color: var(--text-muted);
 }
 
-.mini-rewards {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.mini-reward {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--font-code);
-}
-
-.mini-val {
-    color: var(--cyan);
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.mini-unit {
-    color: var(--text-muted);
-    font-size: 0.7rem;
-}
-
 .action-btn {
   width: 100%;
-  height: 44px;
-  font-size: 0.95rem;
+  height: 36px;
+  font-size: 0.9rem;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;

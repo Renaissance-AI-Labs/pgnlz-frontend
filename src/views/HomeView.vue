@@ -94,7 +94,7 @@
           
           <div class="hero-title">
             <!-- <span class="title-prefix">//</span> -->
-            <span class="title-text">与PGNLZ MAX一起打造去中心化世界</span>
+            <span class="title-text">{{ t('home.subtitle') }}</span>
           </div>
           
           <!-- <p class="hero-description">

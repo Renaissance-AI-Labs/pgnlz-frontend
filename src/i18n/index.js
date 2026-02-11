@@ -44,9 +44,11 @@ const languagePacks = {
     
      // Announcement
      'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
+    'home.subtitle': 'Build a decentralized world with PGNLZ MAX',
 
      // Staking Section
      'staking.title': 'Staking Investment',
+     'staking.description': 'Stake USDT to start PGNLZ mining, enjoy up to 300% returns, secure and worry-free investment.',
      'staking.amountLabel': 'Investment Amount',
      'staking.approve': 'Approve USDT',
      'staking.approving': 'Approving...',
@@ -75,7 +77,7 @@ const languagePacks = {
     'lp.connectWallet': 'Connect Wallet to View',
      
     // Orders Section
-     'orders.title': 'My Orders',
+     'orders.title': '< My Orders />',
      'orders.tab.processing': 'In Progress',
      'orders.tab.completed': 'Completed',
      'orders.status.queued': 'Queued',
@@ -216,9 +218,11 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX系统加急升级公告',
+     'home.subtitle': '与PGNLZ MAX一起打造去中心化世界',
 
      // Staking Section
      'staking.title': '质押投资',
+     'staking.description': '质押 USDT 开启 PGNLZ 挖矿，最高享 300% 收益，安全护航，投资更安心。',
      'staking.amountLabel': '投资金额',
      'staking.approve': '授权 USDT',
      'staking.approving': '授权中...',
@@ -247,7 +251,7 @@ const languagePacks = {
     'lp.connectWallet': '连接钱包查看',
 
     // Orders Section
-     'orders.title': '我的订单',
+     'orders.title': '< 我的订单 />',
      'orders.tab.processing': '进行中',
      'orders.tab.completed': '已完成',
      'orders.status.queued': '排队中',
@@ -389,9 +393,11 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 系統加急升級公告',
+     'home.subtitle': '與PGNLZ MAX一起打造去中心化世界',
 
      // Staking Section
      'staking.title': '質押投資',
+     'staking.description': '質押 USDT 開啟 PGNLZ 挖礦，最高享 300% 收益，安全護航，投資更安心。',
      'staking.amountLabel': '投資金額',
      'staking.approve': '授權 USDT',
      'staking.approving': '授權中...',
@@ -420,7 +426,7 @@ const languagePacks = {
     'lp.connectWallet': '連接錢包查看',
 
     // Orders Section
-     'orders.title': '我的訂單',
+     'orders.title': '< 我的訂單 />',
      'orders.tab.processing': '進行中',
      'orders.tab.completed': '已完成',
      'orders.status.queued': '排隊中',
@@ -563,9 +569,11 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAXシステムアップグレードに関する緊急のお知らせ',
+     'home.subtitle': 'PGNLZ MAXと共に分散型世界を構築しましょう',
 
      // Staking Section
      'staking.title': 'ステーキング投資',
+     'staking.description': 'USDTをステーキングしてPGNLZマイニングを開始、最大300%の収益、安全で安心な投資。',
      'staking.amountLabel': '投資額',
      'staking.approve': 'USDTを承認',
      'staking.approving': '承認中...',
@@ -594,7 +602,7 @@ const languagePacks = {
     'lp.connectWallet': 'ウォレットを接続して表示',
 
     // Orders Section
-     'orders.title': '私の注文',
+     'orders.title': '< 私の注文 />',
      'orders.tab.processing': '進行中',
      'orders.tab.completed': '完了',
      'orders.status.queued': '待機中',
@@ -737,9 +745,11 @@ const languagePacks = {
 
      // Announcement
      'home.announcement.title': 'PGNLZ MAX 시스템 업그레이드에 관한 긴급 공지',
+     'home.subtitle': 'PGNLZ MAX와 함께 탈중앙화 세상을 만들어가세요',
 
      // Staking Section
      'staking.title': '스테이킹 투자',
+     'staking.description': 'USDT 스테이킹으로 PGNLZ 채굴 시작, 최대 300% 수익, 안전하고 안심할 수 있는 투자.',
      'staking.amountLabel': '투자 금액',
      'staking.approve': 'USDT 승인',
      'staking.approving': '승인 중...',
@@ -768,7 +778,7 @@ const languagePacks = {
     'lp.connectWallet': '지갑 연결하여 보기',
 
     // Orders Section
-     'orders.title': '내 주문',
+     'orders.title': '< 내 주문 />',
      'orders.tab.processing': '진행 중',
      'orders.tab.completed': '완료됨',
      'orders.status.queued': '대기 중',
