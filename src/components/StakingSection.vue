@@ -4,7 +4,7 @@
     
     <div class="stake-card">
       <div class="amount-display">
-        <span class="label">{{ t('staking.amountLabel') }}</span>
+        <!-- <span class="label">{{ t('staking.amountLabel') }}</span> -->
         
         <!-- Amount Selection Buttons -->
         <div v-if="allowedAmounts.length > 0" class="amount-selection">
@@ -62,26 +62,15 @@
         </template>
         
       </div>
-    </div>
 
-    <!-- Queue Status for Latest Order -->
-    <div v-if="queueStatus" class="queue-status-card">
-      <div class="status-header">
-        <span class="status-dot pulsing"></span>
-        {{ t('staking.queueTitle') }}
-      </div>
-      <div class="status-details">
-        <div class="detail-row">
-          <span>{{ t('staking.position') }}:</span>
-          <span class="highlight">{{ queueStatus.position }}</span>
-        </div>
-        <div class="detail-row">
-          <span>{{ t('staking.amountAhead') }}:</span>
-          <span class="highlight">{{ queueStatus.amountAhead }} USDT</span>
-        </div>
-        <div class="detail-row">
-          <span>{{ t('staking.waitDays') }}:</span>
-          <span class="highlight">{{ queueStatus.estimatedWaitDays }} {{ t('staking.days') }}</span>
+      <!-- Queue Status Compact -->
+      <div v-if="queueStatus" class="queue-status-compact">
+        <div class="status-ticker">
+            <span class="status-dot pulsing"></span>
+            <span class="status-label">{{ t('staking.queueTitle') }}:</span>
+            <span class="status-value highlight">#{{ queueStatus.position }}</span>
+            <span class="divider">|</span>
+            <span class="status-value">{{ t('staking.waitDays') }} ~{{ queueStatus.estimatedWaitDays }}{{ t('staking.days') }}</span>
         </div>
       </div>
     </div>
@@ -399,92 +388,94 @@ watch(() => walletState.isConnected, () => {
 <style scoped>
 .staking-container {
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto 1.5rem;
-  padding: 1.5rem;
-  border-radius: 16px;
-  background: rgba(15, 23, 42, 0.6);
+  max-width: 600px; /* Reduced width for compactness */
+  margin: 0 auto 1rem;
+  padding: 1.2rem;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.4);
   border: 1px solid rgba(192, 132, 252, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .section-title {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
   font-family: var(--font-primary);
   letter-spacing: 0.05em;
+  font-weight: 700;
+  opacity: 0.9;
 }
 
 .stake-card {
   width: 100%;
-  max-width: 400px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  padding: 1.2rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border-radius: 16px;
+  padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 .amount-display {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
-}
-
-.label {
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-  text-transform: uppercase;
+  gap: 0.5rem;
 }
 
 .amount-selection {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  justify-content: center;
-  margin: 0.8rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.6rem;
+  width: 100%;
+  margin: 0.5rem 0;
 }
 
 .amount-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-secondary);
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  padding: 0.6rem 0.4rem;
+  border-radius: 10px;
   font-family: var(--font-code);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
-  align-items: baseline;
-  gap: 0.3rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  min-height: 50px;
 }
 
 .amount-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
 }
 
 .amount-btn.active {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--primary);
+  background: rgba(139, 92, 246, 0.15);
+  color: #fff;
   border-color: var(--primary);
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
 }
 
 .amount-value {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .amount-currency {
-  font-size: 0.8rem;
-  opacity: 0.8;
+  font-size: 0.65rem;
+  opacity: 0.7;
+  letter-spacing: 0.05em;
 }
 
 .action-area {
@@ -497,58 +488,67 @@ watch(() => walletState.isConnected, () => {
 
 .action-btn {
   width: 100%;
-  height: 44px;
+  height: 48px;
   font-size: 1rem;
-  border-radius: 10px;
+  font-weight: 600;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .connect-hint {
   color: var(--text-muted);
   font-size: 0.85rem;
-}
-
-.error-text {
-  color: #ef4444;
-  font-size: 0.8rem;
+  padding: 0.5rem;
 }
 
 .spinner {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border: 2px solid rgba(255,255,255,0.3);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Queue Status */
-.queue-status-card {
-  margin-top: 1rem;
+/* Compact Queue Status */
+.queue-status-compact {
   width: 100%;
-  max-width: 400px;
-  background: rgba(103, 232, 249, 0.05);
-  border: 1px solid rgba(103, 232, 249, 0.2);
-  border-radius: 10px;
-  padding: 0.8rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.status-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  font-weight: 600;
-  color: var(--cyan);
-  margin-bottom: 0.6rem;
-  font-size: 0.85rem;
+.status-ticker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    flex-wrap: wrap;
 }
 
 .status-dot {
@@ -569,55 +569,40 @@ watch(() => walletState.isConnected, () => {
   100% { opacity: 0.5; transform: scale(1); }
 }
 
-.status-details {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+.status-label {
+    font-weight: 500;
 }
 
-.detail-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  flex: 1;
-}
-
-.detail-row span:first-child {
-  font-size: 0.7rem;
-  opacity: 0.8;
+.divider {
+    color: rgba(255,255,255,0.1);
+    margin: 0 0.2rem;
 }
 
 .highlight {
-  color: #fff;
+  color: var(--cyan);
   font-family: var(--font-code);
   font-weight: 600;
-  font-size: 0.9rem;
 }
 
 /* Mobile Optimization */
 @media (max-width: 768px) {
   .staking-container {
     padding: 1rem;
-    gap: 0.5rem;
+    margin: 0 1rem 1rem;
+    width: auto;
   }
 
   .stake-card {
-    padding: 1rem;
-    gap: 0.8rem;
+    padding: 0.8rem;
   }
   
   .action-btn {
-    height: 40px;
+    height: 44px;
     font-size: 0.95rem;
   }
   
-  .status-details {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    text-align: center;
+  .amount-selection {
+      grid-template-columns: repeat(3, 1fr); /* Force 3 columns on mobile */
   }
 }
 </style>
