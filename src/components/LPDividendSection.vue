@@ -14,7 +14,7 @@
         <!-- Compact Info Grid -->
         <div class="info-grid">
             <!-- My Stake -->
-            <div class="info-item">
+            <div class="info-item row-layout">
                 <span class="label">{{ t('lp.myStake') }}</span>
                 <div class="value-group">
                     <span class="value highlight">{{ formatAmount(userStake) }}</span>
@@ -226,6 +226,12 @@ watch(() => walletState.isConnected, () => {
     border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
+.info-item.row-layout {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .label {
   color: var(--text-secondary);
   font-size: 0.75rem;
@@ -317,7 +323,7 @@ watch(() => walletState.isConnected, () => {
 @media (max-width: 768px) {
   .lp-container {
     padding: 1rem;
-    margin: 0 1rem 2rem;
+    margin: 1rem 0rem;
     width: auto;
   }
 

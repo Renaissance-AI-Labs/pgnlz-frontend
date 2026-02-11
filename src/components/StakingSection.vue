@@ -1,7 +1,9 @@
 <template>
   <div class="staking-container glass">
     <h2 class="section-title text-gradient">{{ t('staking.title') }}</h2>
-    
+    <p class="staking-footer-text">
+        质押 USDT 开启 PGNLZ 挖矿，最高享 300% 收益，安全护航，投资更安心。
+    </p>
     <div class="stake-card">
       <div class="amount-display">
         <!-- <span class="label">{{ t('staking.amountLabel') }}</span> -->
@@ -588,7 +590,7 @@ watch(() => walletState.isConnected, () => {
 @media (max-width: 768px) {
   .staking-container {
     padding: 1rem;
-    margin: 0 1rem 1rem;
+    margin: 1.5rem 0rem;
     width: auto;
   }
 
@@ -604,5 +606,13 @@ watch(() => walletState.isConnected, () => {
   .amount-selection {
       grid-template-columns: repeat(3, 1fr); /* Force 3 columns on mobile */
   }
+}
+
+.staking-footer-text {
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+    color: #fff;
+    text-align: center;
+    opacity: 0.8;
 }
 </style>
