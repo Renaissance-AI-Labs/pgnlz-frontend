@@ -310,7 +310,7 @@ watch(() => walletState.isConnected, (newVal) => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  /* gap: 0.2rem; */
   /* padding-top: 0.5rem; */
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -393,6 +393,7 @@ watch(() => walletState.isConnected, (newVal) => {
 
 .p-title {
   color: var(--text-secondary);
+  line-height: normal;
 }
 
 .p-value {
