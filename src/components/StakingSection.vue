@@ -9,7 +9,7 @@
         <!-- <span class="label">{{ t('staking.amountLabel') }}</span> -->
         
         <!-- Amount Selection Buttons -->
-        <div v-if="allowedAmounts.length > 0" class="amount-selection">
+        <div v-if="allowedAmounts.length > 0" class="amount-selection" :class="{ 'single-mode': allowedAmounts.length === 1 }">
             <button 
                 v-for="(amount, index) in allowedAmounts" 
                 :key="index"
@@ -608,6 +608,10 @@ watch(() => walletState.isConnected, () => {
   
   .amount-selection {
       grid-template-columns: repeat(3, 1fr); /* Force 3 columns on mobile */
+  }
+
+  .amount-selection.single-mode {
+      grid-template-columns: 1fr;
   }
 }
 

@@ -8,14 +8,28 @@
             :class="{ active: activeTab === 0 }" 
             @click="switchTab(0)"
         >
-            {{ t('orders.tab.processing') }}
+            {{ t('orders.tab.queued') }} <span class="tab-count" v-if="counts[0] > 0">({{ counts[0] }})</span>
         </button>
         <button 
             class="tab-btn" 
             :class="{ active: activeTab === 1 }" 
             @click="switchTab(1)"
         >
-            {{ t('orders.tab.completed') }}
+            {{ t('orders.tab.processing') }} <span class="tab-count" v-if="counts[1] > 0">({{ counts[1] }})</span>
+        </button>
+        <button 
+            class="tab-btn" 
+            :class="{ active: activeTab === 2 }" 
+            @click="switchTab(2)"
+        >
+            {{ t('orders.tab.claimable') }} <span class="tab-count" v-if="counts[2] > 0">({{ counts[2] }})</span>
+        </button>
+        <button 
+            class="tab-btn" 
+            :class="{ active: activeTab === 3 }" 
+            @click="switchTab(3)"
+        >
+            {{ t('orders.tab.completed') }} <span class="tab-count" v-if="counts[3] > 0">({{ counts[3] }})</span>
         </button>
     </div>
 
@@ -42,7 +56,7 @@
                     </div>
                     <div class="header-right">
                         <span v-if="!order.isQueued" class="order-date">{{ formatDateShort(order.stakeTime) }}</span>
-                        <span class="status-badge" :class="{ queued: order.isQueued, completed: activeTab === 1 }">
+                        <span class="status-badge" :class="{ queued: order.isQueued, completed: activeTab === 3, claimable: activeTab === 2 }">
                             {{ getStatusLabel(order) }}
                         </span>
                     </div>
@@ -64,21 +78,10 @@
                             <span class="value">{{ order.queueWait !== undefined ? order.queueWait : '-' }} {{ t('orders.queue.days') }}</span>
                         </div>
                     </div>
-                    <div class="actions-compact mt-2">
-                        <button 
-                            class="btn-icon btn-unstake" 
-                            @click="openUnstakeModal(order.id)"
-                            :disabled="processing"
-                            :title="t('orders.btn.unstake')"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                            {{ t('orders.btn.unstake') }}
-                        </button>
-                    </div>
                 </div>
 
-                <!-- Active/Completed View (Not Queued) -->
-                <div v-else class="active-details">
+                <!-- Active/Claimable/Completed View (Not Queued) -->
+                <div class="active-details">
                     
                     <!-- Stats Grid -->
                     <div class="stats-grid-compact">
@@ -133,8 +136,11 @@
                         </div>
                     </div>
                     
-                    <div class="actions-compact" v-if="activeTab === 0">
+                    <!-- Actions -->
+                    <div class="actions-compact" v-if="activeTab === 0 || activeTab === 1 || activeTab === 2">
+                        <!-- Harvest Button: Show for Running (1) and Claimable (2) -->
                         <button 
+                            v-if="activeTab === 1 || activeTab === 2"
                             class="btn-icon btn-harvest" 
                             @click="harvest(order.id)" 
                             :disabled="processing || !canHarvest(order)"
@@ -143,10 +149,16 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                             {{ t('orders.btn.harvest') }}
                         </button>
+                        
+                        <!-- Unstake Button: Show for Running (1) only? Or Queued (0)? Queued is handled above. 
+                             Usually unstake is only for Running/Queued. 
+                             Claimable/Completed orders are closed/claimable.
+                        -->
                         <button 
+                            v-if="(activeTab === 0 || activeTab === 1) && order.isUnstakeable"
                             class="btn-icon btn-unstake" 
                             @click="openUnstakeModal(order.id)"
-                            :disabled="processing || !order.isUnstakeable"
+                            :disabled="processing"
                             :title="t('orders.btn.unstake')"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -192,7 +204,7 @@ import { showToast } from '@/services/notification';
 
 const props = defineProps({});
 
-const activeTab = ref(0); // 0: Processing, 1: Completed
+const activeTab = ref(0); // 0: Queued, 1: Running, 2: Claimable, 3: Completed
 const orders = ref([]);
 const loading = ref(false);
 const processing = ref(false);
@@ -200,6 +212,12 @@ const hasMore = ref(false);
 const fetchBatchSize = 20;
 const nextCursor = ref(BigInt(0));
 const globalRate = ref(BigInt(100)); // Default 1%
+const counts = reactive({
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0
+});
 
 // Modal State
 const showUnstakeModal = ref(false);
@@ -234,7 +252,8 @@ const formatAmount = (amount) => {
 };
 
 const getStatusLabel = (order) => {
-    if (activeTab.value === 1) return t('orders.status.completed');
+    if (activeTab.value === 3) return t('orders.status.completed');
+    if (activeTab.value === 2) return t('orders.status.claimable');
     return order.isQueued ? t('orders.status.queued') : t('orders.status.earning');
 };
 
@@ -256,10 +275,36 @@ const switchTab = (tab) => {
     fetchOrders(tab, true);
 };
 
+const fetchCounts = async () => {
+    if (!walletState.isConnected || !walletState.address) return;
+    try {
+        const provider = walletState.provider;
+        const stakingAddress = getContractAddress('Staking');
+        const stakingContract = new ethers.Contract(stakingAddress, StakingABI, provider);
+
+        const [c0, c1, c2, c3] = await Promise.all([
+            stakingContract.getUserRecordCount(walletState.address, 0),
+            stakingContract.getUserRecordCount(walletState.address, 1),
+            stakingContract.getUserRecordCount(walletState.address, 2),
+            stakingContract.getUserRecordCount(walletState.address, 3)
+        ]);
+
+        counts[0] = Number(c0);
+        counts[1] = Number(c1);
+        counts[2] = Number(c2);
+        counts[3] = Number(c3);
+    } catch (e) {
+        console.warn("Failed to fetch counts", e);
+    }
+};
+
 const fetchOrders = async (status, isReset = false) => {
     if (!walletState.isConnected || !walletState.address) return;
     
     loading.value = true;
+    
+    // Also fetch counts when fetching orders (or at least on first load/reset)
+    if (isReset) fetchCounts();
 
     try {
         const provider = walletState.provider;
@@ -324,7 +369,7 @@ const fetchOrders = async (status, isReset = false) => {
             };
             
             // Logic for Queued
-            if (order.isQueued) {
+            if (order.isQueued && activeTab.value === 0) {
                 try {
                     const qInfo = await stakingViewContract.getQueuePositionInfo(walletState.address, order.id);
                     if (qInfo[0]) {
@@ -335,61 +380,60 @@ const fetchOrders = async (status, isReset = false) => {
                 } catch (e) {
                     console.warn("Failed to get queue info for order", order.id);
                 }
+            }
+
+            // Logic for In Progress (1), Claimable (2), Completed (3), AND Queued (0) - Common Stats
+            // Out Progress (3x)
+            // Need total received + pending static
+            const totalCurrent = BigInt(item.totalReceivedUsdt);
+            // Target = Amount * 3 (Simplification based on prompt)
+            const target = BigInt(r.amount) * BigInt(3);
+            
+            // Store values for UI
+            order.outValue = formatAmount(totalCurrent);
+            order.outTarget = formatAmount(target);
+            
+            if (target > BigInt(0)) {
+                const prog = (totalCurrent * BigInt(100)) / target;
+                order.outProgress = Number(prog);
+                if (order.outProgress > 100) order.outProgress = 100;
+            }
+
+            // Recovery Progress (New)
+            // Logic: Current = totalReceivedUsdt, Target = guaranteeUsdt
+            
+            const currentRecovery = BigInt(item.totalReceivedUsdt);
+            const targetRecovery = BigInt(item.guaranteeUsdt);
+            
+            order.recoveryValue = formatAmount(currentRecovery > targetRecovery ? targetRecovery : currentRecovery);
+            order.recoveryTarget = formatAmount(targetRecovery);
+            
+            if (targetRecovery > BigInt(0)) {
+                const recProg = (currentRecovery * BigInt(100)) / targetRecovery;
+                order.recoveryProgress = Number(recProg);
+                if (order.recoveryProgress > 100) order.recoveryProgress = 100;
             } else {
-                // Logic for In Progress AND Completed (Not Queued)
-                
-                // Out Progress (3x)
-                // Need total received + pending static
-                const totalCurrent = BigInt(item.totalReceivedUsdt);
-                // Target = Amount * 3 (Simplification based on prompt)
-                const target = BigInt(r.amount) * BigInt(3);
-                
-                // Store values for UI
-                order.outValue = formatAmount(totalCurrent);
-                order.outTarget = formatAmount(target);
-                
-                if (target > BigInt(0)) {
-                    const prog = (totalCurrent * BigInt(100)) / target;
-                    order.outProgress = Number(prog);
-                    if (order.outProgress > 100) order.outProgress = 100;
-                }
+                order.recoveryProgress = 0;
+            }
+            
+            // Time Progress
+            // (now - stakeTime) / SECONDS_PER_DAY
+            const now = Math.floor(Date.now() / 1000);
+            const elapsed = now - order.stakeTime;
+            const duration = Number(sd); // stakeDuration in seconds
+            const secondsPerDayVal = Number(spd); // SECONDS_PER_DAY
+            
+            // Store values for UI
+            const daysPassed = Math.floor(elapsed / secondsPerDayVal);
+            const totalDays = Math.floor(duration / secondsPerDayVal);
+            
+            order.timeValue = daysPassed > totalDays ? totalDays : daysPassed;
+            order.timeTarget = totalDays;
 
-                // Recovery Progress (New)
-                // Logic: Current = totalReceivedUsdt, Target = guaranteeUsdt
-                
-                const currentRecovery = BigInt(item.totalReceivedUsdt);
-                const targetRecovery = BigInt(item.guaranteeUsdt);
-                
-                order.recoveryValue = formatAmount(currentRecovery > targetRecovery ? targetRecovery : currentRecovery);
-                order.recoveryTarget = formatAmount(targetRecovery);
-                
-                if (targetRecovery > BigInt(0)) {
-                    const recProg = (currentRecovery * BigInt(100)) / targetRecovery;
-                    order.recoveryProgress = Number(recProg);
-                    if (order.recoveryProgress > 100) order.recoveryProgress = 100;
-                } else {
-                    order.recoveryProgress = 0;
-                }
-                
-                // Time Progress
-                // (now - stakeTime) / SECONDS_PER_DAY
-                const now = Math.floor(Date.now() / 1000);
-                const elapsed = now - order.stakeTime;
-                const duration = Number(sd); // stakeDuration in seconds
-                const secondsPerDayVal = Number(spd); // SECONDS_PER_DAY
-                
-                // Store values for UI
-                const daysPassed = Math.floor(elapsed / secondsPerDayVal);
-                const totalDays = Math.floor(duration / secondsPerDayVal);
-                
-                order.timeValue = daysPassed > totalDays ? totalDays : daysPassed;
-                order.timeTarget = totalDays;
-
-                if (duration > 0) {
-                        const tProg = (elapsed * 100) / duration;
-                        order.timeProgress = Math.floor(tProg);
-                        if (order.timeProgress > 100) order.timeProgress = 100;
-                }
+            if (duration > 0) {
+                    const tProg = (elapsed * 100) / duration;
+                    order.timeProgress = Math.floor(tProg);
+                    if (order.timeProgress > 100) order.timeProgress = 100;
             }
             
             return order;
@@ -438,7 +482,9 @@ const harvest = async (id) => {
         showToast(t('orders.harvestSuccess'), 'success');
         // Refresh
         orders.value = [];
-        fetchOrders(activeTab.value);
+        nextCursor.value = BigInt(0);
+        fetchOrders(activeTab.value, true);
+        fetchCounts(); // Update counts
     } catch (e) {
         console.error(e);
         showToast(t('orders.error'), 'error');
@@ -460,11 +506,6 @@ const closeUnstakeModal = () => {
 const confirmUnstake = async () => {
     if (processing.value || !selectedUnstakeId.value) return;
     
-    // Close modal first or keep open? Better close or show loading inside.
-    // Let's keep modal open but maybe disable buttons if we wanted perfect UI, 
-    // but for now let's just close and show toast/loading state.
-    // Actually, user might want to see it processing.
-    // But simplistic approach: Close modal, set global processing.
     const id = selectedUnstakeId.value;
     showUnstakeModal.value = false;
     
@@ -480,7 +521,9 @@ const confirmUnstake = async () => {
         showToast(t('orders.unstakeSuccess'), 'success');
         // Refresh
         orders.value = [];
-        fetchOrders(activeTab.value);
+        nextCursor.value = BigInt(0);
+        fetchOrders(activeTab.value, true);
+        fetchCounts(); // Update counts
     } catch (e) {
         console.error(e);
         // User rejected
@@ -532,15 +575,17 @@ watch(() => walletState.isConnected, (newVal) => {
 
 .tabs {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     margin-bottom: 1.5rem;
     background: rgba(255,255,255,0.05);
     padding: 0.3rem;
     border-radius: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .tab-btn {
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1rem;
     background: transparent;
     border: none;
     color: var(--text-secondary);
@@ -549,12 +594,20 @@ watch(() => walletState.isConnected, (newVal) => {
     font-size: 0.9rem;
     transition: all 0.2s;
     line-height: normal;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .tab-btn.active {
     background: var(--primary);
     color: #fff;
     box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+.tab-count {
+    font-size: 0.8em;
+    opacity: 0.8;
 }
 
 .connect-hint {
@@ -676,6 +729,12 @@ watch(() => walletState.isConnected, (newVal) => {
     background: rgba(245, 158, 11, 0.15);
     color: #fbbf24;
     border-color: rgba(245, 158, 11, 0.2);
+}
+
+.status-badge.claimable {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.2);
 }
 
 .status-badge.completed {
@@ -1003,5 +1062,6 @@ watch(() => walletState.isConnected, (newVal) => {
 .queue-wrapper {
     display: flex;
     flex-direction: column;
+    margin-bottom: 0.8rem;
 }
 </style>
