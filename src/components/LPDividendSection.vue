@@ -293,35 +293,38 @@ watch(() => walletState.isConnected, () => {
 
 .action-btn {
   width: 100%;
-  height: 36px;
-  font-size: 0.9rem;
+  height: 48px;
+  font-size: 1rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: rgba(103, 232, 249, 0.1);
-  border: 1px solid rgba(103, 232, 249, 0.2);
-  color: var(--cyan);
+  background: linear-gradient(135deg, #368f9a 0%, #6ba9fa 100%);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
   transition: all 0.3s ease;
 }
 
 .action-btn:hover:not(:disabled) {
-    background: rgba(103, 232, 249, 0.2);
-    box-shadow: 0 0 15px rgba(103, 232, 249, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .action-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(103, 232, 249, 0.3);
-  border-top-color: var(--cyan);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -343,6 +346,11 @@ watch(() => walletState.isConnected, () => {
   
   .info-grid {
       grid-template-columns: 1fr; /* Stack on mobile */
+  }
+
+  .action-btn {
+    height: 44px;
+    font-size: 0.95rem;
   }
   
   .mini-rewards {

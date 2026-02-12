@@ -1272,7 +1272,7 @@ export default {
 }
 
 .stat-box {
-    background: rgba(0, 0, 0, 0.2);
+    background: transparent;
     border-radius: 12px;
     padding: 10px;
     display: flex;
@@ -1280,7 +1280,7 @@ export default {
     align-items: center;
     justify-content: center;
     gap: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    border: none;
 }
 
 .stat-box.highlight-box {
@@ -1397,7 +1397,7 @@ export default {
 .friend-section {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.3rem;
   margin-bottom: 2rem;
 }
 
@@ -1410,7 +1410,7 @@ export default {
 .section-desc {
   font-size: 0.9rem;
   color: var(--text-secondary);
-  margin: -0.5rem 0 0.5rem;
+  /* margin: -0.5rem 0 0.5rem; */
   line-height: 1.4;
 }
 
