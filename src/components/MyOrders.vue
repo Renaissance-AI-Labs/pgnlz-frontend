@@ -63,7 +63,7 @@
                 </div>
 
                 <!-- Queued View -->
-                <div v-if="order.isQueued" class="queue-wrapper">
+                <div v-if="order.isQueued && shouldShowQueueWrapper(order)" class="queue-wrapper">
                     <div class="queued-details">
                         <div class="detail-row">
                             <span class="label">{{ t('orders.queue.position') }}:</span>
@@ -266,6 +266,12 @@ const canHarvest = (order) => {
     } catch (e) {
         return false;
     }
+};
+
+const shouldShowQueueWrapper = (order) => {
+    if (activeTab.value !== 3) return true;
+    const isValid = (val) => val !== undefined && val !== null && val !== '';
+    return isValid(order.queuePosition) && isValid(order.queueAmountAhead) && isValid(order.queueWait);
 };
 
 const switchTab = (tab) => {
