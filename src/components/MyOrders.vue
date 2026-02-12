@@ -55,7 +55,7 @@
                         <span class="order-amount">{{ formatAmount(order.amount) }}<span class="unit">USDT</span></span>
                     </div>
                     <div class="header-right">
-                        <span v-if="!order.isQueued" class="order-date">{{ formatDateShort(order.stakeTime) }}</span>
+                        <span class="order-date">{{ formatDateShort(order.stakeTime) }}</span>
                         <span class="status-badge" :class="{ queued: order.isQueued, completed: activeTab === 3, claimable: activeTab === 2 }">
                             {{ getStatusLabel(order) }}
                         </span>
@@ -373,9 +373,9 @@ const fetchOrders = async (status, isReset = false) => {
                 try {
                     const qInfo = await stakingViewContract.getQueuePositionInfo(walletState.address, order.id);
                     if (qInfo[0]) {
-                        order.queuePosition = Number(qInfo[1]) + 1;
+                        order.queuePosition = Number(qInfo[1]);
                         order.queueAmountAhead = formatAmount(qInfo[2]);
-                        order.queueWait = Number(qInfo[3]) + 1;
+                        order.queueWait = Number(qInfo[3]);
                     }
                 } catch (e) {
                     console.warn("Failed to get queue info for order", order.id);
