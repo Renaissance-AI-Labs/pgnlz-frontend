@@ -133,13 +133,16 @@
       </div>
     </div>
 
-    <transition name="modal">
-      <ConnectWalletModal v-if="isModalVisible" @close="closeModal" />
-    </transition>
+    <Teleport to="body">
+      <transition name="modal">
+        <ConnectWalletModal v-if="isModalVisible" @close="closeModal" />
+      </transition>
+    </Teleport>
 
     <!-- Activation Requirements Modal -->
-    <transition name="modal">
-      <div v-if="isActivationModalVisible" class="modal-overlay" @click.self="closeActivationModal">
+    <Teleport to="body">
+      <transition name="modal">
+        <div v-if="isActivationModalVisible" class="modal-overlay" @click.self="closeActivationModal">
         <div class="modal-content activation-modal">
           <div class="modal-header">
             <h3>{{ t('nft.activationRequirements') }}</h3>
@@ -183,7 +186,8 @@
           </div>
         </div>
       </div>
-    </transition>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
@@ -663,7 +667,8 @@ export default {
       calculateProgress,
       formatNumber,
       rewardCap,
-      getUsdtValue
+      getUsdtValue,
+      canReactivate
     };
   }
 }
