@@ -575,7 +575,7 @@ watch(() => walletState.isConnected, (newVal) => {
 
 .tabs {
     display: flex;
-    gap: 0.5rem;
+    gap: 0rem;
     margin-bottom: 1.5rem;
     background: rgba(255,255,255,0.05);
     padding: 0.3rem;
