@@ -348,6 +348,29 @@ const fetchOrders = async (status, isReset = false) => {
         const processed = await Promise.all(records.map(async (item) => {
             const r = item.record;
             
+            // Debug Log: Raw Order Data
+            try {
+                console.log(`[Order #${item.id}] Full Item:`, item);
+                console.log(`[Order #${item.id}] Raw Fields:`, {
+                    id: item.id?.toString(),
+                    amount: r?.amount?.toString(),
+                    stakeTime: r?.stakeTime?.toString(),
+                    isQueued: r?.isQueued,
+                    status: r?.status,
+                    // Check if properties exist before toString
+                    totalReceivedUsdt: item.totalReceivedUsdt?.toString() || 'undefined',
+                    pendingStaticUsdt: item.pendingStaticUsdt?.toString(),
+                    pendingTokenAmount: item.pendingTokenAmount?.toString(),
+                    guaranteeUsdt: item.guaranteeUsdt?.toString(),
+                    isUnstakeable: item.isUnstakeable,
+                    refundUsdt: item.refundUsdt?.toString(),
+                    record_totalStaticUsdt: r?.totalStaticUsdt?.toString(),
+                    record_debtStaticUsdt: r?.debtStaticUsdt?.toString()
+                });
+            } catch (err) {
+                console.error("Error logging raw fields:", err);
+            }
+            
             // Basic data
             const order = {
                 id: item.id.toString(),
