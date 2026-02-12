@@ -63,7 +63,7 @@
                 </div>
 
                 <!-- Queued View -->
-                <div v-if="order.isQueued && activeTab !== 3" class="queue-wrapper">
+                <div v-if="order.isQueued" class="queue-wrapper">
                     <div class="queued-details">
                         <div class="detail-row">
                             <span class="label">{{ t('orders.queue.position') }}:</span>
@@ -371,7 +371,7 @@ const fetchOrders = async (status, isReset = false) => {
             };
             
             // Logic for Queued
-            if (order.isQueued && activeTab.value === 0) {
+            if (order.isQueued) {
                 try {
                     const qInfo = await stakingViewContract.getQueuePositionInfo(walletState.address, order.id);
                     if (qInfo[0]) {
@@ -921,7 +921,7 @@ watch(() => walletState.isConnected, (newVal) => {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     background: rgba(245, 158, 11, 0.05);
-    padding: 0.6rem;
+    padding: .6rem .6rem 0.2rem .6rem;
     border-radius: 8px;
     border: 1px dashed rgba(245, 158, 11, 0.2);
 }
