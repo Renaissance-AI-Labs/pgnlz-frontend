@@ -86,27 +86,36 @@
                         <div v-for="(amount, symbol) in nft.rewards" :key="symbol" class="reward-unit">
                              <span class="val">{{ formatReward(amount) }}</span>
                              <span class="sym">{{ symbol }}</span>
+                             <span v-if="getUsdtValue(amount, symbol)" class="usdt-equiv">
+                               (≈ {{ getUsdtValue(amount, symbol) }} USDT)
+                             </span>
                         </div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
                     </div>
                     <div class="progress-info">
                         <span class="label">{{ t('nft.cycleProgress') }}</span>
                         <span class="value">{{ formatReward(nft.harvested) }} / {{ formatReward(rewardCap) }}</span>
                     </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
-                    </div>
+                    
                     
                  </div>
                  
                  <div class="item-status col-status">
-                    <button 
-                      v-if="nft.needsReactivation" 
-                      @click="handleReactivate(nft.id)" 
-                      class="action-btn reactivate-btn"
-                      :disabled="isActionProcessing"
-                    >
-                      {{ t('nft.reactivate') }} (500 U)
-                    </button>
+                    <div v-if="nft.needsReactivation" class="reactivate-wrapper">
+                      <button 
+                        @click="handleReactivate(nft.id)" 
+                        class="action-btn reactivate-btn"
+                        :disabled="isActionProcessing"
+                      >
+                        {{ t('nft.reactivate') }} (500 U)
+                      </button>
+                      <div class="status-badge inactive">
+                        <span class="dot"></span>
+                        {{ t('nft.notEffective') }}
+                      </div>
+                    </div>
                     <div v-else class="status-badge active">
                       <span class="dot"></span>
                       {{ t('nft.active') }}
@@ -194,6 +203,10 @@ const ERC20_ABI = [
   "function decimals() view returns (uint8)"
 ];
 
+const ROUTER_ABI = [
+  "function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)"
+];
+
 export default {
   name: 'NftView',
   components: {
@@ -207,6 +220,7 @@ export default {
     const isActionProcessing = ref(false);
     const rewardCap = ref(0);
     const canReactivate = ref(false);
+    const pgnlzPrice = ref(0);
     
     // Activation Modal State
     const isActivationModalVisible = ref(false);
@@ -263,14 +277,14 @@ export default {
     };
     
     const calculateProgress = (current, target) => {
-      if (!target || target === 0) return 100;
+      if (!target || target === 0) return 0;
       
       try {
           // Handle BigInt
           const currentBn = BigInt(current);
           const targetBn = BigInt(target);
           
-          if (targetBn === 0n) return 100;
+          if (targetBn === 0n) return 0;
           
           // Calculate percentage with precision
           // (current * 10000) / target -> then divide by 100 for decimals
@@ -284,6 +298,46 @@ export default {
     
     const formatNumber = (num) => {
       return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(num);
+    };
+
+    const fetchPgnlzPrice = async () => {
+      try {
+        const routerAddr = getContractAddress('Router');
+        const pgnlzAddr = getContractAddress('PGNLZ');
+        const usdtAddr = getContractAddress('USDT');
+
+        if (!routerAddr || !pgnlzAddr || !usdtAddr) return;
+
+        // Use a provider (read-only) if signer is not available, but usually we are connected here
+        const provider = walletState.signer || walletState.provider; 
+        if (!provider) return;
+
+        const routerContract = new ethers.Contract(routerAddr, ROUTER_ABI, provider);
+        
+        // 1 PGNLZ
+        const amountIn = ethers.parseUnits('1', 18); 
+        const amounts = await routerContract.getAmountsOut(amountIn, [pgnlzAddr, usdtAddr]);
+        
+        // amounts[1] is USDT amount for 1 PGNLZ
+        // Assuming USDT is 18 decimals as per existing code usage in handleReactivate
+        pgnlzPrice.value = parseFloat(ethers.formatUnits(amounts[1], 18));
+      } catch (e) {
+        console.error("Failed to fetch PGNLZ price", e);
+      }
+    };
+
+    const getUsdtValue = (amount, symbol) => {
+        if (!amount || !pgnlzPrice.value) return null;
+        if (symbol !== 'PGNLZ') return null;
+        
+        try {
+            const val = parseFloat(ethers.formatUnits(amount, 18));
+            const usdtVal = val * pgnlzPrice.value;
+            // Format to 2-4 decimals
+            return usdtVal < 0.01 ? usdtVal.toPrecision(2) : usdtVal.toFixed(2);
+        } catch (e) {
+            return null;
+        }
     };
 
     const fetchBalance = async () => {
@@ -302,6 +356,7 @@ export default {
         
         if (balance > 0) {
           await fetchNftList();
+          fetchPgnlzPrice();
         }
       } catch (error) {
         console.error('Failed to fetch NFT balance:', error);
@@ -313,14 +368,7 @@ export default {
       isLoading.value = true;
       try {
         const nftContractAddr = getContractAddress('nodeNFT');
-        const nodePoolAddr = getContractAddress('NodePool');
-        const stakingAddr = getContractAddress('Staking');
-        const pgnlzAddr = getContractAddress('PGNLZ');
-        const usdtAddr = getContractAddress('USDT');
-
         const nftContract = new ethers.Contract(nftContractAddr, nodeNFTAbi, walletState.signer);
-        const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
-        const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
 
         // 1. Get My NFTs
         // Assuming reasonably small number, fetch all in one batch with size 100
@@ -334,11 +382,47 @@ export default {
           return;
         }
 
+        // Initialize list with basic info immediately
+        nftList.value = nfts.map(n => ({
+            id: n.id.toString(),
+            level: n.level.toString(),
+            rewards: {},
+            needsReactivation: false,
+            harvested: 0,
+            isDetailLoading: true
+        }));
+        
+        // Stop loading spinner immediately
+        isLoading.value = false;
+        
+        // 2. Fetch details asynchronously
+        fetchNftDetails(nfts);
+
+      } catch (error) {
+        console.error('Failed to fetch NFT list:', error);
+        isLoading.value = false; // Ensure loading stops on error
+        nftList.value = [];
+      }
+    };
+
+    const fetchNftDetails = async (nfts) => {
+      try {
+        const nodePoolAddr = getContractAddress('NodePool');
+        const stakingAddr = getContractAddress('Staking');
+        const pgnlzAddr = getContractAddress('PGNLZ');
+        const usdtAddr = getContractAddress('USDT');
+
+        const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
+        const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
+
         const nftIds = nfts.map(n => n.id);
         
         // 2. Get Supported Tokens and Reward Cap
-        const supportedTokens = await nodePoolContract.getSupportedTokens();
-        const cap = await nodePoolContract.rewardCap();
+        const [supportedTokens, cap] = await Promise.all([
+             nodePoolContract.getSupportedTokens(),
+             nodePoolContract.rewardCap()
+        ]);
+        
         rewardCap.value = cap;
 
         // Get PGNLZ address from Staking contract as requested
@@ -362,11 +446,11 @@ export default {
         ]);
         
         // 3. Batch Get Rewards
-        const rewardsMap = {}; // nftId -> { symbol: amount }
+        const rewardsMap = {}; // nftId (string) -> { symbol: amount }
         
         // Initialize map
         nftIds.forEach(id => {
-          rewardsMap[id] = {};
+          rewardsMap[id.toString()] = {};
         });
 
         // Fetch rewards for each token
@@ -380,38 +464,49 @@ export default {
                 
                 nftIds.forEach((id, index) => {
                     const amount = amounts[index];
-                    rewardsMap[id][symbol] = amount;
+                    rewardsMap[id.toString()][symbol] = amount;
                 });
             } catch (err) {
                 console.error(`Failed to fetch rewards for token ${tokenAddr}`, err);
             }
         }
 
-        // 4. Check Reactivation Status
+        // Update rewards in the list
+        nftList.value = nftList.value.map(item => ({
+             ...item,
+             rewards: rewardsMap[item.id] || item.rewards
+        }));
+
+
+        // 4. Check Reactivation Status & Harvested
         const canUserReactivate = await stakingContract.checkReactivate(walletState.address);
         canReactivate.value = canUserReactivate;
 
-        const list = [];
-        for (let i = 0; i < nfts.length; i++) {
-            const nft = nfts[i];
-            const harvested = await nodePoolContract.nftCycleHarvested(nft.id);
-            const needsReactivation = harvested >= cap; // && canUserReactivate? Logic says show button if cap reached
-            
-            list.push({
-                id: nft.id.toString(),
-                level: nft.level.toString(),
-                rewards: rewardsMap[nft.id] || {},
-                needsReactivation: needsReactivation,
-                harvested: harvested
-            });
-        }
-        
-        nftList.value = list;
+        // Fetch per-item data in parallel
+        await Promise.all(nfts.map(async (nft) => {
+            try {
+                const harvested = await nodePoolContract.nftCycleHarvested(nft.id);
+                const needsReactivation = harvested >= cap;
+                
+                // Update specific item
+                const index = nftList.value.findIndex(i => i.id === nft.id.toString());
+                if (index !== -1) {
+                    const item = nftList.value[index];
+                    // Create new object to trigger reactivity
+                    nftList.value[index] = {
+                        ...item,
+                        harvested,
+                        needsReactivation,
+                        isDetailLoading: false
+                    };
+                }
+            } catch (e) {
+                console.error(`Failed to fetch details for NFT ${nft.id}`, e);
+            }
+        }));
 
       } catch (error) {
-        console.error('Failed to fetch NFT list:', error);
-      } finally {
-        isLoading.value = false;
+        console.error('Failed to fetch NFT details:', error);
       }
     };
 
@@ -565,7 +660,8 @@ export default {
       closeActivationModal,
       calculateProgress,
       formatNumber,
-      rewardCap
+      rewardCap,
+      getUsdtValue
     };
   }
 }
@@ -719,7 +815,7 @@ export default {
 }
 
 .harvest-all-btn {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--purple-dark) 100%);
+  background: var(--primary);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -729,27 +825,27 @@ export default {
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(192, 132, 252, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap; /* Prevent line breaks */
   min-width: 100px; /* Reduced from 120px */
   text-align: center;
+  line-height: normal;
 }
 
 .harvest-all-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(192, 132, 252, 0.5);
+  background: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 .harvest-all-btn:disabled {
-  opacity: 0.8; /* Higher opacity for better visibility if it's "How to Activate" */
-  cursor: pointer; /* Keep pointer if it's the activate button */
+  background: rgba(139, 92, 246, 0.3);
+  cursor: not-allowed;
   transform: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
+  color: #fff;
   box-shadow: none;
-  color: var(--text-secondary);
 }
 
 /* Specific style for when it is "How to Activate" */
@@ -813,10 +909,11 @@ export default {
 
 .rewards-inline-row {
     display: flex;
-    gap: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
     margin-bottom: 0.8rem; /* Space between rewards and progress bar */
-    align-items: flex-end;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .reward-unit {
@@ -841,11 +938,18 @@ export default {
     text-transform: uppercase;
 }
 
+.usdt-equiv {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-left: 4px;
+    font-family: var(--font-code);
+}
+
 .progress-info {
     display: flex;
     justify-content: space-between;
     font-size: 0.75rem;
-    margin-bottom: 4px;
+    margin-top: 4px;
     color: var(--text-secondary);
 }
 
@@ -1055,7 +1159,7 @@ export default {
   }
 
   .rewards-inline-row {
-    gap: 1rem;
+    gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
 
@@ -1675,5 +1779,43 @@ h1 {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+.reactivate-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.reactivate-wrapper .action-btn {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.status-badge.inactive {
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+    width: auto;
+    white-space: nowrap;
+    min-width: unset;
+    padding: 6px 10px; /* Match button padding */
+}
+
+.status-badge.inactive .dot {
+    width: 6px;
+    height: 6px;
+    background: #94a3b8;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+    .reactivate-wrapper {
+        justify-content: space-between;
+        width: 100%;
+    }
 }
 </style>

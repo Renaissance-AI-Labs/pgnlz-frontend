@@ -48,6 +48,9 @@
 
               <!-- State: Wallet Connected -->
               <div v-else>
+                  <div class="list-header">
+                    <span>{{ t('team.myStats') }}</span>
+                  </div>
                   <div class="stats-card">
                     <div class="stats-row">
                         <div class="stat-item">
@@ -61,14 +64,19 @@
                         </div>
                         <div class="stat-divider"></div>
                         <div class="stat-item">
-                          <span class="label">{{ t('team.teamCount') }}</span>
-                          <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                          <span class="label">{{ t('team.myStake') }}</span>
+                          <span class="value">{{ myStakedAmount }} <span class="unit">U</span></span>
                         </div>
                     </div>
                     
                     <div class="stats-row-divider"></div>
 
-                    <div class="stats-row single-item">
+                    <div class="stats-row">
+                        <div class="stat-item">
+                          <span class="label">{{ t('team.teamCount') }}</span>
+                          <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                        </div>
+                        <div class="stat-divider"></div>
                         <div class="stat-item">
                           <span class="label">{{ t('nft.teamPerformance') }}</span>
                           <span class="value highlight">{{ myTeamTotalInvestValue }} <span class="unit">U</span></span>
@@ -108,6 +116,15 @@
 
                                     <div class="card-stats-grid">
                                         <div class="stat-box">
+                                            <span class="stat-label">{{ t('team.friendStaking') }}</span>
+                                            <span class="stat-value">
+                                                <span v-if="currentChild.friendStaking !== null">{{ currentChild.friendStaking }}</span>
+                                                <span v-else class="loading-dots">...</span>
+                                                <span class="unit">U</span>
+                                            </span>
+                                        </div>
+
+                                        <div class="stat-box">
                                             <span class="stat-label">{{ t('team.teamCount') }}</span>
                                             <span class="stat-value">
                                                 <span v-if="currentChild.teamCount !== null">{{ currentChild.teamCount }}</span>
@@ -116,7 +133,7 @@
                                             </span>
                                         </div>
 
-                                        <div class="stat-box highlight-box">
+                                        <div class="stat-box">
                                             <span class="stat-label">{{ t('nft.teamPerformance') }}</span>
                                             <span class="stat-value highlight">
                                                 <span v-if="currentChild.teamTotalInvestValue !== null">{{ currentChild.teamTotalInvestValue }}</span>
@@ -269,6 +286,7 @@ export default {
     const validDirectReferrals = ref(0);
     const teamCount = ref(0);
     const myTeamTotalInvestValue = ref('0.0');
+    const myStakedAmount = ref('0.0');
     const childrenList = ref([]);
     const currentCardIndex = ref(0);
     const childrenCursor = ref(0);
@@ -357,19 +375,22 @@ export default {
                     const stakingContract = new ethers.Contract(stakingAddress, stakingAbi, provider);
                     
                     // Parallel fetch
-                    const [value, validCount] = await Promise.all([
+                    const [value, validCount, balance] = await Promise.all([
                         stakingContract.teamTotalInvestValue(walletState.address),
-                        stakingContract.validDirectReferralsCount(walletState.address)
+                        stakingContract.validDirectReferralsCount(walletState.address),
+                        stakingContract.balanceOf(walletState.address)
                     ]);
 
                     myTeamTotalInvestValue.value = parseFloat(ethers.formatEther(value)).toFixed(1);
                     validDirectReferrals.value = validCount.toString();
+                    myStakedAmount.value = parseFloat(ethers.formatEther(balance)).toFixed(1);
                 }
             }
         } catch (err) {
             console.error("Error fetching staking data:", err);
             myTeamTotalInvestValue.value = '0.0';
             validDirectReferrals.value = 0;
+            myStakedAmount.value = '0.0';
         }
 
         // Get Current Referrer
@@ -451,7 +472,8 @@ export default {
             const childObjects = validChildren.map(addr => ({
                 address: addr,
                 teamCount: null, // Init as null
-                teamTotalInvestValue: null // Init as null
+                teamTotalInvestValue: null, // Init as null
+                friendStaking: null // Init as null
             }));
             
             childrenList.value = [...childrenList.value, ...childObjects];
@@ -496,7 +518,7 @@ export default {
 
     const fetchChildStakingData = async (index) => {
         const child = childrenList.value[index];
-        if (!child || child.teamTotalInvestValue !== null) return;
+        if (!child || (child.teamTotalInvestValue !== null && child.friendStaking !== null)) return;
 
         try {
             // Get Staking Contract (Read Only)
@@ -510,14 +532,19 @@ export default {
             if (!address) return;
             
             const contract = new ethers.Contract(address, stakingAbi, provider);
-            const value = await contract.teamTotalInvestValue(child.address);
+            
+            const [value, balance] = await Promise.all([
+                contract.teamTotalInvestValue(child.address),
+                contract.balanceOf(child.address)
+            ]);
             
             // Format to 1 decimal place
-            const formatted = parseFloat(ethers.formatEther(value)).toFixed(1);
-            child.teamTotalInvestValue = formatted;
+            child.teamTotalInvestValue = parseFloat(ethers.formatEther(value)).toFixed(1);
+            child.friendStaking = parseFloat(ethers.formatEther(balance)).toFixed(1);
         } catch (error) {
             console.error(`Error fetching staking data for ${child.address}:`, error);
             child.teamTotalInvestValue = '0.0';
+            child.friendStaking = '0.0';
         }
     };
 
@@ -789,6 +816,7 @@ export default {
       validDirectReferrals,
       teamCount,
       myTeamTotalInvestValue,
+      myStakedAmount,
       childrenList,
       loadingChildren,
       hasMoreChildren,
@@ -1238,8 +1266,8 @@ export default {
 
 .card-stats-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
     width: 100%;
 }
 
@@ -1609,5 +1637,15 @@ export default {
   overflow: hidden; /* Hide scrollbar */
   /* Remove min-height to allow vertical centering by flex container */
   /* Remove flex properties from textarea */
+}
+
+.list-header {
+  font-size: 1.1rem;
+  color: #fff;
+  /* margin-bottom: 1rem; */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  padding-left: 0.2rem;
 }
 </style>

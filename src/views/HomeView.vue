@@ -344,9 +344,34 @@ export default {
 
 .hero-title {
     font-family: var(--font-code);
-    font-size: 1rem;
-    color: var(--cyan);
-    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    /* margin-bottom: 2rem; */
+    position: relative;
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    /* background: rgba(192, 132, 252, 0.05); */
+    /* border: 1px solid rgba(192, 132, 252, 0.2); */
+    border-radius: 12px;
+    /* box-shadow: 0 0 20px rgba(192, 132, 252, 0.1), inset 0 0 10px rgba(192, 132, 252, 0.05); */
+    /* backdrop-filter: blur(5px); */
+}
+
+.title-text {
+    background: linear-gradient(90deg, #c084fc, #e879f9, #d8b4fe, #c084fc);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    letter-spacing: 1px;
+    animation: textShine 30s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.6));
+}
+
+@keyframes textShine {
+  to {
+    background-position: 300% center;
+  }
 }
 
 .title-prefix {
