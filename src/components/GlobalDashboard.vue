@@ -85,6 +85,7 @@ import { walletState, networks } from '@/services/wallet';
 import { getContractAddress } from '@/services/contracts';
 import { APP_ENV } from '@/services/environment';
 import StakingABI from '@/abis/staking.json';
+import StakingViewABI from '@/abis/stakingView.json';
 
 const loading = ref(false);
 const dailyQuota = ref(BigInt(0));
@@ -177,12 +178,15 @@ const fetchData = async () => {
     }
 
     const stakingAddress = getContractAddress('Staking');
+    const stakingViewAddress = getContractAddress('StakingView');
+
     if (!stakingAddress) {
       console.warn('Staking contract address not found');
       return;
     }
 
     const stakingContract = new ethers.Contract(stakingAddress, StakingABI, provider);
+    const stakingViewContract = new ethers.Contract(stakingViewAddress, StakingViewABI, provider);
 
     // Fetch Daily Quota
     // Staking.getDailyQuota()
@@ -190,8 +194,8 @@ const fetchData = async () => {
     dailyQuota.value = quota;
 
     // Fetch Queue Info
-    // Staking.getQueueInfo() -> tuple
-    const info = await stakingContract.getQueueInfo();
+    // StakingView.getQueueInfo() -> tuple
+    const info = await stakingViewContract.getQueueInfo();
     // Tuple: [currentDailyQuota, todayUsedQuota, totalQueuedCount, headIndex, tailIndex, nextBatchSize]
     queueInfo.value = {
       currentDailyQuota: info[0],

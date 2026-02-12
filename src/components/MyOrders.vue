@@ -187,6 +187,7 @@ import { t } from '@/i18n';
 import { walletState } from '@/services/wallet';
 import { getContractAddress } from '@/services/contracts';
 import StakingABI from '@/abis/staking.json';
+import StakingViewABI from '@/abis/stakingView.json';
 import { showToast } from '@/services/notification';
 
 const props = defineProps({});
@@ -265,6 +266,9 @@ const fetchOrders = async (status, isReset = false) => {
         const stakingAddress = getContractAddress('Staking');
         const stakingContract = new ethers.Contract(stakingAddress, StakingABI, provider);
         
+        const stakingViewAddress = getContractAddress('StakingView');
+        const stakingViewContract = new ethers.Contract(stakingViewAddress, StakingViewABI, provider);
+        
         let spd = BigInt(86400);
         let sd = BigInt(100 * 86400);
 
@@ -322,7 +326,7 @@ const fetchOrders = async (status, isReset = false) => {
             // Logic for Queued
             if (order.isQueued) {
                 try {
-                    const qInfo = await stakingContract.getQueuePositionInfo(walletState.address, order.id);
+                    const qInfo = await stakingViewContract.getQueuePositionInfo(walletState.address, order.id);
                     if (qInfo[0]) {
                         order.queuePosition = Number(qInfo[1]) + 1;
                         order.queueAmountAhead = formatAmount(qInfo[2]);

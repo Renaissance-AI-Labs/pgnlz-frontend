@@ -26,15 +26,15 @@ const CONTRACT_ADDRESSES = {
     production: '',
   },
   Staking: {
-    development: '0x345A5cB79d2daD082e2fc2959965dB0400611c2F',
+    development: '0xfbEA068Edb830dCccDBec3d48d629CDBd87C777c',
     production: '',
   },
   PGNLZ: {
-    development: '0x611b5BC652a40E06A51b636b2Bc3A1aFe19B3Bd2',
+    development: '0x67B8eDB46c6b031841C17b517A540cDD3373587C',
     production: '',
   },
   USDT_PGNLZ_LP: {
-    development: '0xCc0eA25FdBd0AdC31C8013e7e5b3Fa5C70Bde98a',
+    development: '0x0Cb9E6De45Ca041795119652437fe609D524f8b4',
     production: '',
   },
   Node: {
@@ -44,7 +44,12 @@ const CONTRACT_ADDRESSES = {
   NodePool: {
     development: '0x6f96b137a558a6B7C70B8AFD6DB3B18228C27298',
     production: '',
-  }
+  },
+  StakingView: {
+    development: '0xCBaa96b00b2D6FDc121D39422E177675d61939Dd',
+    production: '',
+  },
+
 };
 
 /**

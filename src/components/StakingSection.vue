@@ -88,6 +88,7 @@ import { getContractAddress } from '@/services/contracts';
 import { APP_ENV } from '@/services/environment';
 import referralAbi from '@/abis/referral.json';
 import StakingABI from '@/abis/staking.json';
+import StakingViewABI from '@/abis/stakingView.json';
 import { showToast } from '@/services/notification';
 
 // Minimal ERC20 ABI
@@ -152,12 +153,14 @@ const updateData = async () => {
     }
 
     const stakingAddress = getContractAddress('Staking');
+    const stakingViewAddress = getContractAddress('StakingView');
     const usdtAddress = getContractAddress('USDT');
     const referralAddress = getContractAddress('referral');
 
     if (!stakingAddress || !usdtAddress || !referralAddress) return;
 
     const stakingContract = new ethers.Contract(stakingAddress, StakingABI, provider);
+    const stakingViewContract = new ethers.Contract(stakingViewAddress, StakingViewABI, provider);
     
     // 1. Get Allowed Stake Amounts (Read-only)
     const amounts = [];
@@ -213,7 +216,7 @@ const updateData = async () => {
         currentAllowance.value = allowance;
 
         // 4. Check Queue Status
-        await checkQueueStatus(stakingContract, userAddress);
+        await checkQueueStatus(stakingContract, stakingViewContract, userAddress);
 
         // 5. Check Referrer Bind Status
         try {
@@ -241,7 +244,7 @@ const updateData = async () => {
   }
 };
 
-const checkQueueStatus = async (stakingContract, userAddress) => {
+const checkQueueStatus = async (stakingContract, stakingViewContract, userAddress) => {
     try {
         // Get user record count
         const count = await stakingContract.getUserRecordCount(userAddress, 0); // 0 for all? or check ABI
@@ -277,7 +280,7 @@ const checkQueueStatus = async (stakingContract, userAddress) => {
             // Struct RecordInfo has `uint256 id`.
             const index = queuedRecord.id;
             
-            const posInfo = await stakingContract.getQueuePositionInfo(userAddress, index);
+            const posInfo = await stakingViewContract.getQueuePositionInfo(userAddress, index);
             // returns [found, position, amountAhead, estimatedWaitDays]
             
             if (posInfo[0]) { // found
