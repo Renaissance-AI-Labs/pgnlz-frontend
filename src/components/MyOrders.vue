@@ -8,28 +8,28 @@
             :class="{ active: activeTab === 0 }" 
             @click="switchTab(0)"
         >
-            {{ t('orders.tab.queued') }} <span class="tab-count" v-if="counts[0] > 0">({{ counts[0] }})</span>
+            {{ t('orders.tab.queued') }}
         </button>
         <button 
             class="tab-btn" 
             :class="{ active: activeTab === 1 }" 
             @click="switchTab(1)"
         >
-            {{ t('orders.tab.processing') }} <span class="tab-count" v-if="counts[1] > 0">({{ counts[1] }})</span>
+            {{ t('orders.tab.processing') }}
         </button>
         <button 
             class="tab-btn" 
             :class="{ active: activeTab === 2 }" 
             @click="switchTab(2)"
         >
-            {{ t('orders.tab.claimable') }} <span class="tab-count" v-if="counts[2] > 0">({{ counts[2] }})</span>
+            {{ t('orders.tab.claimable') }}
         </button>
         <button 
             class="tab-btn" 
             :class="{ active: activeTab === 3 }" 
             @click="switchTab(3)"
         >
-            {{ t('orders.tab.completed') }} <span class="tab-count" v-if="counts[3] > 0">({{ counts[3] }})</span>
+            {{ t('orders.tab.completed') }}
         </button>
     </div>
 
@@ -84,7 +84,7 @@
                 <div class="active-details">
                     
                     <!-- Stats Grid -->
-                    <div class="stats-grid-compact">
+                    <div class="stats-grid-compact" v-if="activeTab !== 0">
                          <div class="stat-item">
                             <span class="label">{{ t('orders.col.earnings') }}</span>
                             <span class="value">{{ formatAmount(order.totalReceivedUsdt) }}</span>
@@ -146,7 +146,7 @@
                             :disabled="processing || !canHarvest(order)"
                             :title="t('orders.btn.harvest')"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                            <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg> -->
                             {{ t('orders.btn.harvest') }}
                         </button>
                         
@@ -157,11 +157,11 @@
                         <button 
                             v-if="(activeTab === 0 || activeTab === 1) && order.isUnstakeable"
                             class="btn-icon btn-unstake" 
-                            @click="openUnstakeModal(order.id)"
+                            @click="openUnstakeModal(order)"
                             :disabled="processing"
                             :title="t('orders.btn.unstake')"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> -->
                             {{ t('orders.btn.unstake') }}
                         </button>
                     </div>
@@ -178,7 +178,7 @@
     <div v-if="showUnstakeModal" class="modal-overlay">
         <div class="modal-content glass">
             <h3 class="modal-title">{{ t('orders.modal.unstakeTitle') }}</h3>
-            <p class="modal-desc">{{ t('orders.confirmUnstake') }}</p>
+            <p class="modal-desc">{{ t('orders.confirmUnstake', { amount: unstakeRefundAmount }) }}</p>
             <div class="modal-actions">
                 <button class="btn btn-danger-outline" @click="confirmUnstake">
                     {{ t('orders.modal.confirm') }}
@@ -222,6 +222,7 @@ const counts = reactive({
 // Modal State
 const showUnstakeModal = ref(false);
 const selectedUnstakeId = ref(null);
+const unstakeRefundAmount = ref('0');
 
 // Helper to format Date
 const formatDate = (timestamp) => {
@@ -359,6 +360,7 @@ const fetchOrders = async (status, isReset = false) => {
                 pendingTokenAmount: item.pendingTokenAmount,
                 guaranteeUsdt: item.guaranteeUsdt,
                 isUnstakeable: item.isUnstakeable,
+                refundUsdt: item.refundUsdt,
                 
                 // For UI state
                 queuePosition: undefined,
@@ -493,8 +495,9 @@ const harvest = async (id) => {
     }
 };
 
-const openUnstakeModal = (id) => {
-    selectedUnstakeId.value = id;
+const openUnstakeModal = (order) => {
+    selectedUnstakeId.value = order.id;
+    unstakeRefundAmount.value = formatAmount(order.refundUsdt);
     showUnstakeModal.value = true;
 };
 
@@ -637,7 +640,7 @@ watch(() => walletState.isConnected, (newVal) => {
 }
 
 .order-card {
-    background: rgb(15 16 45 / 75%);
+    background: rgba(15, 16, 45, 0.974);
     border: 1px solid rgba(148, 163, 184, 0.1);
     border-radius: 12px;
     padding: 0.8rem 1rem;
@@ -1034,6 +1037,13 @@ watch(() => walletState.isConnected, (newVal) => {
     display: flex;
     width: 100%;
     gap: 1rem;
+}
+
+.modal-actions .btn {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .btn-primary {

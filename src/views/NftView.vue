@@ -86,27 +86,36 @@
                         <div v-for="(amount, symbol) in nft.rewards" :key="symbol" class="reward-unit">
                              <span class="val">{{ formatReward(amount) }}</span>
                              <span class="sym">{{ symbol }}</span>
+                             <span v-if="getUsdtValue(amount, symbol)" class="usdt-equiv">
+                               (≈ {{ getUsdtValue(amount, symbol) }} USDT)
+                             </span>
                         </div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
                     </div>
                     <div class="progress-info">
                         <span class="label">{{ t('nft.cycleProgress') }}</span>
                         <span class="value">{{ formatReward(nft.harvested) }} / {{ formatReward(rewardCap) }}</span>
                     </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
-                    </div>
+                    
                     
                  </div>
                  
                  <div class="item-status col-status">
-                    <button 
-                      v-if="nft.needsReactivation" 
-                      @click="handleReactivate(nft.id)" 
-                      class="action-btn reactivate-btn"
-                      :disabled="isActionProcessing"
-                    >
-                      {{ t('nft.reactivate') }} (500 U)
-                    </button>
+                    <div v-if="nft.needsReactivation" class="reactivate-wrapper">
+                      <button 
+                        @click="handleReactivate(nft.id)" 
+                        class="action-btn reactivate-btn"
+                        :disabled="isActionProcessing"
+                      >
+                        {{ t('nft.reactivate') }} (500 U)
+                      </button>
+                      <div class="status-badge inactive">
+                        <span class="dot"></span>
+                        {{ t('nft.notEffective') }}
+                      </div>
+                    </div>
                     <div v-else class="status-badge active">
                       <span class="dot"></span>
                       {{ t('nft.active') }}
@@ -194,6 +203,10 @@ const ERC20_ABI = [
   "function decimals() view returns (uint8)"
 ];
 
+const ROUTER_ABI = [
+  "function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)"
+];
+
 export default {
   name: 'NftView',
   components: {
@@ -207,6 +220,7 @@ export default {
     const isActionProcessing = ref(false);
     const rewardCap = ref(0);
     const canReactivate = ref(false);
+    const pgnlzPrice = ref(0);
     
     // Activation Modal State
     const isActivationModalVisible = ref(false);
@@ -286,6 +300,46 @@ export default {
       return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(num);
     };
 
+    const fetchPgnlzPrice = async () => {
+      try {
+        const routerAddr = getContractAddress('Router');
+        const pgnlzAddr = getContractAddress('PGNLZ');
+        const usdtAddr = getContractAddress('USDT');
+
+        if (!routerAddr || !pgnlzAddr || !usdtAddr) return;
+
+        // Use a provider (read-only) if signer is not available, but usually we are connected here
+        const provider = walletState.signer || walletState.provider; 
+        if (!provider) return;
+
+        const routerContract = new ethers.Contract(routerAddr, ROUTER_ABI, provider);
+        
+        // 1 PGNLZ
+        const amountIn = ethers.parseUnits('1', 18); 
+        const amounts = await routerContract.getAmountsOut(amountIn, [pgnlzAddr, usdtAddr]);
+        
+        // amounts[1] is USDT amount for 1 PGNLZ
+        // Assuming USDT is 18 decimals as per existing code usage in handleReactivate
+        pgnlzPrice.value = parseFloat(ethers.formatUnits(amounts[1], 18));
+      } catch (e) {
+        console.error("Failed to fetch PGNLZ price", e);
+      }
+    };
+
+    const getUsdtValue = (amount, symbol) => {
+        if (!amount || !pgnlzPrice.value) return null;
+        if (symbol !== 'PGNLZ') return null;
+        
+        try {
+            const val = parseFloat(ethers.formatUnits(amount, 18));
+            const usdtVal = val * pgnlzPrice.value;
+            // Format to 2-4 decimals
+            return usdtVal < 0.01 ? usdtVal.toPrecision(2) : usdtVal.toFixed(2);
+        } catch (e) {
+            return null;
+        }
+    };
+
     const fetchBalance = async () => {
       if (!walletState.isConnected || !walletState.signer || !walletState.address) {
         nftBalance.value = 0;
@@ -302,6 +356,7 @@ export default {
         
         if (balance > 0) {
           await fetchNftList();
+          fetchPgnlzPrice();
         }
       } catch (error) {
         console.error('Failed to fetch NFT balance:', error);
@@ -565,7 +620,8 @@ export default {
       closeActivationModal,
       calculateProgress,
       formatNumber,
-      rewardCap
+      rewardCap,
+      getUsdtValue
     };
   }
 }
@@ -813,10 +869,11 @@ export default {
 
 .rewards-inline-row {
     display: flex;
-    gap: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
     margin-bottom: 0.8rem; /* Space between rewards and progress bar */
-    align-items: flex-end;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .reward-unit {
@@ -841,11 +898,18 @@ export default {
     text-transform: uppercase;
 }
 
+.usdt-equiv {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-left: 4px;
+    font-family: var(--font-code);
+}
+
 .progress-info {
     display: flex;
     justify-content: space-between;
     font-size: 0.75rem;
-    margin-bottom: 4px;
+    margin-top: 4px;
     color: var(--text-secondary);
 }
 
@@ -1055,7 +1119,7 @@ export default {
   }
 
   .rewards-inline-row {
-    gap: 1rem;
+    gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
 
@@ -1675,5 +1739,43 @@ h1 {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+.reactivate-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.reactivate-wrapper .action-btn {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.status-badge.inactive {
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+    width: auto;
+    white-space: nowrap;
+    min-width: unset;
+    padding: 6px 10px; /* Match button padding */
+}
+
+.status-badge.inactive .dot {
+    width: 6px;
+    height: 6px;
+    background: #94a3b8;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+    .reactivate-wrapper {
+        justify-content: space-between;
+        width: 100%;
+    }
 }
 </style>
