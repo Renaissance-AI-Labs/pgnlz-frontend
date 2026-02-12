@@ -768,14 +768,15 @@ export default {
   padding: 1rem 1.5rem; /* Reduced vertical padding */
   position: relative;
   overflow: hidden;
-  /* Tilt effect for the container */
-  transform: perspective(1000px) rotateY(-2deg);
+  /* Tilt effect removed for mobile */
+  /* transform: perspective(1000px) rotateY(-2deg); */
   transition: transform 0.3s ease;
 }
 
-.nft-showcase:hover {
+/* Hover effect only for PC via media query, removing default hover to fix mobile click issue */
+/* .nft-showcase:hover {
   transform: perspective(1000px) rotateY(0deg);
-}
+} */
 
 .nft-card-wrapper {
   flex-shrink: 0;
@@ -1353,8 +1354,8 @@ export default {
 
 .nft-card-container {
   position: relative;
-  width: 100px; /* Condensed size for mobile */
-  height: 100px;
+  width: 140px; /* Increased size for mobile from 100px */
+  height: 140px;
   perspective: 1500px;
 }
 
