@@ -56,7 +56,7 @@
                     </div>
                     <div class="header-right">
                         <span class="order-date">{{ formatDateShort(order.stakeTime) }}</span>
-                        <span class="status-badge" :class="{ queued: order.isQueued, completed: activeTab === 3, claimable: activeTab === 2 }">
+                        <span class="status-badge" :class="{ queued: order.isQueued, completed: activeTab === 3 && !order.recoveryNotFull, redeemed: activeTab === 3 && order.recoveryNotFull, claimable: activeTab === 2 }">
                             {{ getStatusLabel(order) }}
                         </span>
                     </div>
@@ -84,7 +84,7 @@
                 <div class="active-details">
                     
                     <!-- Stats Grid -->
-                    <div class="stats-grid-compact" v-if="activeTab !== 0">
+                    <div class="stats-grid-compact" v-if="activeTab !== 0 && !order.isQueued">
                          <div class="stat-item">
                             <span class="label">{{ t('orders.col.earnings') }}</span>
                             <span class="value">{{ formatAmount(order.totalReceivedUsdt) }}</span>
@@ -253,7 +253,9 @@ const formatAmount = (amount) => {
 };
 
 const getStatusLabel = (order) => {
-    if (activeTab.value === 3) return t('orders.status.completed');
+    if (activeTab.value === 3) {
+        return order.recoveryNotFull ? t('orders.status.redeemed') : t('orders.status.completed');
+    }
     if (activeTab.value === 2) return t('orders.status.claimable');
     return order.isQueued ? t('orders.status.queued') : t('orders.status.earning');
 };
@@ -348,6 +350,29 @@ const fetchOrders = async (status, isReset = false) => {
         const processed = await Promise.all(records.map(async (item) => {
             const r = item.record;
             
+            // Debug Log: Raw Order Data
+            try {
+                console.log(`[Order #${item.id}] Full Item:`, item);
+                console.log(`[Order #${item.id}] Raw Fields:`, {
+                    id: item.id?.toString(),
+                    amount: r?.amount?.toString(),
+                    stakeTime: r?.stakeTime?.toString(),
+                    isQueued: r?.isQueued,
+                    status: r?.status,
+                    // Check if properties exist before toString
+                    totalReceivedUsdt: item.totalReceivedUsdt?.toString() || 'undefined',
+                    pendingStaticUsdt: item.pendingStaticUsdt?.toString(),
+                    pendingTokenAmount: item.pendingTokenAmount?.toString(),
+                    guaranteeUsdt: item.guaranteeUsdt?.toString(),
+                    isUnstakeable: item.isUnstakeable,
+                    refundUsdt: item.refundUsdt?.toString(),
+                    record_totalStaticUsdt: r?.totalStaticUsdt?.toString(),
+                    record_debtStaticUsdt: r?.debtStaticUsdt?.toString()
+                });
+            } catch (err) {
+                console.error("Error logging raw fields:", err);
+            }
+            
             // Basic data
             const order = {
                 id: item.id.toString(),
@@ -406,6 +431,8 @@ const fetchOrders = async (status, isReset = false) => {
             
             const currentRecovery = BigInt(item.totalReceivedUsdt);
             const targetRecovery = BigInt(item.guaranteeUsdt);
+            
+            order.recoveryNotFull = currentRecovery < targetRecovery;
             
             order.recoveryValue = formatAmount(currentRecovery > targetRecovery ? targetRecovery : currentRecovery);
             order.recoveryTarget = formatAmount(targetRecovery);
@@ -744,6 +771,12 @@ watch(() => walletState.isConnected, (newVal) => {
     background: rgba(100, 116, 139, 0.15);
     color: #94a3b8;
     border-color: rgba(100, 116, 139, 0.2);
+}
+
+.status-badge.redeemed {
+    background: rgba(217, 103, 103, 0.15);
+    color: #d96767;
+    border-color: rgba(217, 103, 103, 0.2);
 }
 
 /* Compact Stats Grid */

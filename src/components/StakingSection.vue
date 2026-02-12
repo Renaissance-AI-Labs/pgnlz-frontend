@@ -1,8 +1,7 @@
 <template>
   <div class="staking-container glass">
     <h2 class="section-title text-gradient">{{ t('staking.title') }}</h2>
-    <p class="staking-footer-text">
-        {{ t('staking.description') }}
+    <p class="staking-footer-text" v-html="t('staking.description')">
     </p>
     <div class="stake-card">
       <div class="amount-display">
@@ -626,7 +625,7 @@ watch(() => walletState.isConnected, () => {
     margin-bottom: 0.3rem;
     font-size: 0.8rem;
     color: #fff;
-    text-align: center;
+    text-align: left;
     opacity: 0.8;
 }
 </style>
