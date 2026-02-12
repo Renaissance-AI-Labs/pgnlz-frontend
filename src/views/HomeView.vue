@@ -18,17 +18,7 @@
           
           <p class="text-block">{{ t('home.announcement.p1') }}</p>
           
-          <p class="bullet-intro">{{ t('home.announcement.bullet_intro') }}</p>
-          <ul class="bullet-list">
-            <li>{{ t('home.announcement.b1') }}</li>
-            <li>{{ t('home.announcement.b2') }}</li>
-            <li>{{ t('home.announcement.b3') }}</li>
-            <li>{{ t('home.announcement.b4') }}</li>
-          </ul>
-          
           <p class="text-block">{{ t('home.announcement.p2') }}</p>
-          <!-- Combined p2 and p3 slightly -->
-          <p class="text-block">{{ t('home.announcement.p3') }}</p>
           
           <p class="closing text-gradient">{{ t('home.announcement.closing') }}</p>
           
@@ -36,7 +26,7 @@
           
           <div class="signature-block">
             <p class="signature">{{ t('home.announcement.signature') }}</p>
-            <p class="note">{{ t('home.announcement.note') }}</p>
+            <p class="note">{{ t('home.announcement.date') }}</p>
           </div>
         </div>
       </div>

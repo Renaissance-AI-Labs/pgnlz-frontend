@@ -43,10 +43,15 @@ const languagePacks = {
     'dashboard.unlimited': 'Unlimited',
     
      // Announcement
-     'home.announcement.title': 'Urgent Announcement Regarding PGNLZ MAX System Upgrade',
-    'home.subtitle': 'Build a decentralized world with PGNLZ MAX',
-
-     // Staking Section
+     'home.announcement.title': 'Announcement on PGNLZ MAX Product Progress',
+     'home.announcement.greeting': 'Dear Community Members and Followers:',
+     'home.announcement.p1': 'We are pleased to update you on the latest progress of PGNLZ MAX. Currently, the frontend integration work will be completed today, and the team will immediately enter the internal environment testing phase to conduct a comprehensive system check to ensure stable operation and no major vulnerabilities.',
+     'home.announcement.p2': 'After the testnet feedback collection is completed and the system runs stably, we will officially confirm the mainnet launch time and announce it to the community as soon as possible.',
+     'home.announcement.closing': 'Thank you for your continued support and patience! We look forward to witnessing the official launch of PGNLZ MAX with you.',
+     'home.announcement.contact': 'If you have any questions, please feel free to contact us through official channels.',
+     'home.announcement.signature': 'PGNLZMAX Overseas Technical Team',
+     'home.announcement.date': 'February 12, 2026',
+     'home.subtitle': 'Build a decentralized world with PGNLZ MAX',
      'staking.title': 'Staking Investment',
      'staking.description': 'Stake USDT to start PGNLZ mining, enjoy up to 300% returns, secure and worry-free investment.',
      'staking.amountLabel': 'Investment Amount',
@@ -111,19 +116,13 @@ const languagePacks = {
      'orders.harvestSuccess': 'Harvest Successful',
      'orders.unstakeSuccess': 'Unstake Successful',
 
-    'home.announcement.greeting': 'Dear Users,',
-    'home.announcement.p1': 'To provide you with better service and an ultimate experience, we are undergoing a comprehensive brand and technical upgrade. The platform has officially been renamed PGNLZ MAX. This upgrade is supported by the core development team of the original PG public chain, ensuring the advanced nature and reliability of the underlying architecture',
-    'home.announcement.bullet_intro': 'Currently, the technical team is fully advancing the following key tasks:',
-    'home.announcement.b1': 'Contract Testing & Security Audit: A new round of contract deployment has been completed, and strict security audits and logic tests are being performed to ensure system stability and asset security',
-    'home.announcement.b2': 'DAPP Domain Upgrade: To align with the brand and functional upgrade, the DAPP domain will be officially updated to: pgnlz-max.com, providing you with a more convenient and secure access point',
-    'home.announcement.b3': 'On-chain Logic Optimization & Redeemable Function Expansion',
-    'home.announcement.b4': 'Comprehensive UI Interface Refactoring',
-    'home.announcement.p2': 'Based on the brand-new underlying architecture, we will fully ensure the safety of your funds and smooth transactions, bringing a better user experience',
-    'home.announcement.p3': 'The system is expected to complete the upgrade and go back online in the near future. Please pay attention to official notifications for the specific time',
-    'home.announcement.closing': 'Thank you for your continued patience and support! PGNLZ MAX is about to set sail!',
-    'home.announcement.contact': 'If you have any questions, please contact us through official channels',
-    'home.announcement.signature': 'PGNLZ MAX Technical Team',
-    'home.announcement.note': '(System upgrade work is proceeding in an orderly manner, stay tuned)',
+    'home.announcement.greeting': 'Dear Community Members and Followers:',
+    'home.announcement.p1': 'We are pleased to update you on the latest progress of PGNLZ MAX. Currently, the frontend integration work will be completed today, and the team will immediately enter the internal environment testing phase to conduct a comprehensive system check to ensure stable operation and no major vulnerabilities.',
+    'home.announcement.p2': 'After the testnet feedback collection is completed and the system runs stably, we will officially confirm the mainnet launch time and announce it to the community as soon as possible.',
+    'home.announcement.closing': 'Thank you for your continued support and patience! We look forward to witnessing the official launch of PGNLZ MAX with you.',
+    'home.announcement.contact': 'If you have any questions, please feel free to contact us through official channels.',
+    'home.announcement.signature': 'PGNLZMAX Overseas Technical Team',
+    'home.announcement.date': 'February 12, 2026',
 
     // NFT Page
     'nft.pageTitle': '< NFT NODE />',
@@ -221,7 +220,7 @@ const languagePacks = {
      'dashboard.unlimited': '不限额',
 
      // Announcement
-     'home.announcement.title': 'PGNLZ MAX系统加急升级公告',
+     'home.announcement.title': '关于 PGNLZ MAX 产品进展的公告',
      'home.subtitle': '与PGNLZ MAX一起打造去中心化世界',
 
      // Staking Section
@@ -289,19 +288,13 @@ const languagePacks = {
      'orders.harvestSuccess': '领取成功',
      'orders.unstakeSuccess': '撤资成功',
 
-     'home.announcement.greeting': '尊敬的平台用户：\n您好！',
-     'home.announcement.p1': '为向您提供更优质的服务与更极致的体验，我们正在进行全面的品牌与技术升级，平台现已正式更名为 PGNLZ MAX。本次升级得到了原PG公链核心开发团队的技术支持与合作，共同确保底层架构的先进性与可靠性',
-     'home.announcement.bullet_intro': '目前，技术团队正全力推进以下关键工作：',
-     'home.announcement.b1': '合约测试与安全审计：已完成新一轮合约部署，并正在执行严格的安全审计与逻辑测试，以保障系统稳定与资产安全',
-     'home.announcement.b2': 'DAPP 域名升级：为配合品牌与功能升级，DAPP 域名将正式更新为：pgnlz-max.com，为您提供更便捷、更安全的访问入口',
-     'home.announcement.b3': '链上逻辑优化及可赎回功能扩展',
-     'home.announcement.b4': 'UI 交互界面全面重构',
-     'home.announcement.p2': '我们将基于全新的底层架构，全力确保您的资金安全与交易流畅，带来更优质的使用体验',
-     'home.announcement.p3': '系统预计于近期完成升级并重新上线，具体时间敬请留意官方后续通知',
-     'home.announcement.closing': '感谢您一直以来的耐心与支持！PGNLZ MAX，即将全新启航！',
-     'home.announcement.contact': '如有任何疑问，可通过官方渠道联系我们',
-     'home.announcement.signature': 'PGNLZ MAX 技术团队',
-     'home.announcement.note': '（系统升级工作正有序推进中，敬请期待）',
+     'home.announcement.greeting': '尊敬的社区成员与关注者：',
+     'home.announcement.p1': '我们很高兴向大家同步 PGNLZ MAX 产品的最新进展。目前，前端对接工作将于今日内全部完成，团队将随即进入内部环境测试阶段，对系统进行全面检测，确保运行稳定、无重大漏洞。',
+     'home.announcement.p2': '待测试网反馈收集完毕且系统运行稳定后，我们将正式确认主网上线时间，并第一时间向社区公布。',
+     'home.announcement.closing': '感谢大家一直以来的支持与耐心等待！我们期待与您共同见证 PGNLZMAX 的正式推出。',
+     'home.announcement.contact': '如有任何疑问，请随时通过官方渠道与我们联系。',
+     'home.announcement.signature': 'PGNLZMAX 海外技术团队 敬上',
+     'home.announcement.date': '2026年2月12日',
 
      // NFT Page
      'nft.pageTitle': '< NFT NODE />',
@@ -400,7 +393,7 @@ const languagePacks = {
      'dashboard.unlimited': '不限額',
 
      // Announcement
-     'home.announcement.title': 'PGNLZ MAX 系統加急升級公告',
+     'home.announcement.title': '關於 PGNLZ MAX 產品進展的公告',
      'home.subtitle': '與PGNLZ MAX一起打造去中心化世界',
 
      // Staking Section
@@ -468,19 +461,13 @@ const languagePacks = {
      'orders.harvestSuccess': '領取成功',
      'orders.unstakeSuccess': '撤資成功',
 
-     'home.announcement.greeting': '尊敬的平台用戶：\n您好！',
-     'home.announcement.p1': '為向您提供更優質的服務與更極致的體驗，我們正在進行全面的品牌與技術升級，平台現已正式更名為 PGNLZ MAX。本次升級得到了原PG公鏈核心開發團隊的技術支持與合作，共同確保底層架構的先進性與可靠性',
-     'home.announcement.bullet_intro': '目前，技術團隊正全力推進以下關鍵工作：',
-     'home.announcement.b1': '合約測試與安全審計：已完成新一輪合約部署，並正在執行嚴格的安全審計與邏輯測試，以保障系統穩定與資產安全',
-     'home.announcement.b2': 'DAPP 域名升級：為配合品牌與功能升級，DAPP 域名將正式更新為：pgnlz-max.com，為您提供更便捷、更安全的訪問入口',
-     'home.announcement.b3': '鏈上邏輯優化及可贖回功能擴展',
-     'home.announcement.b4': 'UI 交互界面全面重構',
-     'home.announcement.p2': '我們將基於全新的底層架構，全力確保您的資金安全與交易流暢，帶來更優質的使用體驗',
-     'home.announcement.p3': '系統預計於近期完成升級並重新上線，具體時間敬請留意官方後續通知',
-     'home.announcement.closing': '感謝您一直以來的耐心與支持！PGNLZ MAX，即將全新啟航！',
-     'home.announcement.contact': '如有任何疑問，可通過官方渠道聯繫我們',
-     'home.announcement.signature': 'PGNLZ MAX 技術團隊',
-     'home.announcement.note': '（系統升級工作正有序推進中，敬請期待）',
+     'home.announcement.greeting': '尊敬的社區成員與關注者：',
+     'home.announcement.p1': '我們很高興向大家同步 PGNLZ MAX 產品的最新進展。目前，前端對接工作將於今日內全部完成，團隊將隨即進入內部環境測試階段，對系統進行全面檢測，確保運行穩定、無重大漏洞。',
+     'home.announcement.p2': '待測試網反饋收集完畢且系統運行穩定後，我們將正式確認主網上線時間，並第一時間向社區公佈。',
+     'home.announcement.closing': '感謝大家一直以來的支持與耐心等待！我們期待與您共同見證 PGNLZMAX 的正式推出。',
+     'home.announcement.contact': '如有任何疑問，請隨時通過官方渠道與我們聯繫。',
+     'home.announcement.signature': 'PGNLZMAX 海外技術團隊 敬上',
+     'home.announcement.date': '2026年2月12日',
 
      // NFT Page
      'nft.pageTitle': '< NFT NODE />',
@@ -580,7 +567,7 @@ const languagePacks = {
      'dashboard.unlimited': '無制限',
 
      // Announcement
-     'home.announcement.title': 'PGNLZ MAXシステムアップグレードに関する緊急のお知らせ',
+     'home.announcement.title': 'PGNLZ MAX製品進捗に関するお知らせ',
      'home.subtitle': 'PGNLZ MAXと共に分散型世界を構築しましょう',
 
      // Staking Section
@@ -648,19 +635,13 @@ const languagePacks = {
      'orders.harvestSuccess': '受取成功',
      'orders.unstakeSuccess': '撤退成功',
 
-     'home.announcement.greeting': 'ユーザーの皆様へ',
-     'home.announcement.p1': 'より良いサービスと最高の体験を提供するため、全面的にブランドと技術のアップグレードを行っております。プラットフォームは正式にPGNLZ MAXに名称変更されました。今回のアップグレードは、元のPGパブリックチェーンのコア開発チームからの技術サポートと協力を得て、基盤アーキテクチャの先進性と信頼性を確保しています',
-     'home.announcement.bullet_intro': '現在、技術チームは以下の重要な作業を全力で進めています：',
-     'home.announcement.b1': 'コントラクトテストとセキュリティ監査：新しいコントラクトの展開が完了し、システムの安定性と資産の安全を確保するために、厳格なセキュリティ監査とロジックテストを実行しています',
-     'home.announcement.b2': 'DAPPドメインのアップグレード：ブランドと機能のアップグレードに合わせて、DAPPドメインは正式にpgnlz-max.comに更新され、より便利で安全なアクセス入口を提供します',
-     'home.announcement.b3': 'オンチェーンロジックの最適化および償還可能機能の拡張',
-     'home.announcement.b4': 'UIインターフェースの全面的な再構築',
-     'home.announcement.p2': '全く新しい基盤アーキテクチャに基づき、資金の安全とスムーズな取引を全力で確保し、より良い利用体験をお届けします',
-     'home.announcement.p3': 'システムは近日中にアップグレードを完了し、再開する予定です。具体的な時間については、公式の後の通知にご注意ください',
-     'home.announcement.closing': 'これまでのご愛顧とご支援に感謝いたします！PGNLZ MAX、まもなく新たな船出です！',
-     'home.announcement.contact': 'ご質問がございましたら、公式チャンネルを通じてお問い合わせください',
-     'home.announcement.signature': 'PGNLZ MAX 技術チーム',
-     'home.announcement.note': '（システムアップグレード作業は順調に進行中です。ご期待ください）',
+     'home.announcement.greeting': 'コミュニティメンバーおよびフォロワーの皆様へ：',
+     'home.announcement.p1': 'PGNLZ MAX製品の最新進捗状況をお知らせいたします。現在、フロントエンドの統合作業は本日中に完了する予定です。その後、チームは直ちに内部環境テスト段階に入り、システムの包括的なチェックを行い、安定した運用と重大な脆弱性がないことを確認します。',
+     'home.announcement.p2': 'テストネットのフィードバック収集が完了し、システムが安定して稼働した後、メインネットのローンチ時期を正式に確認し、できるだけ早くコミュニティに発表いたします。',
+     'home.announcement.closing': '変わらぬご支援とご辛抱に感謝いたします！PGNLZ MAXの正式なローンチを皆様と共に目撃できることを楽しみにしています。',
+     'home.announcement.contact': 'ご不明な点がございましたら、公式チャンネルを通じてお気軽にお問い合わせください。',
+     'home.announcement.signature': 'PGNLZMAX 海外技術チーム',
+     'home.announcement.date': '2026年2月12日',
 
      // NFT Page
      'nft.pageTitle': '< NFT NODE />',
@@ -760,7 +741,7 @@ const languagePacks = {
      'dashboard.unlimited': '무제한',
 
      // Announcement
-     'home.announcement.title': 'PGNLZ MAX 시스템 업그레이드에 관한 긴급 공지',
+     'home.announcement.title': 'PGNLZ MAX 제품 진행 상황에 대한 공지',
      'home.subtitle': 'PGNLZ MAX와 함께 탈중앙화 세상을 만들어가세요',
 
      // Staking Section
@@ -828,19 +809,13 @@ const languagePacks = {
      'orders.harvestSuccess': '수령 성공',
      'orders.unstakeSuccess': '철수 성공',
 
-     'home.announcement.greeting': '존경하는 사용자 여러분,',
-     'home.announcement.p1': '더 나은 서비스와 최고의 경험을 제공하기 위해 전면적인 브랜드 및 기술 업그레이드를 진행 중이며, 플랫폼 명칭이 PGNLZ MAX로 공식 변경되었습니다. 이번 업그레이드는 원 PG 퍼블릭 체인 핵심 개발팀의 기술 지원과 협력을 받아 기본 아키텍처의 선진성과 신뢰성을 공동으로 보장합니다',
-     'home.announcement.bullet_intro': '현재 기술팀은 다음 주요 작업을 전력으로 추진하고 있습니다:',
-     'home.announcement.b1': '계약 테스트 및 보안 감사: 새로운 계약 배포가 완료되었으며, 시스템 안정성과 자산 안전을 보장하기 위해 엄격한 보안 감사 및 로직 테스트를 수행하고 있습니다',
-     'home.announcement.b2': 'DAPP 도메인 업그레이드: 브랜드 및 기능 업그레이드에 맞춰 DAPP 도메인이 공식적으로 pgnlz-max.com으로 업데이트되어 더 편리하고 안전한 접속 경로를 제공할 것입니다',
-     'home.announcement.b3': '온체인 로직 최적화 및 상환 가능 기능 확장',
-     'home.announcement.b4': 'UI 인터페이스 전면 재구축',
-     'home.announcement.p2': '새로운 기본 아키텍처를 기반으로 자금 안전과 원활한 거래를 전력으로 보장하며, 더 나은 사용 경험을 제공하겠습니다',
-     'home.announcement.p3': '시스템은 조만간 업그레이드를 완료하고 다시 오픈할 예정이며, 구체적인 시간은 공식 후속 공지를 확인해 주시기 바랍니다',
-     'home.announcement.closing': '그동안의 인내와 지지에 감사드립니다! PGNLZ MAX, 곧 새롭게 출발합니다!',
-     'home.announcement.contact': '질문이 있으시면 공식 채널을 통해 문의해 주시기 바랍니다',
-     'home.announcement.signature': 'PGNLZ MAX 기술팀',
-     'home.announcement.note': '(시스템 업그레이드 작업이 순조롭게 진행 중입니다. 기대해 주세요)',
+     'home.announcement.greeting': '존경하는 커뮤니티 회원 및 팔로워 여러분:',
+     'home.announcement.p1': 'PGNLZ MAX 제품의 최신 진행 상황을 공유하게 되어 기쁩니다. 현재 프론트엔드 통합 작업은 오늘 내로 완료될 예정이며, 팀은 즉시 내부 환경 테스트 단계에 들어가 시스템에 대한 포괄적인 검사를 수행하여 안정적인 운영과 중대한 취약점이 없음을 보장할 것입니다.',
+     'home.announcement.p2': '테스트넷 피드백 수집이 완료되고 시스템이 안정적으로 운영되면, 메인넷 출시 시간을 공식적으로 확정하여 커뮤니티에 가장 먼저 공지하겠습니다.',
+     'home.announcement.closing': '여러분의 지속적인 지지와 인내에 감사드립니다! PGNLZ MAX의 정식 출시를 여러분과 함께 지켜보기를 기대합니다.',
+     'home.announcement.contact': '질문이 있으시면 언제든지 공식 채널을 통해 문의해 주시기 바랍니다.',
+     'home.announcement.signature': 'PGNLZMAX 해외 기술팀',
+     'home.announcement.date': '2026년 2월 12일',
 
      // NFT Page
      'nft.pageTitle': '< NFT NODE />',
