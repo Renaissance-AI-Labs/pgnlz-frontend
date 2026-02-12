@@ -353,7 +353,7 @@ export default {
     /* border: 1px solid rgba(192, 132, 252, 0.2); */
     border-radius: 12px;
     /* box-shadow: 0 0 20px rgba(192, 132, 252, 0.1), inset 0 0 10px rgba(192, 132, 252, 0.05); */
-    backdrop-filter: blur(5px);
+    /* backdrop-filter: blur(5px); */
 }
 
 .title-text {

@@ -815,7 +815,7 @@ export default {
 }
 
 .harvest-all-btn {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--purple-dark) 100%);
+  background: var(--primary);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -825,27 +825,27 @@ export default {
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(192, 132, 252, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap; /* Prevent line breaks */
   min-width: 100px; /* Reduced from 120px */
   text-align: center;
+  line-height: normal;
 }
 
 .harvest-all-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(192, 132, 252, 0.5);
+  background: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 .harvest-all-btn:disabled {
-  opacity: 0.8; /* Higher opacity for better visibility if it's "How to Activate" */
-  cursor: pointer; /* Keep pointer if it's the activate button */
+  background: rgba(139, 92, 246, 0.3);
+  cursor: not-allowed;
   transform: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
+  color: #fff;
   box-shadow: none;
-  color: var(--text-secondary);
 }
 
 /* Specific style for when it is "How to Activate" */

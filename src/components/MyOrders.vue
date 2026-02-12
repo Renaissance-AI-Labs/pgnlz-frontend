@@ -63,7 +63,7 @@
                 </div>
 
                 <!-- Queued View -->
-                <div v-if="order.isQueued" class="queue-wrapper">
+                <div v-if="order.isQueued && activeTab !== 3" class="queue-wrapper">
                     <div class="queued-details">
                         <div class="detail-row">
                             <span class="label">{{ t('orders.queue.position') }}:</span>

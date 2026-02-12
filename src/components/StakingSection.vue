@@ -312,14 +312,14 @@ const handleApprove = async () => {
     
     const usdtContract = new ethers.Contract(usdtAddress, ERC20_ABI, signer);
     
-    // Approve fixed amount (or max)
-    const tx = await usdtContract.approve(stakingAddress, rawFixedAmount.value);
+    // Approve infinite amount (MaxUint256)
+    const tx = await usdtContract.approve(stakingAddress, ethers.MaxUint256);
     await tx.wait();
     
     showToast(t('staking.approveSuccess'), 'success');
     
     // Update allowance immediately to reflect change in UI
-    currentAllowance.value = rawFixedAmount.value; 
+    currentAllowance.value = ethers.MaxUint256; 
     // Optionally refresh real data
     // await updateData();
   } catch (error) {
