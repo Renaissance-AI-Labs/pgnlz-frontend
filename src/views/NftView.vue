@@ -277,14 +277,14 @@ export default {
     };
     
     const calculateProgress = (current, target) => {
-      if (!target || target === 0) return 100;
+      if (!target || target === 0) return 0;
       
       try {
           // Handle BigInt
           const currentBn = BigInt(current);
           const targetBn = BigInt(target);
           
-          if (targetBn === 0n) return 100;
+          if (targetBn === 0n) return 0;
           
           // Calculate percentage with precision
           // (current * 10000) / target -> then divide by 100 for decimals
@@ -368,14 +368,7 @@ export default {
       isLoading.value = true;
       try {
         const nftContractAddr = getContractAddress('nodeNFT');
-        const nodePoolAddr = getContractAddress('NodePool');
-        const stakingAddr = getContractAddress('Staking');
-        const pgnlzAddr = getContractAddress('PGNLZ');
-        const usdtAddr = getContractAddress('USDT');
-
         const nftContract = new ethers.Contract(nftContractAddr, nodeNFTAbi, walletState.signer);
-        const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
-        const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
 
         // 1. Get My NFTs
         // Assuming reasonably small number, fetch all in one batch with size 100
@@ -389,11 +382,47 @@ export default {
           return;
         }
 
+        // Initialize list with basic info immediately
+        nftList.value = nfts.map(n => ({
+            id: n.id.toString(),
+            level: n.level.toString(),
+            rewards: {},
+            needsReactivation: false,
+            harvested: 0,
+            isDetailLoading: true
+        }));
+        
+        // Stop loading spinner immediately
+        isLoading.value = false;
+        
+        // 2. Fetch details asynchronously
+        fetchNftDetails(nfts);
+
+      } catch (error) {
+        console.error('Failed to fetch NFT list:', error);
+        isLoading.value = false; // Ensure loading stops on error
+        nftList.value = [];
+      }
+    };
+
+    const fetchNftDetails = async (nfts) => {
+      try {
+        const nodePoolAddr = getContractAddress('NodePool');
+        const stakingAddr = getContractAddress('Staking');
+        const pgnlzAddr = getContractAddress('PGNLZ');
+        const usdtAddr = getContractAddress('USDT');
+
+        const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
+        const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
+
         const nftIds = nfts.map(n => n.id);
         
         // 2. Get Supported Tokens and Reward Cap
-        const supportedTokens = await nodePoolContract.getSupportedTokens();
-        const cap = await nodePoolContract.rewardCap();
+        const [supportedTokens, cap] = await Promise.all([
+             nodePoolContract.getSupportedTokens(),
+             nodePoolContract.rewardCap()
+        ]);
+        
         rewardCap.value = cap;
 
         // Get PGNLZ address from Staking contract as requested
@@ -417,11 +446,11 @@ export default {
         ]);
         
         // 3. Batch Get Rewards
-        const rewardsMap = {}; // nftId -> { symbol: amount }
+        const rewardsMap = {}; // nftId (string) -> { symbol: amount }
         
         // Initialize map
         nftIds.forEach(id => {
-          rewardsMap[id] = {};
+          rewardsMap[id.toString()] = {};
         });
 
         // Fetch rewards for each token
@@ -435,38 +464,49 @@ export default {
                 
                 nftIds.forEach((id, index) => {
                     const amount = amounts[index];
-                    rewardsMap[id][symbol] = amount;
+                    rewardsMap[id.toString()][symbol] = amount;
                 });
             } catch (err) {
                 console.error(`Failed to fetch rewards for token ${tokenAddr}`, err);
             }
         }
 
-        // 4. Check Reactivation Status
+        // Update rewards in the list
+        nftList.value = nftList.value.map(item => ({
+             ...item,
+             rewards: rewardsMap[item.id] || item.rewards
+        }));
+
+
+        // 4. Check Reactivation Status & Harvested
         const canUserReactivate = await stakingContract.checkReactivate(walletState.address);
         canReactivate.value = canUserReactivate;
 
-        const list = [];
-        for (let i = 0; i < nfts.length; i++) {
-            const nft = nfts[i];
-            const harvested = await nodePoolContract.nftCycleHarvested(nft.id);
-            const needsReactivation = harvested >= cap; // && canUserReactivate? Logic says show button if cap reached
-            
-            list.push({
-                id: nft.id.toString(),
-                level: nft.level.toString(),
-                rewards: rewardsMap[nft.id] || {},
-                needsReactivation: needsReactivation,
-                harvested: harvested
-            });
-        }
-        
-        nftList.value = list;
+        // Fetch per-item data in parallel
+        await Promise.all(nfts.map(async (nft) => {
+            try {
+                const harvested = await nodePoolContract.nftCycleHarvested(nft.id);
+                const needsReactivation = harvested >= cap;
+                
+                // Update specific item
+                const index = nftList.value.findIndex(i => i.id === nft.id.toString());
+                if (index !== -1) {
+                    const item = nftList.value[index];
+                    // Create new object to trigger reactivity
+                    nftList.value[index] = {
+                        ...item,
+                        harvested,
+                        needsReactivation,
+                        isDetailLoading: false
+                    };
+                }
+            } catch (e) {
+                console.error(`Failed to fetch details for NFT ${nft.id}`, e);
+            }
+        }));
 
       } catch (error) {
-        console.error('Failed to fetch NFT list:', error);
-      } finally {
-        isLoading.value = false;
+        console.error('Failed to fetch NFT details:', error);
       }
     };
 
