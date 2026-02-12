@@ -1648,4 +1648,16 @@ export default {
   align-items: center;
   padding-left: 0.2rem;
 }
+
+.empty-state, .loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  font-family: var(--font-code);
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  margin-top: 1rem;
+}
 </style>
