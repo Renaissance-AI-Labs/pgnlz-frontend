@@ -107,9 +107,10 @@
                       <button 
                         @click="handleReactivate(nft.id)" 
                         class="action-btn reactivate-btn"
+                        :class="{ 'can-activate': canReactivate }"
                         :disabled="isActionProcessing"
                       >
-                        {{ t('nft.reactivate') }} (500 U)
+                        {{ canReactivate ? t('nft.reactivateWithAmount') : t('nft.activationConditionsNotMetShort') }}
                       </button>
                       <div class="status-badge inactive">
                         <span class="dot"></span>
@@ -561,7 +562,8 @@ export default {
             const can = await stakingContract.checkReactivate(walletState.address);
             
             if (!can) {
-                showToast(t('nft.activationConditionNotMet'), 'error');
+                // Open activation modal instead of showing toast
+                openActivationModal();
                 return;
             }
 
@@ -1028,21 +1030,40 @@ export default {
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-align: center;
+  height: 32px; /* Fixed height to match badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .reactivate-btn {
-  background: rgba(234, 179, 8, 0.1);
-  border: 1px solid rgba(234, 179, 8, 0.2);
-  color: #facc15;
+  /* Default (cannot activate): White border similar to activate-mode */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
   box-shadow: none;
+  height: 32px; /* Explicit height */
 }
 
 .reactivate-btn:hover:not(:disabled) {
-  background: rgba(234, 179, 8, 0.2);
-  border-color: rgba(234, 179, 8, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
+}
+
+.reactivate-btn.can-activate {
+  /* Can activate: Green border */
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  color: #4ade80;
+}
+
+.reactivate-btn.can-activate:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
 }
 
 .status-badge {
@@ -1060,6 +1081,7 @@ export default {
   font-family: var(--font-code); /* Match button font */
   width: 100%; /* Match button width */
   text-transform: uppercase;
+  height: 32px; /* Fixed height to match button */
 }
 
 .status-badge.active .dot {
@@ -1796,13 +1818,14 @@ h1 {
 }
 
 .status-badge.inactive {
-    background: rgba(148, 163, 184, 0.1);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    color: #94a3b8;
-    width: auto;
-    white-space: nowrap;
-    min-width: unset;
-    padding: 6px 10px; /* Match button padding */
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #ffffff;
+  width: auto;
+  white-space: nowrap;
+  min-width: unset;
+  padding: 6px 10px; /* Match button padding */
+  height: 32px; /* Fixed height */
 }
 
 .status-badge.inactive .dot {

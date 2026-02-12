@@ -143,7 +143,7 @@ const languagePacks = {
     'nft.reactivateSuccess': 'Reactivation Successful',
     'nft.loading': 'Loading...',
     'nft.noNfts': 'No NFTs found',
-    'nft.howToActivate': 'How to Activate?',
+    'nft.howToActivate': 'How to Activate NFT?',
     'nft.activationRequirements': 'Activation Requirements',
     'nft.directReferrals': 'Valid Direct Referrals',
     'nft.teamPerformance': 'Team Total Investment',
@@ -152,6 +152,8 @@ const languagePacks = {
     'nft.activationConditionNotMet': 'Activation conditions not met',
     'nft.activationCostTip': 'Activation cost for one NODE NFT is 500 USDT',
     'nft.notEffective': 'Not Effective',
+    'nft.reactivateWithAmount': 'Reactivate (500 USDT)',
+    'nft.activationConditionsNotMetShort': 'Conditions Not Met',
 
     // Team / Friend Page
     'team.pageTitle': '< Friends />',
@@ -319,7 +321,7 @@ const languagePacks = {
      'nft.reactivateSuccess': '激活成功',
      'nft.loading': '加载中...',
      'nft.noNfts': '暂无 NFT',
-     'nft.howToActivate': '如何激活?',
+     'nft.howToActivate': '查看NFT激活条件',
      'nft.activationRequirements': '激活条件',
     'nft.directReferrals': '有效好友人数',
     'nft.teamPerformance': '组队成果',
@@ -327,7 +329,9 @@ const languagePacks = {
      'nft.current': '当前',
      'nft.activationConditionNotMet': '未达到激活条件',
      'nft.activationCostTip': '激活一张 NODE NFT 的费用为 500 USDT',
-     'nft.notEffective': '未生效',
+     'nft.notEffective': '未激活',
+     'nft.reactivateWithAmount': '激活(需 500 USDT)',
+     'nft.activationConditionsNotMetShort': '查看激活条件',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -502,7 +506,7 @@ const languagePacks = {
      'nft.reactivateSuccess': '激活成功',
      'nft.loading': '加載中...',
      'nft.noNfts': '暫無 NFT',
-     'nft.howToActivate': '如何激活?',
+     'nft.howToActivate': '查看NFT激活條件',
      'nft.activationRequirements': '激活條件',
      'nft.directReferrals': '有效好友人數',
      'nft.teamPerformance': '團隊總業績',
@@ -511,7 +515,9 @@ const languagePacks = {
      'nft.required': '目標',
      'nft.activationConditionNotMet': '當前未達到激活條件',
      'nft.activationCostTip': '激活一張 NODE NFT 的費用為 500 USDT',
-     'nft.notEffective': '未生效',
+     'nft.notEffective': '未激活',
+     'nft.reactivateWithAmount': '激活(需 500 USDT)',
+     'nft.activationConditionsNotMetShort': '查看激活條件',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -679,7 +685,7 @@ const languagePacks = {
      'nft.reactivateSuccess': '再活性化成功',
      'nft.loading': '読み込み中...',
      'nft.noNfts': 'NFTなし',
-     'nft.howToActivate': '有効化する方法?',
+     'nft.howToActivate': 'NFTを有効化する方法?',
      'nft.activationRequirements': '有効化条件',
      'nft.directReferrals': '有効な直接紹介数',
      'nft.teamPerformance': 'チーム総投資額',
@@ -689,6 +695,8 @@ const languagePacks = {
      'nft.activationConditionNotMet': '現在、有効化条件を満たしていません',
      'nft.activationCostTip': 'NODE NFT 1枚の有効化費用は 500 USDT です',
      'nft.notEffective': '無効',
+     'nft.reactivateWithAmount': '有効化(500 USDT)',
+     'nft.activationConditionsNotMetShort': '条件未達成',
 
      // Team / Friend Page
      'team.pageTitle': '< 友達 />',
@@ -857,7 +865,7 @@ const languagePacks = {
      'nft.reactivateSuccess': '활성화 성공',
      'nft.loading': '로딩 중...',
      'nft.noNfts': 'NFT 없음',
-     'nft.howToActivate': '활성화 방법?',
+     'nft.howToActivate': 'NFT 활성화 방법?',
      'nft.activationRequirements': '활성화 조건',
      'nft.directReferrals': '유효 직추천 수',
      'nft.teamPerformance': '팀 총 투자액',
@@ -866,6 +874,8 @@ const languagePacks = {
      'nft.activationConditionNotMet': '현재 활성화 조건을 충족하지 못했습니다',
      'nft.activationCostTip': 'NODE NFT 1장 활성화 비용은 500 USDT입니다',
      'nft.notEffective': '미발효',
+     'nft.reactivateWithAmount': '활성화(500 USDT)',
+     'nft.activationConditionsNotMetShort': '조건 미충족',
 
      // Team / Friend Page
      'team.pageTitle': '< 친구 />',
