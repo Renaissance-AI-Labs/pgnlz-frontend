@@ -165,6 +165,18 @@
                             {{ t('orders.btn.unstake') }}
                         </button>
                     </div>
+
+                    <div class="actions-compact" v-if="activeTab === 0">
+                        <button 
+                            v-if="order.isUnstakeable"
+                            class="btn-icon btn-unstake" 
+                            @click="openUnstakeModal(order)"
+                            :disabled="processing"
+                            :title="t('orders.btn.unstake')"
+                        >
+                            {{ t('orders.btn.unstake') }}
+                        </button>
+                    </div>
                 </div>
 
             </div>
