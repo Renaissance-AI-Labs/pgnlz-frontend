@@ -37,7 +37,7 @@
     </div>
 
     <!-- Progress Bar -->
-    <div class="progress-section">
+    <div class="progress-section" style="margin-top: 6px;">
       <div class="progress-bar-bg">
         <div 
           class="progress-bar-fill" 
@@ -399,6 +399,7 @@ watch(() => walletState.isConnected, (newVal) => {
   color: var(--text-muted);
   font-family: var(--font-code);
   text-align: right;
+  line-height: normal;
 }
 
 .progress-text {
@@ -409,7 +410,7 @@ watch(() => walletState.isConnected, (newVal) => {
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 0.8rem;
-    gap: 0.8rem;
+    gap: 0.5rem;
     margin-bottom: 1rem;
   }
 

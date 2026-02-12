@@ -197,7 +197,7 @@ watch(() => walletState.isConnected, () => {
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-family: var(--font-primary);
   letter-spacing: 0.05em;
   font-weight: 700;
@@ -255,7 +255,7 @@ watch(() => walletState.isConnected, () => {
 
 .label {
   color: var(--text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
