@@ -60,6 +60,7 @@
             <template v-else>
                 {{ insufficientBalance ? t('staking.insufficientBalance') : t('staking.stake') }}
             </template>
+            <span v-if="processing" class="processing-text">{{ t('staking.processing') }}</span>
           </button>
         </template>
         
@@ -523,6 +524,11 @@ watch(() => walletState.isConnected, () => {
   padding: 0.5rem;
 }
 
+.processing-text {
+    margin-left: 0.5rem;
+    font-size: 0.95rem;
+}
+
 .spinner {
   width: 20px;
   height: 20px;
@@ -530,6 +536,7 @@ watch(() => walletState.isConnected, () => {
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin {
