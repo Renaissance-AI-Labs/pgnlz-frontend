@@ -67,8 +67,7 @@
                <!-- Header (PC Only) -->
                <div class="grid-header">
                  <div class="col-id">{{ t('nft.id') }}</div>
-                 <div class="col-progress">{{ t('nft.cycleProgress') }}</div>
-                 <div class="col-rewards">{{ t('nft.rewards') }}</div>
+                 <div class="col-progress">{{ t('nft.rewards') }} / {{ t('nft.cycleProgress') }}</div>
                  <div class="col-status">{{ t('nft.status') }}</div>
                </div>
                
@@ -83,6 +82,12 @@
                  
                  <!-- Progress Bar Section -->
                  <div class="item-progress col-progress">
+                    <div class="rewards-inline-row">
+                        <div v-for="(amount, symbol) in nft.rewards" :key="symbol" class="reward-unit">
+                             <span class="val">{{ formatReward(amount) }}</span>
+                             <span class="sym">{{ symbol }}</span>
+                        </div>
+                    </div>
                     <div class="progress-info">
                         <span class="label">{{ t('nft.cycleProgress') }}</span>
                         <span class="value">{{ formatReward(nft.harvested) }} / {{ formatReward(rewardCap) }}</span>
@@ -90,17 +95,7 @@
                     <div class="progress-track">
                         <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
                     </div>
-                 </div>
-                 
-                 <div class="item-rewards col-rewards">
-                   <span class="mobile-label">{{ t('nft.rewards') }}</span>
-                   <div class="reward-list">
-                      <div v-for="(amount, symbol) in nft.rewards" :key="symbol" class="reward-tag">
-                        <span class="amount">{{ formatReward(amount) }}</span>
-                        <span class="symbol">{{ symbol }}</span>
-                      </div>
-                      <div v-if="Object.keys(nft.rewards).length === 0" class="no-rewards">-</div>
-                   </div>
+                    
                  </div>
                  
                  <div class="item-status col-status">
@@ -385,11 +380,7 @@ export default {
                 
                 nftIds.forEach((id, index) => {
                     const amount = amounts[index];
-                    // Store even if 0 if you want to show 0 values, but usually we filter > 0
-                    // User said "USDT is not displayed", so maybe they have rewards but it wasn't queried.
-                    if (amount > 0n) { // Use BigInt comparison
-                        rewardsMap[id][symbol] = amount;
-                    }
+                    rewardsMap[id][symbol] = amount;
                 });
             } catch (err) {
                 console.error(`Failed to fetch rewards for token ${tokenAddr}`, err);
@@ -788,7 +779,7 @@ export default {
 
 .grid-header {
   display: grid;
-  grid-template-columns: 0.8fr 1.5fr 1.5fr 1.2fr;
+  grid-template-columns: 0.8fr 3fr 1.2fr;
   padding: 0 1rem 0.6rem;
   color: var(--text-secondary);
   font-family: var(--font-code);
@@ -800,7 +791,7 @@ export default {
 
 .grid-item {
   display: grid;
-  grid-template-columns: 0.8fr 1.5fr 1.5fr 1.2fr;
+  grid-template-columns: 0.8fr 3fr 1.2fr;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px; /* Slightly reduced radius */
@@ -818,6 +809,36 @@ export default {
 
 .item-progress {
     padding-right: 1rem;
+}
+
+.rewards-inline-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.8rem; /* Space between rewards and progress bar */
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.reward-unit {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.reward-unit .val {
+    color: #fff;
+    font-family: var(--font-code);
+    font-weight: 600;
+    font-size: 1.2rem;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+}
+
+.reward-unit .sym {
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .progress-info {
@@ -1003,6 +1024,7 @@ export default {
     padding: 0.8rem 0.5rem;
     background: rgba(255, 255, 255, 0.04);
     min-height: 50px;
+    justify-content: space-between;
   }
   
   .grid-item:hover {
@@ -1030,6 +1052,15 @@ export default {
     order: 3; /* Move to bottom on mobile */
     padding-right: 0;
     margin-top: 0.5rem;
+  }
+
+  .rewards-inline-row {
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .reward-unit .val {
+    font-size: 1.1rem;
   }
   
   .mobile-label {
@@ -1457,6 +1488,21 @@ h1 {
 }
 
 /* Activation Modal Styles - Matching Team View Modal */
+.modal-overlay {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
 .activation-modal {
   width: 90%;
   max-width: 400px;

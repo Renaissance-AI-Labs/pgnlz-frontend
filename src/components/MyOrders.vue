@@ -77,8 +77,8 @@
                     </div>
                 </div>
 
-                <!-- Active View (Not Queued) -->
-                <div v-else-if="activeTab === 0" class="active-details">
+                <!-- Active/Completed View (Not Queued) -->
+                <div v-else class="active-details">
                     
                     <!-- Stats Grid -->
                     <div class="stats-grid-compact">
@@ -133,7 +133,7 @@
                         </div>
                     </div>
                     
-                    <div class="actions-compact">
+                    <div class="actions-compact" v-if="activeTab === 0">
                         <button 
                             class="btn-icon btn-harvest" 
                             @click="harvest(order.id)" 
@@ -152,20 +152,6 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                             {{ t('orders.btn.unstake') }}
                         </button>
-                    </div>
-                </div>
-
-                <!-- Completed View -->
-                <div v-else class="completed-details">
-                     <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="label">{{ t('orders.col.earnings') }}</span>
-                            <span class="value">{{ formatAmount(order.totalReceivedUsdt) }}</span>
-                        </div>
-                        <div class="stat-item">
-                             <span class="label">Token</span>
-                             <span class="value">{{ formatAmount(order.pendingTokenAmount) }}</span>
-                        </div>
                     </div>
                 </div>
 
@@ -305,6 +291,7 @@ const fetchOrders = async (status, isReset = false) => {
         );
         
         const records = result[0];
+        console.log('Raw records:', records);
         const newCursor = result[1];
 
         // Process records
@@ -344,8 +331,8 @@ const fetchOrders = async (status, isReset = false) => {
                 } catch (e) {
                     console.warn("Failed to get queue info for order", order.id);
                 }
-            } else if (!order.status) {
-                // Logic for In Progress (Not Queued)
+            } else {
+                // Logic for In Progress AND Completed (Not Queued)
                 
                 // Out Progress (3x)
                 // Need total received + pending static
@@ -404,6 +391,8 @@ const fetchOrders = async (status, isReset = false) => {
             return order;
         }));
         
+        console.log('Processed orders:', processed);
+
         if (isReset) {
             orders.value = processed;
         } else {
@@ -692,6 +681,12 @@ watch(() => walletState.isConnected, (newVal) => {
 }
 
 /* Compact Stats Grid */
+.stats-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
 .stats-grid-compact {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
