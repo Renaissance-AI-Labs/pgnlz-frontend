@@ -195,7 +195,7 @@
 import { walletState } from '@/services/wallet.js';
 import { getContractAddress } from '@/services/contracts.js';
 import { showToast } from '@/services/notification.js';
-import { onMounted, ref, watch, computed } from 'vue';
+import { onMounted, onActivated, ref, watch, computed } from 'vue';
 import { ethers } from 'ethers';
 import nodeNFTAbi from '@/abis/nodeNFT.json';
 import nodePoolAbi from '@/abis/nodePool.json';
@@ -643,6 +643,12 @@ export default {
                 particle.style.animationDuration = (10 + Math.random() * 10) + 's';
                 particlesContainer.appendChild(particle);
             }
+        }
+    });
+
+    onActivated(() => {
+        if (walletState.isConnected) {
+            fetchBalance();
         }
     });
 

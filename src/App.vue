@@ -7,7 +7,11 @@
     
     <!-- Simplified Layout Wrapper -->
     <div id="wrapper">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <keep-alive include="NftView">
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </div>
     
     <Footer />
@@ -67,6 +71,10 @@ export default {
   mounted() {
     initializeLanguage();
     autoConnectWallet();
+
+    // 预加载 NFT 图片
+    const preloadImage = new Image();
+    preloadImage.src = '/asset/images/nft/pgnlz-node.png';
 
     // 如果 URL 中包含 ref 参数，且当前不是团队页面，则跳转到团队页面
     const urlParams = new URLSearchParams(window.location.search);
