@@ -7,6 +7,13 @@
         </div>
         <span class="nav-label">{{ t('nav.home') || '首页' }}</span>
       </router-link>
+
+      <router-link to="/orders" class="nav-item" active-class="active">
+        <div class="icon-container">
+          <i class="fas fa-list-alt"></i>
+        </div>
+        <span class="nav-label">{{ t('nav.orders') || '订单' }}</span>
+      </router-link>
       
       <router-link to="/nft" class="nav-item" active-class="active">
         <div class="icon-container">

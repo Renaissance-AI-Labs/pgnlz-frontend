@@ -49,14 +49,30 @@
               <!-- State: Wallet Connected -->
               <div v-else>
                   <div class="stats-card">
-                    <div class="stat-item">
-                      <span class="label">{{ t('team.friendsCount') }}</span>
-                      <span class="value">{{ referralCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                          <span class="label">{{ t('team.friendsCount') }}</span>
+                          <span class="value">{{ referralCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                          <span class="label">{{ t('team.validDirectReferrals') }}</span>
+                          <span class="value">{{ validDirectReferrals }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                          <span class="label">{{ t('team.teamCount') }}</span>
+                          <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                        </div>
                     </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                      <span class="label">{{ t('team.teamCount') }}</span>
-                      <span class="value">{{ teamCount }} <span class="unit">{{ t('team.peopleUnit') }}</span></span>
+                    
+                    <div class="stats-row-divider"></div>
+
+                    <div class="stats-row single-item">
+                        <div class="stat-item">
+                          <span class="label">{{ t('nft.teamPerformance') }}</span>
+                          <span class="value highlight">{{ myTeamTotalInvestValue }} <span class="unit">U</span></span>
+                        </div>
                     </div>
                   </div>
 
@@ -80,19 +96,34 @@
                         <div class="card-viewport">
                             <transition name="slide-fade" mode="out-in">
                                 <div :key="currentCardIndex" class="friend-card" v-if="currentChild">
-                                    <div class="card-address" @click="copyText(currentChild.address)">
-                                        {{ formatAddress(currentChild.address) }}
+                                    <div class="card-header-row">
+                                        <div class="user-avatar-placeholder">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        </div>
+                                        <div class="card-address" @click="copyText(currentChild.address)">
+                                            {{ formatAddress(currentChild.address) }}
+                                            <!-- <svg class="copy-icon-small" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> -->
+                                        </div>
                                     </div>
-                                    
-                                    <div class="card-divider"></div>
 
-                                    <div class="card-stats">
-                                        <span class="stat-label">{{ t('team.teamCount') }}</span>
-                                        <span class="stat-value">
-                                            <span v-if="currentChild.teamCount !== null">{{ currentChild.teamCount }}</span>
-                                            <span v-else class="loading-dots">...</span>
-                                            <span class="unit">{{ t('team.peopleUnit') }}</span>
-                                        </span>
+                                    <div class="card-stats-grid">
+                                        <div class="stat-box">
+                                            <span class="stat-label">{{ t('team.teamCount') }}</span>
+                                            <span class="stat-value">
+                                                <span v-if="currentChild.teamCount !== null">{{ currentChild.teamCount }}</span>
+                                                <span v-else class="loading-dots">...</span>
+                                                <span class="unit">{{ t('team.peopleUnit') }}</span>
+                                            </span>
+                                        </div>
+
+                                        <div class="stat-box highlight-box">
+                                            <span class="stat-label">{{ t('nft.teamPerformance') }}</span>
+                                            <span class="stat-value highlight">
+                                                <span v-if="currentChild.teamTotalInvestValue !== null">{{ currentChild.teamTotalInvestValue }}</span>
+                                                <span v-else class="loading-dots">...</span>
+                                                <span class="unit">U</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </transition>
@@ -218,6 +249,7 @@ import { showToast } from '@/services/notification.js';
 import { onMounted, ref, computed, watch, nextTick } from 'vue';
 import { ethers } from 'ethers';
 import referralAbi from '@/abis/referral.json';
+import stakingAbi from '@/abis/staking.json';
 import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
 import { useRoute } from 'vue-router'; // We might need router for query params, but window.location is safer without router setup check
 import { t } from '@/i18n/index.js';
@@ -234,7 +266,9 @@ export default {
     
     // Data State
     const referralCount = ref(0);
+    const validDirectReferrals = ref(0);
     const teamCount = ref(0);
+    const myTeamTotalInvestValue = ref('0.0');
     const childrenList = ref([]);
     const currentCardIndex = ref(0);
     const childrenCursor = ref(0);
@@ -310,6 +344,33 @@ export default {
         // Get Team Count
         const tCount = await contract.getTeamCount(walletState.address);
         teamCount.value = tCount.toString();
+
+        // Get My Team Total Invest Value & Valid Direct Referrals
+        try {
+            let provider = walletState.provider;
+            if (!provider && window.ethereum) {
+                 provider = new ethers.BrowserProvider(window.ethereum);
+            }
+            if (provider) {
+                const stakingAddress = getContractAddress('Staking');
+                if (stakingAddress) {
+                    const stakingContract = new ethers.Contract(stakingAddress, stakingAbi, provider);
+                    
+                    // Parallel fetch
+                    const [value, validCount] = await Promise.all([
+                        stakingContract.teamTotalInvestValue(walletState.address),
+                        stakingContract.validDirectReferralsCount(walletState.address)
+                    ]);
+
+                    myTeamTotalInvestValue.value = parseFloat(ethers.formatEther(value)).toFixed(1);
+                    validDirectReferrals.value = validCount.toString();
+                }
+            }
+        } catch (err) {
+            console.error("Error fetching staking data:", err);
+            myTeamTotalInvestValue.value = '0.0';
+            validDirectReferrals.value = 0;
+        }
 
         // Get Current Referrer
         const referrer = await contract.getReferral(walletState.address);
@@ -389,7 +450,8 @@ export default {
             // Map to objects
             const childObjects = validChildren.map(addr => ({
                 address: addr,
-                teamCount: null // Init as null
+                teamCount: null, // Init as null
+                teamTotalInvestValue: null // Init as null
             }));
             
             childrenList.value = [...childrenList.value, ...childObjects];
@@ -398,6 +460,7 @@ export default {
             // If this is the first load (or reset), fetch the first child's team count immediately
             if (reset && childrenList.value.length > 0) {
                 fetchChildTeamCount(0);
+                fetchChildStakingData(0);
             }
 
             if (newChildren.length < pageSize) {
@@ -431,6 +494,33 @@ export default {
         }
     };
 
+    const fetchChildStakingData = async (index) => {
+        const child = childrenList.value[index];
+        if (!child || child.teamTotalInvestValue !== null) return;
+
+        try {
+            // Get Staking Contract (Read Only)
+            let provider = walletState.provider;
+            if (!provider && window.ethereum) {
+                 provider = new ethers.BrowserProvider(window.ethereum);
+            }
+            if (!provider) return;
+
+            const address = getContractAddress('Staking');
+            if (!address) return;
+            
+            const contract = new ethers.Contract(address, stakingAbi, provider);
+            const value = await contract.teamTotalInvestValue(child.address);
+            
+            // Format to 1 decimal place
+            const formatted = parseFloat(ethers.formatEther(value)).toFixed(1);
+            child.teamTotalInvestValue = formatted;
+        } catch (error) {
+            console.error(`Error fetching staking data for ${child.address}:`, error);
+            child.teamTotalInvestValue = '0.0';
+        }
+    };
+
     // 6. Carousel Navigation
     const prevCard = () => {
         if (currentCardIndex.value > 0) {
@@ -456,6 +546,7 @@ export default {
     watch(currentCardIndex, (newIndex) => {
         if (newIndex >= 0 && newIndex < childrenList.value.length) {
             fetchChildTeamCount(newIndex);
+            fetchChildStakingData(newIndex);
         }
     });
 
@@ -488,17 +579,17 @@ export default {
 
         // Validation
         if (!inputAddress || inputAddress === ethers.ZeroAddress) {
-            showToast(t('team.toast.invalidAddress'));
+            showToast(t('team.toast.invalidAddress'), 'error');
             return;
         }
 
         if (!ethers.isAddress(inputAddress)) {
-            showToast(t('team.toast.formatError'));
+            showToast(t('team.toast.formatError'), 'error');
             return;
         }
 
         if (inputAddress.toLowerCase() === currentAccount.toLowerCase()) {
-            showToast(t('team.toast.selfBindError'));
+            showToast(t('team.toast.selfBindError'), 'error');
             return;
         }
         
@@ -522,18 +613,18 @@ export default {
             const isValidReferrer = await contract.isBindReferral(inputAddress);
             
             if (!isValidReferrer) {
-                showToast(t('team.toast.referrerNotJoined'));
+                showToast(t('team.toast.referrerNotJoined'), 'error');
                 bindingReferrer.value = false;
                 return;
             }
 
             // Bind
             const tx = await contract.bindReferral(inputAddress);
-            showToast(t('team.toast.txSubmitted'));
+            showToast(t('team.toast.txSubmitted'), 'success');
             
             await tx.wait();
             
-            showToast(t('team.toast.bindSuccess'));
+            showToast(t('team.toast.bindSuccess'), 'success');
             isBound.value = true;
             
             // Refresh data
@@ -541,12 +632,18 @@ export default {
 
         } catch (error) {
             console.error("Binding failed:", error);
+            
+            // User rejected check
+            if (error.code === 4001 || error.code === 'ACTION_REJECTED' || (error.reason && error.reason.includes('rejected'))) {
+                return;
+            }
+
             if (error.reason) {
-                 showToast(t('team.toast.bindFailed') + error.reason);
+                 showToast(t('team.toast.bindFailed') + error.reason, 'error');
             } else if (error.message && error.message.includes("User already has a referral")) {
-                 showToast(t('team.toast.alreadyBound'));
+                 showToast(t('team.toast.alreadyBound'), 'error');
             } else {
-                 showToast(t('team.toast.checkNetwork'));
+                 showToast(t('team.toast.checkNetwork'), 'error');
             }
         } finally {
             bindingReferrer.value = false;
@@ -574,7 +671,7 @@ export default {
             document.body.removeChild(textArea);
             
             if (successful) {
-                showToast(t('team.toast.copySuccess'));
+                showToast(t('team.toast.copySuccess'), 'success');
             } else {
                 throw new Error('execCommand returned false');
             }
@@ -583,10 +680,10 @@ export default {
             // Try navigator.clipboard as backup if available
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text)
-                    .then(() => showToast(t('team.toast.copySuccess')))
-                    .catch(() => showToast(t('team.toast.copyFailed')));
+                    .then(() => showToast(t('team.toast.copySuccess'), 'success'))
+                    .catch(() => showToast(t('team.toast.copyFailed'), 'error'));
             } else {
-                showToast(t('team.toast.copyFailed'));
+                showToast(t('team.toast.copyFailed'), 'error');
             }
         }
     };
@@ -605,7 +702,9 @@ export default {
         // If disconnected
         if (!newConnected) {
             referralCount.value = 0;
+            validDirectReferrals.value = 0;
             teamCount.value = 0;
+            myTeamTotalInvestValue.value = '0.0';
             childrenList.value = [];
             currentCardIndex.value = 0;
             childrenCursor.value = 0;
@@ -666,7 +765,7 @@ export default {
 
         // Check param for Tab Switching
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('ref')) {
+        if (urlParams.get('ref') || urlParams.get('tab') === 'team') {
             activeTab.value = 'team'; // 'team' key now corresponds to "我的推荐" (Bind & Link)
         }
 
@@ -687,7 +786,9 @@ export default {
       closeModal,
       activeTab,
       referralCount,
+      validDirectReferrals,
       teamCount,
+      myTeamTotalInvestValue,
       childrenList,
       loadingChildren,
       hasMoreChildren,
@@ -999,70 +1100,189 @@ export default {
     box-shadow: 0 0 15px rgba(192, 132, 252, 0.4);
 }
 
-/* Stats Card */
+/* Stats Card Optimization */
 .stats-card {
-  background: rgba(192, 132, 252, 0.05);
-  border: 1px solid rgba(192, 132, 252, 0.1);
+  background: rgba(15, 23, 42, 0.6); /* Deeper background */
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  padding: 0.8rem 1rem; /* Reduced padding from 1rem 1.5rem */
+  padding: 1rem;
   display: flex;
-  justify-content: space-around; /* Distribute items evenly */
-  align-items: center;
-  margin-bottom: 0.8rem; /* Reduced margin from 1rem */
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 0.5rem;
+}
+
+.stats-row.single-item {
+    justify-content: center;
+}
+
+.stats-row-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.1rem; /* Reduced gap from 0.2rem */
-}
-
-.stat-divider {
-  width: 1px;
-  height: 30px; /* Reduced height from 40px */
-  background: rgba(255, 255, 255, 0.1);
+  gap: 4px;
 }
 
 .stats-card .label {
   color: var(--text-secondary);
-  font-size: 0.85rem; /* Slightly smaller font */
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .stats-card .value {
   color: #fff;
   font-family: var(--font-code);
-  font-size: 1.5rem; /* Reduced font size from 1.8rem */
+  font-size: 1.1rem;
   font-weight: 700;
+  line-height: 1.2;
+}
+
+.stats-card .value.highlight {
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
 }
 
 .stats-card .unit {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   font-weight: 400;
 }
 
-/* Empty State */
-.empty-state {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 2rem;
-  background: rgba(192, 132, 252, 0.05);
-  border: 1px solid rgba(192, 132, 252, 0.1);
+/* Friend Card Optimization */
+.friend-card {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(192, 132, 252, 0.15);
   border-radius: 16px;
-  backdrop-filter: blur(10px);
-  margin-top: 1rem;
-  font-family: var(--font-code);
-}
-
-/* Carousel Styles */
-.carousel-view {
+  padding: 1.2rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem; /* Reduced gap from 1.5rem */
-  margin-top: 0.8rem; /* Reduced margin from 1rem */
-  width: 100%;
+  gap: 1rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle glow effect */
+.friend-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(192, 132, 252, 0.05), transparent 40%);
+    pointer-events: none;
+}
+
+.card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 0.2rem;
+}
+
+.user-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(192, 132, 252, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.card-address {
+    font-family: var(--font-code);
+    font-size: 1.1rem;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.copy-icon-small {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.card-address:hover {
+    color: var(--primary);
+}
+
+.card-address:hover .copy-icon-small {
+    opacity: 1;
+}
+
+.card-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+}
+
+.stat-box {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.stat-box.highlight-box {
+    background: rgba(192, 132, 252, 0.05);
+    border-color: rgba(192, 132, 252, 0.1);
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--font-code);
+}
+
+.stat-value.highlight {
+    color: var(--primary);
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+}
+
+.stat-value .unit {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 2px;
 }
 
 .card-viewport {
@@ -1070,106 +1290,24 @@ export default {
   display: flex;
   justify-content: center;
   position: relative;
-  min-height: 120px; /* Reduced height from 160px */
+  min-height: auto;
 }
 
 .pagination-controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem; /* Reduced gap from 1.5rem */
+    gap: 1.5rem;
     width: 100%;
-}
-
-.page-indicator {
-    font-family: var(--font-code);
-    color: var(--text-secondary);
-    font-size: 0.9rem; /* Slightly smaller font */
-    font-weight: 500;
-}
-
-.friend-card {
-  background: rgba(192, 132, 252, 0.05);
-  border: 1px solid rgba(192, 132, 252, 0.1);
-  border-radius: 16px; /* Slightly smaller radius */
-  padding: 1rem; /* Reduced padding from 1.5rem */
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem; /* Reduced gap from 0.8rem */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-}
-
-.card-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.3rem; /* Reduced margin from 0.5rem */
-}
-
-.card-header .index {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 2px 6px; /* Smaller padding */
-    border-radius: 4px;
-    font-size: 0.75rem; /* Smaller font */
-    color: var(--text-secondary);
-    font-family: var(--font-code);
-}
-
-.card-address {
-    font-family: var(--font-code);
-    font-size: 1.1rem; /* Slightly smaller font */
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.card-address:hover {
-    color: var(--primary);
-}
-
-.card-divider {
-    width: 80%;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 0.3rem 0; /* Reduced margin from 0.5rem */
-}
-
-.card-stats {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.1rem; /* Reduced gap from 0.2rem */
-}
-
-.stat-label {
-    font-size: 0.85rem; /* Smaller font */
-    color: var(--text-secondary);
-}
-
-.stat-value {
-    font-size: 1.3rem; /* Reduced font size from 1.5rem */
-    font-weight: 700;
-    color: #fff;
-    font-family: var(--font-code);
-}
-
-.stat-value .unit {
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: var(--text-secondary);
-    margin-left: 4px;
+    margin-top: 1rem;
 }
 
 .nav-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
