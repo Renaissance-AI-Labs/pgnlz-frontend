@@ -39,6 +39,12 @@
         <div class="nft-list-section" v-if="walletState.isConnected">
           <div class="section-header">
             <h3>{{ t('nft.systemNodes') }}</h3>
+            <div class="nft-tips-section">
+            <div class="tip-item">
+              <div class="tip-icon">!</div>
+              <span>{{ t('nft.tips.combined') }}</span>
+            </div>
+          </div>
             <div class="header-actions">
                 <button 
                   class="harvest-all-btn activate-mode"
@@ -56,6 +62,8 @@
             </div>
           </div>
           
+          
+
           <div class="nft-grid-container">
             <div v-if="isLoading && nftList.length === 0" class="loading-state">
               {{ t('nft.loading') }}
@@ -82,15 +90,21 @@
                  
                  <!-- Progress Bar Section -->
                  <div class="item-progress col-progress">
-                    <div class="rewards-inline-row">
-                        <div v-for="(amount, symbol) in nft.rewards" :key="symbol" class="reward-unit">
-                             <span class="val">{{ formatReward(amount) }}</span>
-                             <span class="sym">{{ symbol }}</span>
-                             <span v-if="getUsdtValue(amount, symbol)" class="usdt-equiv">
-                               (≈ {{ getUsdtValue(amount, symbol) }} USDT)
-                             </span>
+                    <div class="rewards-section">
+                        <div class="rewards-title">{{ t('nft.pendingRewardsTitle') }}</div>
+                        <div class="rewards-unified-box">
+                            <div v-for="(amount, symbol) in nft.rewards" :key="symbol" class="reward-list-item">
+                                    <div class="reward-main">
+                                        <span class="reward-val">{{ formatReward(amount) }}</span>
+                                        <span class="reward-sym">{{ symbol }}</span>
+                                        <span v-if="getUsdtValue(amount, symbol)" class="reward-sub">
+                                            ≈ {{ getUsdtValue(amount, symbol) }} USDT
+                                        </span>
+                                    </div>
+                            </div>
                         </div>
                     </div>
+
                     <div class="progress-track">
                         <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
                     </div>
@@ -110,7 +124,7 @@
                         :class="{ 'can-activate': canReactivate }"
                         :disabled="isActionProcessing"
                       >
-                        {{ canReactivate ? t('nft.reactivateWithAmount') : t('nft.activationConditionsNotMetShort') }}
+                        {{ canReactivate ? (needsApproval ? t('nft.reactivateNeedApprove') : t('nft.reactivateWithAmount')) : t('nft.activationConditionsNotMetShort') }}
                       </button>
                       <div class="status-badge inactive">
                         <span class="dot"></span>
@@ -205,7 +219,8 @@ import { t } from '@/i18n/index.js';
 
 const ERC20_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
-  "function decimals() view returns (uint8)"
+  "function decimals() view returns (uint8)",
+  "function allowance(address owner, address spender) view returns (uint256)"
 ];
 
 const ROUTER_ABI = [
@@ -219,6 +234,7 @@ export default {
   },
   setup() {
     const nftBalance = ref(0);
+    const usdtAllowance = ref(0n);
     const isModalVisible = ref(false);
     const nftList = ref([]);
     const isLoading = ref(false);
@@ -226,6 +242,14 @@ export default {
     const rewardCap = ref(0);
     const canReactivate = ref(false);
     const pgnlzPrice = ref(0);
+    
+    const needsApproval = computed(() => {
+        try {
+            return usdtAllowance.value < ethers.parseUnits('500', 18);
+        } catch (e) {
+            return true;
+        }
+    });
     
     // Activation Modal State
     const isActivationModalVisible = ref(false);
@@ -238,6 +262,19 @@ export default {
     
     // Token info
     const tokenSymbols = ref({}); 
+
+    const fetchAllowance = async () => {
+      if (!walletState.isConnected || !walletState.signer) return;
+      try {
+        const usdtAddr = getContractAddress('USDT');
+        const nodePoolAddr = getContractAddress('NodePool');
+        const usdtContract = new ethers.Contract(usdtAddr, ERC20_ABI, walletState.signer);
+        const allowance = await usdtContract.allowance(walletState.address, nodePoolAddr);
+        usdtAllowance.value = allowance;
+      } catch (e) {
+        console.error("Failed to fetch allowance", e);
+      }
+    };
 
     const openModal = () => {
       isModalVisible.value = true;
@@ -363,6 +400,7 @@ export default {
           await fetchNftList();
           fetchPgnlzPrice();
         }
+        fetchAllowance();
       } catch (error) {
         console.error('Failed to fetch NFT balance:', error);
         nftBalance.value = 0;
@@ -554,48 +592,59 @@ export default {
     const handleReactivate = async (nftId) => {
         if (isActionProcessing.value) return;
 
-        // Check if user is qualified
-        // (Assuming checkReactivate is strict requirement for action)
-        // If canReactivate.value is false, user might not be able to reactivate.
-        // User requirements say: "Staking.checkReactivate(user): returns true... execute activate"
-        // I should warn if false.
-        
         try {
             const stakingAddr = getContractAddress('Staking');
             const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
             const can = await stakingContract.checkReactivate(walletState.address);
             
             if (!can) {
-                // Open activation modal instead of showing toast
                 openActivationModal();
                 return;
+            }
+
+            // Check allowance
+            const requiredAmount = ethers.parseUnits('500', 18);
+            if (usdtAllowance.value < requiredAmount) {
+                 isActionProcessing.value = true;
+                 try {
+                    const usdtAddr = getContractAddress('USDT');
+                    const nodePoolAddr = getContractAddress('NodePool');
+                    const usdtContract = new ethers.Contract(usdtAddr, ERC20_ABI, walletState.signer);
+                    const tx = await usdtContract.approve(nodePoolAddr, ethers.MaxUint256);
+                    showToast(t('team.toast.txSubmitted'), 'info');
+                    await tx.wait();
+                    showToast(t('staking.approveSuccess'), 'success');
+                    await fetchAllowance(); 
+                 } catch (e) {
+                    console.error('Approve failed:', e);
+                    // Don't alert if user rejected
+                    if (e.code === 'ACTION_REJECTED' || (e.info && e.info.error && e.info.error.code === 4001)) {
+                        return;
+                    }
+                    showToast(t('staking.approveFailed') + ': ' + (e.reason || e.message), 'error');
+                 } finally {
+                    isActionProcessing.value = false;
+                 }
+                 return;
             }
 
             isActionProcessing.value = true;
             const nodePoolAddr = getContractAddress('NodePool');
             const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
-            const usdtAddr = getContractAddress('USDT');
-            const usdtContract = new ethers.Contract(usdtAddr, ERC20_ABI, walletState.signer);
             
-            // 500 USDT
-            const amount = ethers.parseUnits('500', 18); // Assuming 18 decimals for USDT in this testnet
-            
-            // Approve
-            alert('Please approve 500 USDT for reactivation');
-            const approveTx = await usdtContract.approve(nodePoolAddr, amount);
-            await approveTx.wait();
-            
-            // Reactivate
             const tx = await nodePoolContract.reactivate(nftId);
-            alert(t('team.toast.txSubmitted'));
+            showToast(t('team.toast.txSubmitted'), 'info');
             await tx.wait();
-            alert(t('nft.reactivateSuccess'));
+            showToast(`#${nftId} NFT ` + t('nft.reactivateSuccess'), 'success');
             
             fetchNftList();
 
         } catch (error) {
             console.error('Reactivation failed:', error);
-            alert('Reactivation Failed: ' + (error.reason || error.message));
+            if (error.code === 'ACTION_REJECTED' || (error.info && error.info.error && error.info.error.code === 4001)) {
+                return;
+            }
+            showToast('Reactivation Failed: ' + (error.reason || error.message), 'error');
         } finally {
             isActionProcessing.value = false;
         }
@@ -674,7 +723,8 @@ export default {
       formatNumber,
       rewardCap,
       getUsdtValue,
-      canReactivate
+      canReactivate,
+      needsApproval
     };
   }
 }
@@ -813,6 +863,44 @@ export default {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.nft-tips-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(234, 179, 8, 0.05);
+  border: 1px solid rgba(234, 179, 8, 0.1);
+  border-radius: 8px;
+  /* margin-bottom: 1rem; */
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  text-align: left;
+  line-height: normal;
+}
+
+.tip-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: var(--font-code);
+  margin-top: 2px;
+}
+
 .section-header h3 {
   font-family: var(--font-code);
   font-size: 1.2rem;
@@ -921,42 +1009,86 @@ export default {
     padding-right: 1rem;
 }
 
-.rewards-inline-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0.8rem; /* Space between rewards and progress bar */
-    align-items: flex-start;
-    justify-content: flex-start;
+.rewards-section {
+  margin-bottom: 12px;
 }
 
-.reward-unit {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
+.rewards-title {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  font-family: var(--font-code);
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.reward-unit .val {
-    color: #fff;
-    font-family: var(--font-code);
-    font-weight: 600;
-    font-size: 1.2rem;
-    line-height: 1;
-    text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+.rewards-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--primary);
 }
 
-.reward-unit .sym {
-    color: var(--primary);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
+.rewards-unified-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.usdt-equiv {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    margin-left: 4px;
-    font-family: var(--font-code);
+.reward-list-item {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s;
+  line-height: normal;
+}
+
+.reward-list-item:last-child {
+  border-bottom: none;
+}
+
+.reward-list-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.reward-main {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.reward-val {
+  color: #fff;
+  font-family: var(--font-code);
+  font-weight: 600;
+  font-size: 1.1rem;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.2);
+}
+
+.reward-sym {
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.reward-sub {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-code);
 }
 
 .progress-info {
@@ -1158,7 +1290,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    /* gap: 0.5rem; */
     padding: 0.8rem 0.5rem;
     background: rgba(255, 255, 255, 0.04);
     min-height: 50px;
@@ -1192,15 +1324,20 @@ export default {
     margin-top: 0.5rem;
   }
 
-  .rewards-inline-row {
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .reward-unit .val {
-    font-size: 1.1rem;
+  .reward-list-item {
+    /* flex-direction: column; */
+    /* align-items: flex-start; */
+    gap: 4px;
   }
   
+  .reward-val {
+    font-size: 1rem;
+  }
+  
+  .reward-sub {
+    font-size: 0.7rem;
+  }
+
   .mobile-label {
     display: none; 
   }
