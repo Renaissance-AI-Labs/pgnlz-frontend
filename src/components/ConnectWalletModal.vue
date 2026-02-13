@@ -20,7 +20,7 @@
                     class="wallet-option-btn" 
                     @click.prevent="handleConnect(wallet.id)">
               <div class="wallet-info">
-                  <img :src="getWalletIcon(wallet.id)" :alt="wallet.name" class="wallet-icon">
+                  <img :src="getWalletIcon(wallet.id)" :alt="wallet.name" class="wallet-icon" :class="{ 'wallet-icon-white': wallet.id === 'okx' }">
                   <span class="wallet-name">{{ wallet.name }}</span>
               </div>
               <i class="fas fa-chevron-right arrow-icon"></i>
@@ -238,6 +238,12 @@ export default {
   width: 32px;
   height: 32px;
   object-fit: contain;
+  border-radius: 6px;
+}
+
+.wallet-icon-white {
+    background: white;
+    padding: 2px;
 }
 
 .wallet-name {
