@@ -125,7 +125,7 @@
                         </div>
 
                         <!-- Time Progress -->
-                        <div class="progress-row">
+                        <div class="progress-row" v-if="activeTab === 1">
                              <div class="progress-info">
                                 <span class="p-label">{{ t('orders.progress.time') }}</span>
                                 <span class="p-value">{{ order.timeValue }} / {{ order.timeTarget }} {{ t('orders.queue.days') }}</span>
