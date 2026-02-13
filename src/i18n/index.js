@@ -155,7 +155,13 @@ const languagePacks = {
     'nft.activationCostTip': 'Activation cost for one NODE NFT is 500 USDT',
     'nft.notEffective': 'Not Effective',
     'nft.reactivateWithAmount': 'Reactivate (500 USDT)',
+    'nft.reactivateNeedApprove': 'Activate (Need Approve USDT)',
     'nft.activationConditionsNotMetShort': 'Conditions Not Met',
+    'nft.tips.claim': 'Please claim your NFT rewards in time. Rewards overflowing after the progress bar is full cannot be retrieved.',
+    'nft.tips.inactive': 'After the reward progress bar is full, the NFT will become inactive, and no rewards can be accumulated at this time.',
+    'nft.tips.activate': 'Activating the NFT will automatically claim its rewards and reset the reward progress bar.',
+    'nft.tips.combined': 'After reaching the reward cap, the NFT will stop accumulating rewards. The excess part and the output during the inactive period cannot be claimed. It is recommended to activate immediately after reaching the cap.',
+    'nft.pendingRewardsTitle': 'PENDING REWARDS',
 
     // Team / Friend Page
     'team.pageTitle': '< Friends />',
@@ -335,7 +341,13 @@ const languagePacks = {
      'nft.activationCostTip': '激活一张 NODE NFT 的费用为 500 USDT',
      'nft.notEffective': '未激活',
      'nft.reactivateWithAmount': '激活(需 500 USDT)',
+     'nft.reactivateNeedApprove': '激活(需授权 USDT)',
      'nft.activationConditionsNotMetShort': '查看激活条件',
+     'nft.tips.claim': '请及时领取您的 NFT 收益，收益进度条满后的溢出收益将无法获取',
+     'nft.tips.inactive': '收益进度条满后 NFT 将转为未激活状态，此时无法累计任何收益',
+     'nft.tips.activate': '激活 NFT 行为将会自动领取该 NFT 的收益并重置收益进度条',
+     'nft.tips.combined': '到收益上限后，NFT 将停止为用户累积收益。超出部分及未激活期间的产出将无法领取，建议到达上限后第一时间激活。',
+     'nft.pendingRewardsTitle': '待领取收益',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -523,7 +535,13 @@ const languagePacks = {
      'nft.activationCostTip': '激活一張 NODE NFT 的費用為 500 USDT',
      'nft.notEffective': '未激活',
      'nft.reactivateWithAmount': '激活(需 500 USDT)',
+     'nft.reactivateNeedApprove': '激活(需授權 USDT)',
      'nft.activationConditionsNotMetShort': '查看激活條件',
+     'nft.tips.claim': '請及時領取您的 NFT 收益，收益進度條滿後的溢出收益將無法獲取',
+     'nft.tips.inactive': '收益進度條滿後 NFT 將轉為未激活狀態，此時無法累計任何收益',
+     'nft.tips.activate': '激活 NFT 行為將會自動領取該 NFT 的收益並重置收益進度條',
+     'nft.tips.combined': '到收益上限後，NFT 將停止為用戶累積收益。超出部分及未激活期間的產出將無法領取，建議到達上限後第一時間激活。',
+     'nft.pendingRewardsTitle': '待領取收益',
 
      // Team / Friend Page
      'team.pageTitle': '< 好友 />',
@@ -704,7 +722,13 @@ const languagePacks = {
      'nft.activationCostTip': 'NODE NFT 1枚の有効化費用は 500 USDT です',
      'nft.notEffective': '無効',
      'nft.reactivateWithAmount': '有効化(500 USDT)',
+     'nft.reactivateNeedApprove': '有効化(USDT承認が必要)',
      'nft.activationConditionsNotMetShort': '条件未達成',
+     'nft.tips.claim': 'NFT報酬は適時に受け取ってください。プログレスバーが満タンになった後の超過報酬は取得できません。',
+     'nft.tips.inactive': '報酬プログレスバーが満タンになると、NFTは無効状態になり、報酬は蓄積されません。',
+     'nft.tips.activate': 'NFTを有効化すると、そのNFTの報酬が自動的に受け取られ、プログレスバーがリセットされます。',
+     'nft.tips.combined': '収益上限に達した後、NFTはユーザーの収益蓄積を停止します。超過分および非アクティブ期間中の産出は受け取ることができません。上限に達した後は、すぐにアクティブ化することをお勧めします。',
+     'nft.pendingRewardsTitle': '未受取報酬',
 
      // Team / Friend Page
      'team.pageTitle': '< 友達 />',
@@ -885,7 +909,13 @@ const languagePacks = {
      'nft.activationCostTip': 'NODE NFT 1장 활성화 비용은 500 USDT입니다',
      'nft.notEffective': '미발효',
      'nft.reactivateWithAmount': '활성화(500 USDT)',
+     'nft.reactivateNeedApprove': '활성화(USDT 승인 필요)',
      'nft.activationConditionsNotMetShort': '조건 미충족',
+     'nft.tips.claim': 'NFT 보상을 제때 수령하세요. 진행률 표시줄이 가득 찬 후의 초과 보상은 받을 수 없습니다.',
+     'nft.tips.inactive': '보상 진행률 표시줄이 가득 차면 NFT는 비활성 상태가 되며, 이때는 보상이 누적되지 않습니다.',
+     'nft.tips.activate': 'NFT 활성화 시 해당 NFT의 보상이 자동으로 수령되며 진행률 표시줄이 초기화됩니다.',
+     'nft.tips.combined': '수익 상한선에 도달하면 NFT는 사용자에게 수익 누적을 중단합니다. 초과 부분 및 비활성화 기간 동안의 생산량은 수령할 수 없으므로 상한선에 도달한 후 즉시 활성화하는 것이 좋습니다.',
+     'nft.pendingRewardsTitle': '미수령 보상',
 
      // Team / Friend Page
      'team.pageTitle': '< 친구 />',
