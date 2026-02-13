@@ -897,6 +897,7 @@ watch(() => walletState.isConnected, (newVal) => {
 .actions-compact {
     display: flex;
     gap: 0.6rem;
+    margin-top: 8px;
 }
 
 .btn-icon {
