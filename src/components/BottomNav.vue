@@ -111,10 +111,14 @@ export default {
   align-items: center;
   text-decoration: none;
   color: var(--text-muted);
-  gap: 4px;
+  /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
   transition: all 0.2s ease;
   position: relative;
   padding: 4px 12px;
+}
+
+.nav-item > * + * {
+  margin-top: 4px;
 }
 
 .icon-container {

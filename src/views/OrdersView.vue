@@ -102,9 +102,13 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
   margin-bottom: 1rem;
+}
+
+.header-section > * + * {
+  margin-top: 1.5rem;
 }
 
 .page-title {
@@ -142,8 +146,12 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  /* gap: 2rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
+}
+
+.right-section > * + * {
+  margin-top: 2rem;
 }
 
 @media (min-width: 1024px) {

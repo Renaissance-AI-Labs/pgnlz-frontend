@@ -46,8 +46,12 @@ export default {
   
   display: flex;
   align-items: center;
-  gap: 10px;
+  /* gap: 10px; Replaced with margin for iOS < 14.5 compatibility */
   pointer-events: auto;
+}
+
+.toast-content > * + * {
+  margin-left: 10px;
 }
 
 .message {

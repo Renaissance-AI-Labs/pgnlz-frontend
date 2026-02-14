@@ -879,9 +879,13 @@ export default {
 .modal-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  /* gap: 12px; Replaced with margin for iOS < 14.5 compatibility */
   align-items: flex-start; /* Align content to left */
   text-align: left; /* Align text to left */
+}
+
+.modal-body > * + * {
+  margin-top: 12px;
 }
 
 .modal-header h3 {
@@ -916,8 +920,12 @@ export default {
 
 .modal-footer {
   display: flex;
-  gap: 12px;
+  /* gap: 12px; Replaced with margin for iOS < 14.5 compatibility */
   justify-content: space-between;
+}
+
+.modal-footer > * + * {
+  margin-left: 12px;
 }
 
 .modal-btn {
@@ -977,7 +985,11 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* Ensure overall content (including title) aligns left */
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.page-content > * + * {
+  margin-top: 1rem;
 }
 
 /* Header Styles */
@@ -987,7 +999,11 @@ export default {
   flex-direction: column;
   align-items: flex-start; /* Ensure title text aligns left */
   text-align: left;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.header-section > * + * {
+  margin-top: 1rem;
 }
 
 .page-title {
@@ -1027,7 +1043,11 @@ export default {
   max-width: 600px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.right-section > * + * {
+  margin-top: 1.5rem;
 }
 
 .team-container {
@@ -1042,10 +1062,14 @@ export default {
 
 .tabs-nav {
   display: flex;
-  gap: 0; 
+  /* gap: 0; Replaced with margin for iOS < 14.5 compatibility */
   margin-bottom: 1.5rem; /* Reduced margin from 2rem */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 0; 
+}
+
+.tabs-nav > * + * {
+  margin-left: 0;
 }
 
 .tab-btn {
@@ -1102,7 +1126,11 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.8rem; /* Reduced gap from 1rem */
+    /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.connect-box > * + * {
+    margin-top: 0.8rem;
 }
 
 .connect-msg {
@@ -1136,9 +1164,13 @@ export default {
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
   margin-bottom: 1rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.stats-card > * + * {
+  margin-top: 0.8rem;
 }
 
 .stats-row {
@@ -1163,7 +1195,11 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.stat-item > * + * {
+  margin-top: 4px;
 }
 
 .stats-card .label {
@@ -1201,11 +1237,15 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(12px);
   position: relative;
   overflow: hidden;
+}
+
+.friend-card > * + * {
+  margin-top: 1rem;
 }
 
 /* Subtle glow effect */
@@ -1224,8 +1264,12 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    /* gap: 10px; Replaced with margin for iOS < 14.5 compatibility */
     margin-bottom: 0.2rem;
+}
+
+.card-header-row > * + * {
+    margin-left: 10px;
 }
 
 .user-avatar-placeholder {
@@ -1248,7 +1292,11 @@ export default {
     transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.card-address > * + * {
+    margin-left: 8px;
 }
 
 .copy-icon-small {
@@ -1267,8 +1315,13 @@ export default {
 .card-stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 6px;
+    /* gap: 6px; Replaced with margin for iOS < 14.5 compatibility */
     width: 100%;
+}
+
+.card-stats-grid > * {
+    /* Grid gap fallback for older browsers is tricky, usually margin on children */
+    margin: 3px; 
 }
 
 .stat-box {
@@ -1279,8 +1332,12 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
     border: none;
+}
+
+.stat-box > * + * {
+    margin-top: 4px;
 }
 
 .stat-box.highlight-box {
@@ -1325,9 +1382,13 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
+    /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
     width: 100%;
     margin-top: 1rem;
+}
+
+.pagination-controls > * + * {
+    margin-left: 1.5rem;
 }
 
 .nav-btn {
@@ -1397,8 +1458,12 @@ export default {
 .friend-section {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  /* gap: 0.3rem; Replaced with margin for iOS < 14.5 compatibility */
   margin-bottom: 2rem;
+}
+
+.friend-section > * + * {
+  margin-top: 0.3rem;
 }
 
 .section-title {
@@ -1422,10 +1487,14 @@ export default {
   opacity: 0.9;
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
   background: rgba(255, 255, 255, 0.05);
   padding: 0.8rem;
   border-radius: 8px;
+}
+
+.section-hint > * + * {
+  margin-left: 0.5rem;
 }
 
 .hint-icon {
@@ -1442,13 +1511,17 @@ export default {
 .input-box {
   display: flex;
   align-items: center; /* Ensure child elements are vertically centered */
-  gap: 0.3rem;
+  /* gap: 0.3rem; Replaced with margin for iOS < 14.5 compatibility */
   background: rgba(0, 0, 0, 0.3);
   padding: 0.5rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   height: auto; /* Let content determine height, or set fixed height */
   min-height: 3.5rem; /* Minimum height */
+}
+
+.input-box > * + * {
+  margin-left: 0.3rem;
 }
 
 .code-input {

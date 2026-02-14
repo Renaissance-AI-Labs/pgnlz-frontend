@@ -90,15 +90,23 @@ export default {
 .brand-social-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
     align-items: flex-start; /* Strictly Left Aligned */
     padding-left: 0; /* Ensure no left padding */
+}
+
+.brand-social-wrapper > * + * {
+    margin-top: 1.5rem;
 }
 
 .brand-logo-large {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.brand-logo-large > * + * {
+    margin-left: 0.8rem;
 }
 
 .footer-logo-img {
@@ -119,7 +127,11 @@ export default {
 
 .footer-social-row {
     display: flex;
-    gap: 1rem;
+    /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.footer-social-row > * + * {
+    margin-left: 1rem;
 }
 
 .footer-social-btn {
@@ -158,8 +170,12 @@ export default {
 .copyright-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     align-items: flex-start;
+}
+
+.copyright-group > * + * {
+    margin-top: 0.5rem;
 }
 
 .copyright-section {

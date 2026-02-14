@@ -406,13 +406,12 @@ watch(() => walletState.isConnected, () => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
+.staking-container > * + * {
+  margin-top: 1rem; /* Assuming default gap */
+}
+
 .section-title {
-  font-size: 1.1rem;
-  margin-bottom: 0.8rem;
-  font-family: var(--font-primary);
-  letter-spacing: 0.05em;
-  font-weight: 700;
-  opacity: 0.9;
+  /* ... */
 }
 
 .stake-card {
@@ -424,7 +423,11 @@ watch(() => walletState.isConnected, () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.stake-card > * + * {
+  margin-top: 1rem;
 }
 
 .amount-display {
@@ -432,7 +435,11 @@ watch(() => walletState.isConnected, () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.amount-display > * + * {
+  margin-top: 0.5rem;
 }
 
 .amount-selection {
@@ -456,8 +463,12 @@ watch(() => walletState.isConnected, () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.1rem;
+  /* gap: 0.1rem; Replaced with margin for iOS < 14.5 compatibility */
   min-height: 50px;
+}
+
+.amount-btn > * + * {
+  margin-top: 0.1rem;
 }
 
 .amount-btn:hover {
@@ -488,7 +499,11 @@ watch(() => walletState.isConnected, () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.8rem;
+  /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.action-area > * + * {
+  margin-top: 0.8rem;
 }
 
 .action-btn {
@@ -500,10 +515,14 @@ watch(() => walletState.isConnected, () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
   background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
   box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
   transition: all 0.3s ease;
+}
+
+.action-btn > * + * {
+  margin-left: 0.5rem;
 }
 
 .action-btn:hover:not(:disabled) {
@@ -556,10 +575,14 @@ watch(() => walletState.isConnected, () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     font-size: 0.8rem;
     color: var(--text-secondary);
     flex-wrap: wrap;
+}
+
+.status-ticker > * + * {
+    margin-left: 0.5rem;
 }
 
 .status-dot {

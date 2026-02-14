@@ -236,7 +236,11 @@ watch(() => walletState.isConnected, (newVal) => {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.dashboard-container > * + * {
+  margin-top: 1rem;
 }
 
 .stats-wrapper {
@@ -244,6 +248,13 @@ watch(() => walletState.isConnected, (newVal) => {
   justify-content: space-around;
   align-items: flex-start;
   width: 100%;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+/* Add margin to flex items if needed, but justify-around handles spacing mostly. 
+   However, if gap was intended for minimum spacing: */
+.stats-wrapper > * + * {
+    margin-left: 0.5rem;
 }
 
 .stat-item {
@@ -290,7 +301,11 @@ watch(() => walletState.isConnected, (newVal) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.text-sm > * + * {
+  margin-left: 4px;
 }
 
 .label-sub {
@@ -339,8 +354,12 @@ watch(() => walletState.isConnected, (newVal) => {
 .queue-bar-container {
     display: flex;
     background: transparent;
-    gap: 4px;
+    /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
     overflow: visible;
+}
+
+.queue-bar-container > * + * {
+    margin-left: 4px;
 }
 
 .bar-segment {
@@ -432,7 +451,11 @@ watch(() => walletState.isConnected, (newVal) => {
     border-radius: 8px;
     padding: 0.4rem;
     margin-top: 0.2rem;
-    gap: 0.8rem;
+    /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .stat-item.full-width-mobile > * + * {
+    margin-left: 0.8rem;
   }
 
   .stat-item.full-width-mobile .item-label {
