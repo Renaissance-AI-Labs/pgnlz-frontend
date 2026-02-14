@@ -7,6 +7,13 @@
         </div>
         <span class="nav-label">{{ t('nav.home') || '首页' }}</span>
       </router-link>
+
+      <router-link to="/orders" class="nav-item" active-class="active">
+        <div class="icon-container">
+          <i class="fas fa-list-alt"></i>
+        </div>
+        <span class="nav-label">{{ t('nav.orders') || '订单' }}</span>
+      </router-link>
       
       <router-link to="/nft" class="nav-item" active-class="active">
         <div class="icon-container">
@@ -104,10 +111,14 @@ export default {
   align-items: center;
   text-decoration: none;
   color: var(--text-muted);
-  gap: 4px;
+  /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
   transition: all 0.2s ease;
   position: relative;
   padding: 4px 12px;
+}
+
+.nav-item > * + * {
+  margin-top: 4px;
 }
 
 .icon-container {

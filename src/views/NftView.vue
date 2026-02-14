@@ -15,53 +15,220 @@
 
       <div class="right-section">
         <div class="nft-showcase">
-          <div class="showcase-header">{{ t('nft.myNodeNft') }}</div>
-          
-          <div class="nft-card-container">
-            <div class="nft-card">
-              <img src="/asset/images/nft/pgnlz-node.png" alt="Exclusive NFT" class="nft-image">
-              <div class="card-reflection"></div>
-              
-              <!-- Balance Badge -->
-              <div class="nft-balance-badge" v-if="walletState.isConnected">
-                <span class="balance-label">{{ t('nft.currentHolding') }}</span>
-                <span class="balance-value">{{ nftBalance }}</span>
+          <div class="nft-card-wrapper">
+            <div class="nft-card-container">
+              <div class="nft-card">
+                <img src="/asset/images/nft/pgnlz-node.png" alt="Exclusive NFT" class="nft-image">
+                <div class="card-reflection"></div>
               </div>
+              <div class="nft-shadow"></div>
             </div>
-            <div class="nft-shadow"></div>
           </div>
           
-          <div class="nft-info">
-            <!-- <h1>NODE</h1>
-            <p class="subtitle">Energy Burst NFT</p> -->
+          <div class="nft-showcase-info">
+            <div class="showcase-header">{{ t('nft.myNodeNft') }}</div>
+            
+            <div class="nft-balance-info" v-if="walletState.isConnected">
+              <span class="balance-label">{{ t('nft.currentHolding') }}</span>
+              <span class="balance-value">{{ nftBalance }}</span>
+            </div>
           </div>
         </div>
 
-        <div class="coming-soon-section">
-          <div class="divider">
-            <div class="line"></div>
-            <div class="icon-separator">◆</div>
-            <div class="line"></div>
+        <!-- NFT System List -->
+        <div class="nft-list-section" v-if="walletState.isConnected">
+          <div class="section-header">
+            <h3>{{ t('nft.systemNodes') }}</h3>
+            <div class="nft-tips-section">
+            <div class="tip-item">
+              <div class="tip-icon">!</div>
+              <span>{{ t('nft.tips.combined') }}</span>
+            </div>
           </div>
-          <p class="coming-soon">{{ t('nft.comingSoon') }}</p>
+            <div class="header-actions">
+                <button 
+                  v-if="showActivationConditions"
+                  class="harvest-all-btn activate-mode"
+                  @click="openActivationModal"
+                >
+                  {{ t('nft.howToActivate') }}
+                </button>
+                <button 
+                  class="harvest-all-btn" 
+                  @click="handleHarvestAll" 
+                  :disabled="isLoading || !hasRewards"
+                >
+                  {{ isLoading ? t('nft.loading') : t('nft.harvestAll') }}
+                </button>
+            </div>
+          </div>
+          
+          
+
+          <div class="nft-grid-container">
+            <div v-if="isLoading && nftList.length === 0" class="loading-state">
+              {{ t('nft.loading') }}
+            </div>
+            <div v-else-if="nftList.length === 0" class="empty-state">
+              {{ t('nft.noNfts') }}
+            </div>
+            <div v-else class="nft-grid-list">
+               <!-- Header (PC Only) -->
+               <div class="grid-header">
+                 <div class="col-id">{{ t('nft.id') }}</div>
+                 <div class="col-progress">{{ t('nft.rewards') }} / {{ t('nft.cycleProgress') }}</div>
+                 <div class="col-status">{{ t('nft.status') }}</div>
+               </div>
+               
+               <!-- Items -->
+               <div class="grid-item" v-for="nft in nftList" :key="nft.id">
+                 <div class="item-main">
+                   <div class="col-id">
+                     <span class="mobile-label">{{ t('nft.id') }}</span>
+                     <span class="value">#{{ nft.id }}</span>
+                   </div>
+                 </div>
+                 
+                 <!-- Progress Bar Section -->
+                 <div class="item-progress col-progress">
+                    <div class="rewards-section">
+                        <div class="rewards-title">{{ t('nft.pendingRewardsTitle') }}</div>
+                        <div class="rewards-unified-box">
+                            <div v-for="(amount, symbol) in nft.rewards" :key="symbol" class="reward-list-item">
+                                    <div class="reward-main">
+                                        <span class="reward-val">{{ formatReward(amount) }}</span>
+                                        <span class="reward-sym">{{ symbol }}</span>
+                                        <span v-if="getUsdtValue(amount, symbol)" class="reward-sub">
+                                            ≈ {{ getUsdtValue(amount, symbol) }} USDT
+                                        </span>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-track">
+                        <div class="progress-fill" :style="{ width: calculateProgress(nft.harvested, rewardCap) + '%' }"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span class="label">{{ t('nft.cycleProgress') }}</span>
+                        <span class="value">{{ formatReward(nft.harvested) }} / {{ formatReward(rewardCap) }}</span>
+                    </div>
+                    
+                    
+                 </div>
+                 
+                 <div class="item-status col-status">
+                    <div v-if="nft.needsReactivation" class="reactivate-wrapper">
+                      <button 
+                        v-if="showActivationConditions"
+                        @click="handleReactivate(nft.id)" 
+                        class="action-btn reactivate-btn"
+                        :class="{ 'can-activate': canReactivate }"
+                        :disabled="isActionProcessing"
+                      >
+                        {{ canReactivate ? (needsApproval ? t('nft.reactivateNeedApprove') : t('nft.reactivateWithAmount')) : t('nft.activationConditionsNotMetShort') }}
+                      </button>
+                      <div class="status-badge inactive">
+                        <span class="dot" style="margin-right: 4px;"></span>
+                        {{ t('nft.notEffective') }}
+                      </div>
+                    </div>
+                    <div v-else class="status-badge active">
+                      <span class="dot" style="margin-right: 4px;"></span>
+                      {{ t('nft.active') }}
+                    </div>
+                 </div>
+               </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="coming-soon-section" v-else>
+           <p class="connect-hint">{{ t('lp.connectWallet') }}</p>
         </div>
       </div>
     </div>
 
-    <transition name="modal">
-      <ConnectWalletModal v-if="isModalVisible" @close="closeModal" />
-    </transition>
+    <Teleport to="body">
+      <transition name="modal">
+        <ConnectWalletModal v-if="isModalVisible" @close="closeModal" />
+      </transition>
+    </Teleport>
+
+    <!-- Activation Requirements Modal -->
+    <Teleport to="body">
+      <transition name="modal">
+        <div v-if="isActivationModalVisible" class="modal-overlay" @click.self="closeActivationModal">
+        <div class="modal-content activation-modal">
+          <div class="modal-header">
+            <h3>{{ t('nft.activationRequirements') }}</h3>
+            <button class="close-btn" @click="closeActivationModal">&times;</button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="activation-tip">
+                {{ t('nft.activationCostTip') }}
+            </div>
+
+            <!-- Progress Bar 1: Direct Referrals -->
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>{{ t('nft.directReferrals') }}</span>
+                <span class="progress-values">
+                    <span class="current">{{ activationStats.directReferrals }}</span> / <span class="target">{{ activationStats.requiredDirectReferrals }}</span>
+                </span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" :style="{ width: calculateProgress(activationStats.directReferrals, activationStats.requiredDirectReferrals) + '%' }"></div>
+              </div>
+            </div>
+
+            <!-- Progress Bar 2: Team Performance -->
+            <div class="progress-item">
+              <div class="progress-label">
+                <span>{{ t('nft.teamPerformance') }}</span>
+                <span class="progress-values">
+                    <span class="current">{{ formatNumber(activationStats.teamPerformance) }}</span> / <span class="target">{{ formatNumber(activationStats.requiredTeamPerformance) }}</span>
+                </span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" :style="{ width: calculateProgress(activationStats.teamPerformance, activationStats.requiredTeamPerformance) + '%' }"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="confirm-btn" @click="closeActivationModal">{{ t('nft.confirm') }}</button>
+          </div>
+        </div>
+      </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
 <script>
 import { walletState } from '@/services/wallet.js';
 import { getContractAddress } from '@/services/contracts.js';
-import { onMounted, ref, watch } from 'vue';
+import { showToast } from '@/services/notification.js';
+import { onMounted, onActivated, ref, watch, computed } from 'vue';
 import { ethers } from 'ethers';
 import nodeNFTAbi from '@/abis/nodeNFT.json';
+import nodePoolAbi from '@/abis/nodePool.json';
+import stakingAbi from '@/abis/staking.json';
 import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
 import { t } from '@/i18n/index.js';
+import { SHOW_ACTIVATION_CONDITIONS } from '@/services/environment.js';
+
+const ERC20_ABI = [
+  "function approve(address spender, uint256 amount) external returns (bool)",
+  "function decimals() view returns (uint8)",
+  "function allowance(address owner, address spender) view returns (uint256)"
+];
+
+const ROUTER_ABI = [
+  "function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)"
+];
 
 export default {
   name: 'NftView',
@@ -70,7 +237,48 @@ export default {
   },
   setup() {
     const nftBalance = ref(0);
+    const usdtAllowance = ref(0n);
     const isModalVisible = ref(false);
+    const nftList = ref([]);
+    const isLoading = ref(false);
+    const isActionProcessing = ref(false);
+    const rewardCap = ref(0);
+    const canReactivate = ref(false);
+    const pgnlzPrice = ref(0);
+    const showActivationConditions = SHOW_ACTIVATION_CONDITIONS;
+    
+    const needsApproval = computed(() => {
+        try {
+            return usdtAllowance.value < ethers.parseUnits('500', 18);
+        } catch (e) {
+            return true;
+        }
+    });
+    
+    // Activation Modal State
+    const isActivationModalVisible = ref(false);
+    const activationStats = ref({
+      directReferrals: 0,
+      requiredDirectReferrals: 0,
+      teamPerformance: 0,
+      requiredTeamPerformance: 0
+    });
+    
+    // Token info
+    const tokenSymbols = ref({}); 
+
+    const fetchAllowance = async () => {
+      if (!walletState.isConnected || !walletState.signer) return;
+      try {
+        const usdtAddr = getContractAddress('USDT');
+        const nodePoolAddr = getContractAddress('NodePool');
+        const usdtContract = new ethers.Contract(usdtAddr, ERC20_ABI, walletState.signer);
+        const allowance = await usdtContract.allowance(walletState.address, nodePoolAddr);
+        usdtAllowance.value = allowance;
+      } catch (e) {
+        console.error("Failed to fetch allowance", e);
+      }
+    };
 
     const openModal = () => {
       isModalVisible.value = true;
@@ -79,10 +287,109 @@ export default {
     const closeModal = () => {
       isModalVisible.value = false;
     };
+    
+    const openActivationModal = async () => {
+      isActivationModalVisible.value = true;
+      try {
+        const stakingAddr = getContractAddress('Staking');
+        const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
+        
+        // Fetch data in parallel
+        const [
+            directRefs,
+            reqDirectRefs,
+            teamPerf,
+            reqTeamPerf
+        ] = await Promise.all([
+            stakingContract.validDirectReferralsCount(walletState.address),
+            stakingContract.reactivateDirectReferrals(),
+            stakingContract.teamTotalInvestValue(walletState.address),
+            stakingContract.reactivateTeamPerformance()
+        ]);
+
+        activationStats.value = {
+            directReferrals: Number(directRefs),
+            requiredDirectReferrals: Number(reqDirectRefs),
+            teamPerformance: parseFloat(ethers.formatUnits(teamPerf, 18)), 
+            requiredTeamPerformance: parseFloat(ethers.formatUnits(reqTeamPerf, 18))
+        };
+      } catch (e) {
+        console.error("Failed to fetch activation stats", e);
+      }
+    };
+
+    const closeActivationModal = () => {
+      isActivationModalVisible.value = false;
+    };
+    
+    const calculateProgress = (current, target) => {
+      if (!target || target === 0) return 0;
+      
+      try {
+          // Handle BigInt
+          const currentBn = BigInt(current);
+          const targetBn = BigInt(target);
+          
+          if (targetBn === 0n) return 0;
+          
+          // Calculate percentage with precision
+          // (current * 10000) / target -> then divide by 100 for decimals
+          const percent = Number((currentBn * 10000n) / targetBn) / 100;
+          return Math.min(percent, 100);
+      } catch (e) {
+          // Fallback for non-BigInt numbers
+          return Math.min((Number(current) / Number(target)) * 100, 100);
+      }
+    };
+    
+    const formatNumber = (num) => {
+      return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(num);
+    };
+
+    const fetchPgnlzPrice = async () => {
+      try {
+        const routerAddr = getContractAddress('Router');
+        const pgnlzAddr = getContractAddress('PGNLZ');
+        const usdtAddr = getContractAddress('USDT');
+
+        if (!routerAddr || !pgnlzAddr || !usdtAddr) return;
+
+        // Use a provider (read-only) if signer is not available, but usually we are connected here
+        const provider = walletState.signer || walletState.provider; 
+        if (!provider) return;
+
+        const routerContract = new ethers.Contract(routerAddr, ROUTER_ABI, provider);
+        
+        // 1 PGNLZ
+        const amountIn = ethers.parseUnits('1', 18); 
+        const amounts = await routerContract.getAmountsOut(amountIn, [pgnlzAddr, usdtAddr]);
+        
+        // amounts[1] is USDT amount for 1 PGNLZ
+        // Assuming USDT is 18 decimals as per existing code usage in handleReactivate
+        pgnlzPrice.value = parseFloat(ethers.formatUnits(amounts[1], 18));
+      } catch (e) {
+        console.error("Failed to fetch PGNLZ price", e);
+      }
+    };
+
+    const getUsdtValue = (amount, symbol) => {
+        if (!amount || !pgnlzPrice.value) return null;
+        if (symbol !== 'PGNLZ') return null;
+        
+        try {
+            const val = parseFloat(ethers.formatUnits(amount, 18));
+            const usdtVal = val * pgnlzPrice.value;
+            // Format to 2-4 decimals
+            return usdtVal < 0.01 ? usdtVal.toPrecision(2) : usdtVal.toFixed(2);
+        } catch (e) {
+            return null;
+        }
+    };
 
     const fetchBalance = async () => {
       if (!walletState.isConnected || !walletState.signer || !walletState.address) {
         nftBalance.value = 0;
+        nftList.value = [];
         return;
       }
 
@@ -92,10 +399,270 @@ export default {
         const balance = await contract.balanceOf(walletState.address);
         nftBalance.value = balance.toString();
         console.log('NFT Balance fetched:', balance.toString());
+        
+        if (balance > 0) {
+          await fetchNftList();
+          fetchPgnlzPrice();
+        }
+        fetchAllowance();
       } catch (error) {
         console.error('Failed to fetch NFT balance:', error);
         nftBalance.value = 0;
       }
+    };
+
+    const fetchNftList = async () => {
+      isLoading.value = true;
+      try {
+        const nftContractAddr = getContractAddress('nodeNFT');
+        const nftContract = new ethers.Contract(nftContractAddr, nodeNFTAbi, walletState.signer);
+
+        // 1. Get My NFTs
+        // Assuming reasonably small number, fetch all in one batch with size 100
+        const result = await nftContract.levelsOfOwnerBySize(walletState.address, 0, 100);
+        // Result is [NftInfo[], nextCursor]
+        const nfts = result[0];
+        
+        if (nfts.length === 0) {
+          nftList.value = [];
+          isLoading.value = false;
+          return;
+        }
+
+        // Initialize list with basic info immediately
+        nftList.value = nfts.map(n => ({
+            id: n.id.toString(),
+            level: n.level.toString(),
+            rewards: {},
+            needsReactivation: false,
+            harvested: 0,
+            isDetailLoading: true
+        }));
+        
+        // Stop loading spinner immediately
+        isLoading.value = false;
+        
+        // 2. Fetch details asynchronously
+        fetchNftDetails(nfts);
+
+      } catch (error) {
+        console.error('Failed to fetch NFT list:', error);
+        isLoading.value = false; // Ensure loading stops on error
+        nftList.value = [];
+      }
+    };
+
+    const fetchNftDetails = async (nfts) => {
+      try {
+        const nodePoolAddr = getContractAddress('NodePool');
+        const stakingAddr = getContractAddress('Staking');
+        const pgnlzAddr = getContractAddress('PGNLZ');
+        const usdtAddr = getContractAddress('USDT');
+
+        const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
+        const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
+
+        const nftIds = nfts.map(n => n.id);
+        
+        // 2. Get Supported Tokens and Reward Cap
+        const [supportedTokens, cap] = await Promise.all([
+             nodePoolContract.getSupportedTokens(),
+             nodePoolContract.rewardCap()
+        ]);
+        
+        rewardCap.value = cap;
+
+        // Get PGNLZ address from Staking contract as requested
+        let pgnlzAddressFromStaking = pgnlzAddr;
+        try {
+            pgnlzAddressFromStaking = await stakingContract.PGNLZ();
+        } catch (e) {
+            console.warn('Failed to fetch PGNLZ address from Staking contract, using config address', e);
+        }
+
+        // Initialize token symbols
+        tokenSymbols.value[pgnlzAddressFromStaking.toLowerCase()] = 'PGNLZ';
+        tokenSymbols.value[pgnlzAddr.toLowerCase()] = 'PGNLZ'; // Fallback
+        tokenSymbols.value[usdtAddr.toLowerCase()] = 'USDT';
+
+        // Prepare list of tokens to query (deduplicate)
+        const tokensToQuery = new Set([
+            ...supportedTokens.map(t => t.toLowerCase()),
+            pgnlzAddressFromStaking.toLowerCase(),
+            usdtAddr.toLowerCase()
+        ]);
+        
+        // 3. Batch Get Rewards
+        const rewardsMap = {}; // nftId (string) -> { symbol: amount }
+        
+        // Initialize map
+        nftIds.forEach(id => {
+          rewardsMap[id.toString()] = {};
+        });
+
+        // Fetch rewards for each token
+        for (const tokenAddr of tokensToQuery) {
+            try {
+                const amounts = await nodePoolContract.getTokenRewardsBatch(nftIds, tokenAddr);
+                // Resolve symbol (case-insensitive check)
+                const symbol = tokenSymbols.value[tokenAddr] || 
+                               (tokenAddr.toLowerCase() === pgnlzAddressFromStaking.toLowerCase() ? 'PGNLZ' : 
+                                tokenAddr.toLowerCase() === usdtAddr.toLowerCase() ? 'USDT' : 'Unknown');
+                
+                nftIds.forEach((id, index) => {
+                    const amount = amounts[index];
+                    rewardsMap[id.toString()][symbol] = amount;
+                });
+            } catch (err) {
+                console.error(`Failed to fetch rewards for token ${tokenAddr}`, err);
+            }
+        }
+
+        // Update rewards in the list
+        nftList.value = nftList.value.map(item => ({
+             ...item,
+             rewards: rewardsMap[item.id] || item.rewards
+        }));
+
+
+        // 4. Check Reactivation Status & Harvested
+        const canUserReactivate = await stakingContract.checkReactivate(walletState.address);
+        canReactivate.value = canUserReactivate;
+
+        // Fetch per-item data in parallel
+        await Promise.all(nfts.map(async (nft) => {
+            try {
+                const harvested = await nodePoolContract.nftCycleHarvested(nft.id);
+                const needsReactivation = harvested >= cap;
+                
+                // Update specific item
+                const index = nftList.value.findIndex(i => i.id === nft.id.toString());
+                if (index !== -1) {
+                    const item = nftList.value[index];
+                    // Create new object to trigger reactivity
+                    nftList.value[index] = {
+                        ...item,
+                        harvested,
+                        needsReactivation,
+                        isDetailLoading: false
+                    };
+                }
+            } catch (e) {
+                console.error(`Failed to fetch details for NFT ${nft.id}`, e);
+            }
+        }));
+
+      } catch (error) {
+        console.error('Failed to fetch NFT details:', error);
+      }
+    };
+
+    const handleHarvestAll = async () => {
+        if (isActionProcessing.value) return;
+        
+        if (!hasRewards.value) {
+            openActivationModal();
+            return;
+        }
+        
+        // Collect all IDs
+        const ids = nftList.value.map(n => n.id);
+        if (ids.length === 0) return;
+
+        try {
+            isActionProcessing.value = true;
+            const nodePoolAddr = getContractAddress('NodePool');
+            const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
+            
+            const tx = await nodePoolContract.harvestAll(ids);
+            showToast(t('team.toast.txSubmitted'), 'info');
+            await tx.wait();
+            showToast(t('nft.harvestSuccess'), 'success');
+            
+            // Refresh
+            fetchNftList();
+        } catch (error) {
+            console.error('Harvest failed:', error);
+            // Don't alert if user rejected
+            if (error.code === 'ACTION_REJECTED' || (error.info && error.info.error && error.info.error.code === 4001)) {
+                return;
+            }
+            showToast('Harvest Failed: ' + (error.reason || error.message), 'error');
+        } finally {
+            isActionProcessing.value = false;
+        }
+    };
+
+    const handleReactivate = async (nftId) => {
+        if (isActionProcessing.value) return;
+
+        try {
+            const stakingAddr = getContractAddress('Staking');
+            const stakingContract = new ethers.Contract(stakingAddr, stakingAbi, walletState.signer);
+            const can = await stakingContract.checkReactivate(walletState.address);
+            
+            if (!can) {
+                openActivationModal();
+                return;
+            }
+
+            // Check allowance
+            const requiredAmount = ethers.parseUnits('500', 18);
+            if (usdtAllowance.value < requiredAmount) {
+                 isActionProcessing.value = true;
+                 try {
+                    const usdtAddr = getContractAddress('USDT');
+                    const nodePoolAddr = getContractAddress('NodePool');
+                    const usdtContract = new ethers.Contract(usdtAddr, ERC20_ABI, walletState.signer);
+                    const tx = await usdtContract.approve(nodePoolAddr, ethers.MaxUint256);
+                    showToast(t('team.toast.txSubmitted'), 'info');
+                    await tx.wait();
+                    showToast(t('staking.approveSuccess'), 'success');
+                    await fetchAllowance(); 
+                 } catch (e) {
+                    console.error('Approve failed:', e);
+                    // Don't alert if user rejected
+                    if (e.code === 'ACTION_REJECTED' || (e.info && e.info.error && e.info.error.code === 4001)) {
+                        return;
+                    }
+                    showToast(t('staking.approveFailed') + ': ' + (e.reason || e.message), 'error');
+                 } finally {
+                    isActionProcessing.value = false;
+                 }
+                 return;
+            }
+
+            isActionProcessing.value = true;
+            const nodePoolAddr = getContractAddress('NodePool');
+            const nodePoolContract = new ethers.Contract(nodePoolAddr, nodePoolAbi, walletState.signer);
+            
+            const tx = await nodePoolContract.reactivate(nftId);
+            showToast(t('team.toast.txSubmitted'), 'info');
+            await tx.wait();
+            showToast(`#${nftId} NFT ` + t('nft.reactivateSuccess'), 'success');
+            
+            fetchNftList();
+
+        } catch (error) {
+            console.error('Reactivation failed:', error);
+            if (error.code === 'ACTION_REJECTED' || (error.info && error.info.error && error.info.error.code === 4001)) {
+                return;
+            }
+            showToast('Reactivation Failed: ' + (error.reason || error.message), 'error');
+        } finally {
+            isActionProcessing.value = false;
+        }
+    };
+
+    const hasRewards = computed(() => {
+        return nftList.value.some(nft => Object.keys(nft.rewards).length > 0);
+    });
+
+    const formatReward = (val) => {
+        if (!val) return '0';
+        // Assume 18 decimals for rewards
+        const formatted = ethers.formatUnits(val, 18);
+        return parseFloat(formatted).toFixed(4);
     };
 
     // Watch for wallet connection changes
@@ -106,6 +673,7 @@ export default {
           fetchBalance();
         } else {
           nftBalance.value = 0;
+          nftList.value = [];
         }
       },
       { immediate: true }
@@ -131,13 +699,37 @@ export default {
         }
     });
 
+    onActivated(() => {
+        if (walletState.isConnected) {
+            fetchBalance();
+        }
+    });
+
     return {
       t,
       walletState,
       nftBalance,
       isModalVisible,
       openModal,
-      closeModal
+      closeModal,
+      nftList,
+      isLoading,
+      isActionProcessing,
+      handleHarvestAll,
+      handleReactivate,
+      hasRewards,
+      formatReward,
+      isActivationModalVisible,
+      activationStats,
+      openActivationModal,
+      closeActivationModal,
+      calculateProgress,
+      formatNumber,
+      rewardCap,
+      getUsdtValue,
+      canReactivate,
+      needsApproval,
+      showActivationConditions
     };
   }
 }
@@ -148,7 +740,7 @@ export default {
   min-height: 85vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 40px 20px;
   perspective: 1000px;
   overflow: hidden;
@@ -163,17 +755,25 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
   /* padding: 0 1.5rem; */
+}
+
+.page-content > * + * {
+  margin-top: 1rem;
 }
 
 .header-section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
   margin-bottom: 1rem;
+}
+
+.header-section > * + * {
+  margin-top: 1.5rem;
 }
 
 .page-title {
@@ -211,15 +811,19 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
+}
+
+.right-section > * + * {
+  margin-top: 1rem;
 }
 
 .nft-showcase {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 2rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
   background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(12px);
@@ -227,38 +831,678 @@ export default {
   box-shadow: 
     0 4px 24px -1px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(192, 132, 252, 0.05);
-  border-radius: 24px;
-  padding: 1rem 1rem 1rem 1.5rem;
+  border-radius: 20px;
+  padding: 1rem 1.5rem; /* Reduced vertical padding */
   position: relative;
   overflow: hidden;
-  /* Tilt effect for the container */
-  transform: perspective(1000px) rotateY(-2deg);
+  /* Tilt effect removed for mobile */
+  /* transform: perspective(1000px) rotateY(-2deg); */
   transition: transform 0.3s ease;
 }
 
-.nft-showcase:hover {
-  transform: perspective(1000px) rotateY(0deg);
+.nft-showcase > * + * {
+  margin-left: 1.5rem;
 }
 
-/* Remove old sections styles */
-/* .nft-section-1 { ... } */
-/* .nft-section-2 { ... } */
+/* Hover effect only for PC via media query, removing default hover to fix mobile click issue */
+/* .nft-showcase:hover {
+  transform: perspective(1000px) rotateY(0deg);
+} */
+
+.nft-card-wrapper {
+  flex-shrink: 0;
+}
+
+.nft-showcase-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+  flex: 1;
+}
+
+.nft-showcase-info > * + * {
+  margin-top: 0.5rem;
+}
+
+.nft-list-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
+  background: rgba(15, 23, 42, 0.4); /* Less opaque */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(192, 132, 252, 0.1);
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.nft-list-section > * + * {
+  margin-top: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nft-tips-section {
+  display: flex;
+  flex-direction: column;
+  /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
+  padding: 12px;
+  background: rgba(234, 179, 8, 0.05);
+  border: 1px solid rgba(234, 179, 8, 0.1);
+  border-radius: 8px;
+  /* margin-bottom: 1rem; */
+}
+
+.nft-tips-section > * + * {
+  margin-top: 8px;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  /* gap: 10px; Replaced with margin for iOS < 14.5 compatibility */
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  text-align: left;
+  line-height: normal;
+}
+
+.tip-item > * + * {
+  margin-left: 10px;
+}
+
+.tip-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: var(--font-code);
+  margin-top: 2px;
+}
+
+.section-header h3 {
+  font-family: var(--font-code);
+  font-size: 1.2rem;
+  color: #fff;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.harvest-all-btn {
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  font-family: var(--font-code);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap; /* Prevent line breaks */
+  min-width: 100px; /* Reduced from 120px */
+  text-align: center;
+  line-height: normal;
+}
+
+.harvest-all-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.harvest-all-btn:disabled {
+  background: rgba(139, 92, 246, 0.3);
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.7;
+  color: #fff;
+  box-shadow: none;
+}
+
+/* Specific style for when it is "How to Activate" */
+.harvest-all-btn.activate-mode {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: none;
+}
+
+.harvest-all-btn.activate-mode:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Grid Layout Styles */
+.nft-grid-container {
+  width: 100%;
+}
+
+.nft-grid-list {
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.nft-grid-list > * + * {
+  margin-top: 0.5rem;
+}
+
+.grid-header {
+  display: grid;
+  grid-template-columns: 0.8fr 3fr 1.2fr;
+  padding: 0 1rem 0.6rem;
+  color: var(--text-secondary);
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.grid-item {
+  display: grid;
+  grid-template-columns: 0.8fr 3fr 1.2fr;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px; /* Slightly reduced radius */
+  padding: 0.8rem 1rem; /* Compact padding */
+  align-items: center;
+  transition: all 0.2s ease;
+  min-height: 70px; /* Ensure consistent height */
+}
+
+.grid-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(192, 132, 252, 0.2);
+  transform: translateX(4px);
+}
+
+.item-progress {
+    padding-right: 1rem;
+}
+
+.rewards-section {
+  margin-bottom: 12px;
+}
+
+.rewards-title {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  font-family: var(--font-code);
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rewards-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--primary);
+}
+
+.rewards-unified-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.reward-list-item {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s;
+  line-height: normal;
+}
+
+.reward-list-item:last-child {
+  border-bottom: none;
+}
+
+.reward-list-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.reward-main {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.reward-val {
+  color: #fff;
+  font-family: var(--font-code);
+  font-weight: 600;
+  font-size: 1.1rem;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.2);
+}
+
+.reward-sym {
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.reward-sub {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-code);
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    color: var(--text-secondary);
+}
+
+.progress-info .value {
+    color: #fff;
+    font-family: var(--font-code);
+}
+
+.progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #a855f7);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.item-main {
+  display: contents; /* PC ignores this wrapper */
+}
+
+.col-id .value {
+  font-family: var(--font-code);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Removed .col-level .value */
+
+.reward-list {
+  display: flex;
+  flex-wrap: wrap;
+  /* gap: 6px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.reward-list > * + * {
+  margin-left: 6px;
+}
+
+.reward-tag {
+  display: inline-flex;
+  align-items: center;
+  /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reward-tag > * + * {
+  margin-left: 4px;
+}
+
+.reward-tag .amount {
+  color: #fff;
+  font-family: var(--font-code);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.reward-tag .symbol {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.mobile-label {
+  display: none; /* Hidden on PC */
+}
+
+.action-btn {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: var(--font-code);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  text-align: center;
+  height: 32px; /* Fixed height to match badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reactivate-btn {
+  /* Default (cannot activate): White border similar to activate-mode */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: none;
+  height: 32px; /* Explicit height */
+}
+
+.reactivate-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.reactivate-btn.can-activate {
+  /* Can activate: Green border */
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  color: #4ade80;
+}
+
+.reactivate-btn.can-activate:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* gap: 6px; Replaced with margin for iOS < 14.5 compatibility */
+  padding: 6px 10px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 6px; /* Match button radius */
+  font-size: 0.8rem;
+  color: #4ade80;
+  font-weight: 600; /* Match button weight */
+  font-family: var(--font-code); /* Match button font */
+  width: 100%; /* Match button width */
+  text-transform: uppercase;
+  height: 32px; /* Fixed height to match button */
+}
+
+.status-badge > * + * {
+  margin-left: 6px;
+}
+
+.status-badge.active .dot {
+  width: 5px;
+  height: 5px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  font-family: var(--font-code);
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .nft-list-section {
+    padding: 0.8rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: flex;
+    /* gap: 10px; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .header-actions > * + * {
+    margin-left: 10px;
+  }
+
+  .harvest-all-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 8px;
+    font-size: 0.8rem;
+  }
+
+  /* When only one button exists (activation hidden), keep it half-width and right-aligned */
+  .harvest-all-btn:only-child {
+    flex: 0 0 calc(50% - 5px);
+    margin-left: auto;
+  }
+  
+  .grid-header {
+    display: none; /* Hide header on mobile */
+  }
+  
+  .nft-grid-list {
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .nft-grid-list > * + * {
+    margin-top: 0.5rem;
+  }
+
+  .grid-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+    padding: 0.8rem 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    min-height: 50px;
+    justify-content: space-between;
+  }
+
+  .grid-item > * + * {
+    margin-left: 0.5rem; /* Or margin-top depending on wrap */
+  }
+  
+  .grid-item:hover {
+    transform: none;
+  }
+  
+  .item-main {
+    display: contents;
+  }
+  
+  .col-id {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+  }
+  
+  .col-id .value {
+    font-size: 0.9rem;
+  }
+
+  /* Removed .col-level styles */
+  
+  .item-progress {
+    width: 100%;
+    order: 3; /* Move to bottom on mobile */
+    padding-right: 0;
+    margin-top: 0.5rem;
+  }
+
+  .reward-list-item {
+    /* flex-direction: column; */
+    /* align-items: flex-start; */
+    /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .reward-list-item > * + * {
+    margin-left: 4px;
+  }
+  
+  .reward-val {
+    font-size: 1rem;
+  }
+  
+  .reward-sub {
+    font-size: 0.7rem;
+  }
+
+  .mobile-label {
+    display: none; 
+  }
+  
+  .item-rewards {
+    flex: 1;
+    min-width: 0; /* Allow flex shrinking */
+    overflow-x: auto; /* Scroll if needed */
+    white-space: nowrap;
+    padding: 0 0.5rem;
+    display: flex;
+    align-items: center;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .item-rewards::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .reward-list {
+    display: flex;
+    flex-wrap: nowrap;
+    /* gap: 6px; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .reward-list > * + * {
+    margin-left: 6px;
+  }
+
+  .reward-tag {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    background: rgba(0,0,0,0.3);
+    white-space: nowrap;
+  }
+  
+  .reward-tag .amount {
+    font-size: 0.8rem;
+  }
+  
+  .item-status {
+    flex: 0 0 auto;
+    width: auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    width: auto;
+    min-width: unset;
+    white-space: nowrap;
+  }
+  
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    width: auto;
+    min-width: unset;
+  }
+}
+
 
 .coming-soon-section {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   opacity: 0.8;
+}
+
+.coming-soon-section > * + * {
+  margin-top: 1.5rem;
 }
 
 .divider {
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
   opacity: 0.3;
+}
+
+.divider > * + * {
+  margin-left: 1rem;
 }
 
 .line {
@@ -271,9 +1515,6 @@ export default {
   color: var(--primary);
   font-size: 0.8rem;
 }
-
-/* Remove unused styles */
-/* .nft-section-2 { ... } */
 
 .background-animation {
   position: absolute;
@@ -321,32 +1562,24 @@ export default {
     }
 }
 
-.nft-showcase {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  z-index: 1;
-}
-
 .showcase-header {
   font-family: var(--font-code);
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #fff;
-  text-align: center;
-  margin-bottom: 1rem;
+  text-align: left;
+  margin-bottom: 0.2rem;
   text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
   letter-spacing: 1px;
-  padding: 0.5rem 1.5rem;
-  border-bottom: 1px solid rgba(192, 132, 252, 0.2);
-  width: 100%;
+  padding: 0;
+  border-bottom: none;
+  width: auto;
 }
 
 .nft-card-container {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: 140px; /* Increased size for mobile from 100px */
+  height: 140px;
   perspective: 1500px;
 }
 
@@ -356,54 +1589,43 @@ export default {
   position: relative;
   transform-style: preserve-3d;
   animation: float-rotate 6s ease-in-out infinite;
-  border-radius: 20px;
+  border-radius: 12px;
 }
 
 .nft-image {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Ensure full image is visible */
-  border-radius: 20px;
-  /* White glow effect */
+  object-fit: contain;
+  border-radius: 12px;
   filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
   transition: all 0.3s ease;
 }
 
-.nft-balance-badge {
-  position: absolute;
-  left: 50%;
-  width: auto;
-  min-width: 90px;
-  transform: translateX(-50%) translateZ(30px);
-  z-index: 10;
-  bottom: -40px;
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(192, 132, 252, 0.3);
-  border-radius: 12px;
-  padding: 6px 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  
+.nft-balance-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  align-items: flex-start;
+  /* gap: 2px; Replaced with margin for iOS < 14.5 compatibility */
 }
 
-.nft-balance-badge .balance-label {
+.nft-balance-info > * + * {
+  margin-top: 2px;
+}
+
+.nft-balance-info .balance-label {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.nft-balance-badge .balance-value {
+.nft-balance-info .balance-value {
   color: #fff;
   font-family: var(--font-code);
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
-  line-height: 1;
+  line-height: 1.1;
 }
 
 /* Enhancing the glow on hover or via animation */
@@ -476,18 +1698,6 @@ h1 {
 
 /* Removed pulse animation to make it more formal */
 
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  backdrop-filter: blur(5px);
-}
 
 .dot {
   width: 8px;
@@ -501,13 +1711,13 @@ h1 {
 /* Animations */
 @keyframes float-rotate {
   0% {
-    transform: translateY(0) rotateY(-15deg) rotateX(5deg);
+    transform: rotateY(-15deg);
   }
   50% {
-    transform: translateY(-20px) rotateY(15deg) rotateX(-5deg);
+    transform: rotateY(15deg);
   }
   100% {
-    transform: translateY(0) rotateY(-15deg) rotateX(5deg);
+    transform: rotateY(-15deg);
   }
 }
 
@@ -523,16 +1733,12 @@ h1 {
 }
 
 @keyframes shadow-scale {
-  0% {
+  0%, 100% {
     transform: translateX(-50%) scale(1);
     opacity: 0.6;
   }
   50% {
-    transform: translateX(-50%) scale(0.8);
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateX(-50%) scale(1);
+    transform: translateX(-50%) scale(1); /* No scaling */
     opacity: 0.6;
   }
 }
@@ -599,6 +1805,20 @@ h1 {
   .nft-showcase {
     padding: 4rem 3rem; /* More padding inside card */
     transform: perspective(1000px) rotateY(-5deg); /* Stronger tilt initially */
+    gap: 3rem;
+  }
+  
+  .showcase-header {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .nft-balance-info .balance-value {
+    font-size: 2.5rem;
+  }
+  
+  .nft-balance-info .balance-label {
+    font-size: 0.9rem;
   }
   
   .nft-showcase:hover {
@@ -631,5 +1851,254 @@ h1 {
     flex: 1;
     margin: 0 2rem;
   }
+}
+
+/* Activation Modal Styles - Matching Team View Modal */
+.modal-overlay {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.activation-modal {
+  width: 90%;
+  max-width: 400px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  /* gap: 20px; Replaced with margin for iOS < 14.5 compatibility */
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.activation-modal > * + * {
+  margin-top: 20px;
+}
+
+.modal-header {
+  padding: 0;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-code);
+  font-size: 1.2rem;
+  text-align: left;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+  width: 100%;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.modal-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  /* gap: 20px; Replaced with margin for iOS < 14.5 compatibility */
+  align-items: flex-start;
+  text-align: left;
+}
+
+.modal-body > * + * {
+  margin-top: 20px;
+}
+
+.activation-tip {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+  line-height: normal;
+}
+
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
+  width: 100%;
+}
+
+.progress-item > * + * {
+  margin-top: 8px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-family: var(--font-code);
+  width: 100%;
+}
+
+.progress-values {
+  color: #fff;
+}
+
+.progress-values .current {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
+}
+
+.modal-footer {
+  padding: 0;
+  border-top: none;
+  display: flex;
+  /* gap: 12px; Replaced with margin for iOS < 14.5 compatibility */
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.modal-footer > * + * {
+  margin-left: 12px;
+}
+
+.confirm-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  line-height: normal;
+  background: var(--primary);
+  color: #000;
+  font-family: var(--font-code);
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.confirm-btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 15px rgba(192, 132, 252, 0.4);
+  transform: none;
+}
+
+.modal-overlay {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  /* Inherits from activation-modal but keep for transition target */
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.reactivate-wrapper {
+    display: flex;
+    align-items: center;
+    /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.reactivate-wrapper > * + * {
+    margin-left: 8px;
+}
+
+.reactivate-wrapper .action-btn {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.status-badge.inactive {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #ffffff;
+  width: auto;
+  white-space: nowrap;
+  min-width: unset;
+  padding: 6px 10px; /* Match button padding */
+  height: 32px; /* Fixed height */
+}
+
+.status-badge.inactive .dot {
+    width: 6px;
+    height: 6px;
+    background: #94a3b8;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+    .reactivate-wrapper {
+        justify-content: space-between;
+        width: 100%;
+    }
 }
 </style>

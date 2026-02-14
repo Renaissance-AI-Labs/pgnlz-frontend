@@ -11,8 +11,9 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     legacy({
-      targets: ['defaults', 'not IE 11', 'Android >= 7'],
-      additionalLegacyPolyfills: ['regenerator-runtime/runtime']
+      targets: ['defaults', 'not IE 11', 'Android >= 7', 'iOS >= 11'],
+      additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+      modernPolyfills: true
     })
   ],
   resolve: {
@@ -21,6 +22,13 @@ export default defineConfig({
     },
   },
   build: {
-    target: 'es2015'
+    target: ['es2015', 'ios11'],
+    cssTarget: 'chrome61', // Prevent modern CSS that might break older browsers
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: ['PROD'].includes(process.env.APP_ENV),
+      },
+    },
   }
 })

@@ -22,3 +22,8 @@ export const APP_ENV = getAppEnv();
  * Disable console logs in production
  */
 export const DISABLE_CONSOLE_IN_PROD = true;
+
+/**
+ * Toggle for showing activation conditions (buttons and modal) in NFT view
+ */
+export const SHOW_ACTIVATION_CONDITIONS = false;

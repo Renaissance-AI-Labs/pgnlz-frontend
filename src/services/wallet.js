@@ -10,7 +10,7 @@ import { showToast } from './notification';
 import { t } from '../i18n';
 
 // --- BSC Network Configurations ---
-const networks = {
+export const networks = {
   bscMainnet: {
     chainId: '0x38', // 56
     chainName: 'Binance Smart Chain',
