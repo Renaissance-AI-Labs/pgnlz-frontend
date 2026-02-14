@@ -47,6 +47,7 @@
           </div>
             <div class="header-actions">
                 <button 
+                  v-if="showActivationConditions"
                   class="harvest-all-btn activate-mode"
                   @click="openActivationModal"
                 >
@@ -119,6 +120,7 @@
                  <div class="item-status col-status">
                     <div v-if="nft.needsReactivation" class="reactivate-wrapper">
                       <button 
+                        v-if="showActivationConditions"
                         @click="handleReactivate(nft.id)" 
                         class="action-btn reactivate-btn"
                         :class="{ 'can-activate': canReactivate }"
@@ -132,7 +134,7 @@
                       </div>
                     </div>
                     <div v-else class="status-badge active">
-                      <span class="dot"></span>
+                      <span class="dot" style="margin-right: 4px;"></span>
                       {{ t('nft.active') }}
                     </div>
                  </div>
@@ -216,6 +218,7 @@ import nodePoolAbi from '@/abis/nodePool.json';
 import stakingAbi from '@/abis/staking.json';
 import ConnectWalletModal from '@/components/ConnectWalletModal.vue';
 import { t } from '@/i18n/index.js';
+import { SHOW_ACTIVATION_CONDITIONS } from '@/services/environment.js';
 
 const ERC20_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
@@ -242,6 +245,7 @@ export default {
     const rewardCap = ref(0);
     const canReactivate = ref(false);
     const pgnlzPrice = ref(0);
+    const showActivationConditions = SHOW_ACTIVATION_CONDITIONS;
     
     const needsApproval = computed(() => {
         try {
@@ -724,7 +728,8 @@ export default {
       rewardCap,
       getUsdtValue,
       canReactivate,
-      needsApproval
+      needsApproval,
+      showActivationConditions
     };
   }
 }
