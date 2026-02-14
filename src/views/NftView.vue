@@ -129,7 +129,7 @@
                         {{ canReactivate ? (needsApproval ? t('nft.reactivateNeedApprove') : t('nft.reactivateWithAmount')) : t('nft.activationConditionsNotMetShort') }}
                       </button>
                       <div class="status-badge inactive">
-                        <span class="dot"></span>
+                        <span class="dot" style="margin-right: 4px;"></span>
                         {{ t('nft.notEffective') }}
                       </div>
                     </div>
@@ -1333,6 +1333,12 @@ export default {
     min-width: 0;
     padding: 8px 8px;
     font-size: 0.8rem;
+  }
+
+  /* When only one button exists (activation hidden), keep it half-width and right-aligned */
+  .harvest-all-btn:only-child {
+    flex: 0 0 calc(50% - 5px);
+    margin-left: auto;
   }
   
   .grid-header {
