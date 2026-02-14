@@ -26,4 +26,4 @@ export const DISABLE_CONSOLE_IN_PROD = true;
 /**
  * Toggle for showing activation conditions (buttons and modal) in NFT view
  */
-export const SHOW_ACTIVATION_CONDITIONS = true;
+export const SHOW_ACTIVATION_CONDITIONS = false;
