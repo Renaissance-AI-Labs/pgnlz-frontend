@@ -117,8 +117,12 @@ export default {
     color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     text-decoration: none;
+}
+
+.brand-logo > * + * {
+    margin-left: 0.5rem;
 }
 
 .logo-img {
@@ -140,14 +144,22 @@ export default {
 
 .nav-menu {
     display: flex;
-    gap: 2rem;
+    /* gap: 2rem; Replaced with margin for iOS < 14.5 compatibility */
     align-items: center;
+}
+
+.nav-menu > * + * {
+    margin-left: 2rem;
 }
 
 .nav-controls {
     display: flex;
-    gap: 1rem;
+    /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
     align-items: center;
+}
+
+.nav-controls > * + * {
+    margin-left: 1rem;
 }
 
 .lang-toggle {
@@ -174,11 +186,15 @@ export default {
 .connect-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     height: 38px;
     padding: 0 1rem;
     font-size: 0.85rem;
     transition: all var(--transition);
+}
+
+.connect-btn > * + * {
+    margin-left: 0.5rem;
 }
 
 .connect-btn.gradient-border {

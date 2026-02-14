@@ -522,6 +522,9 @@ const harvest = async (id) => {
         fetchCounts(); // Update counts
     } catch (e) {
         console.error(e);
+        if (e.code === 4001 || e.code === 'ACTION_REJECTED' || (e.info && e.info.error && e.info.error.code === 4001)) {
+             return;
+        }
         showToast(t('orders.error'), 'error');
     } finally {
         processing.value = false;
@@ -611,13 +614,17 @@ watch(() => walletState.isConnected, (newVal) => {
 
 .tabs {
     display: flex;
-    gap: 0rem;
+    /* gap: 0rem; Replaced with margin for iOS < 14.5 compatibility */
     margin-bottom: 1.5rem;
     background: rgba(255,255,255,0.05);
     padding: 0.3rem;
     border-radius: 10px;
     flex-wrap: wrap;
     justify-content: center;
+}
+
+.tabs > * + * {
+    margin-left: 0rem;
 }
 
 .tab-btn {
@@ -632,7 +639,11 @@ watch(() => walletState.isConnected, (newVal) => {
     line-height: normal;
     display: flex;
     align-items: center;
-    gap: 4px;
+    /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.tab-btn > * + * {
+    margin-left: 4px;
 }
 
 .tab-btn.active {
@@ -655,7 +666,11 @@ watch(() => walletState.isConnected, (newVal) => {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.orders-list > * + * {
+    margin-top: 1rem;
 }
 
 .empty-state {
@@ -668,8 +683,12 @@ watch(() => walletState.isConnected, (newVal) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     color: var(--text-secondary);
+}
+
+.loading-state > * + * {
+    margin-left: 0.5rem;
 }
 
 .order-card {
@@ -679,9 +698,13 @@ watch(() => walletState.isConnected, (newVal) => {
     padding: 0.8rem 1rem;
     display: flex;
     flex-direction: column;
-    /* gap: 0.8rem; */
+    /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
     transition: all 0.2s ease;
     margin-bottom: 8px;
+}
+
+.order-card > * + * {
+    margin-top: 0.8rem;
 }
 
 .order-card:hover {
@@ -701,7 +724,15 @@ watch(() => walletState.isConnected, (newVal) => {
 .header-left, .header-right {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    /* gap: 0.6rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.header-left > * + * {
+    margin-left: 0.6rem;
+}
+
+.header-right > * + * {
+    margin-left: 0.6rem;
 }
 
 .order-id {
@@ -795,17 +826,25 @@ watch(() => walletState.isConnected, (newVal) => {
 .stats-grid-compact {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     background: rgba(0,0,0,0.2);
     padding: 0.6rem;
     border-radius: 8px;
+}
+
+.stats-grid-compact > * {
+    margin: 3px; /* Fallback for gap */
 }
 
 .stat-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.1rem;
+    /* gap: 0.1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.stat-item > * + * {
+    margin-top: 0.1rem;
 }
 
 .stat-item .label {
@@ -837,8 +876,12 @@ watch(() => walletState.isConnected, (newVal) => {
 .progress-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
     padding: 0.6rem 0.2rem;
+}
+
+.progress-container > * + * {
+    margin-top: 1rem;
 }
 
 .progress-row {
@@ -896,8 +939,12 @@ watch(() => walletState.isConnected, (newVal) => {
 /* Actions Compact */
 .actions-compact {
     display: flex;
-    gap: 0.6rem;
+    /* gap: 0.6rem; Replaced with margin for iOS < 14.5 compatibility */
     margin-top: 8px;
+}
+
+.actions-compact > * + * {
+    margin-left: 0.6rem;
 }
 
 .btn-icon {
@@ -905,7 +952,7 @@ watch(() => walletState.isConnected, (newVal) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    /* gap: 0.4rem; Replaced with margin for iOS < 14.5 compatibility */
     padding: 0.5rem;
     border-radius: 8px;
     border: none;
@@ -913,6 +960,10 @@ watch(() => walletState.isConnected, (newVal) => {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+}
+
+.btn-icon > * + * {
+    margin-left: 0.4rem;
 }
 
 .btn-harvest {
@@ -959,18 +1010,26 @@ watch(() => walletState.isConnected, (newVal) => {
 .queued-details {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     background: rgba(245, 158, 11, 0.05);
     padding: .6rem .6rem 0.2rem .6rem;
     border-radius: 8px;
     border: 1px dashed rgba(245, 158, 11, 0.2);
 }
 
+.queued-details > * {
+    margin: 3px; /* Fallback */
+}
+
 .detail-row {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.2rem;
+    /* gap: 0.2rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.detail-row > * + * {
+    margin-top: 0.2rem;
 }
 
 .detail-row .label {
@@ -992,10 +1051,14 @@ watch(() => walletState.isConnected, (newVal) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     width: fit-content;
     margin: 0 auto;
     line-height: normal;
+}
+
+.load-more-btn > * + * {
+    margin-left: 0.5rem;
 }
 
 .load-more-btn:hover {
@@ -1056,8 +1119,12 @@ watch(() => walletState.isConnected, (newVal) => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-content > * + * {
+    margin-top: 1.5rem;
 }
 
 .modal-title {
@@ -1076,7 +1143,11 @@ watch(() => walletState.isConnected, (newVal) => {
 .modal-actions {
     display: flex;
     width: 100%;
-    gap: 1rem;
+    /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.modal-actions > * + * {
+    margin-left: 1rem;
 }
 
 .modal-actions .btn {

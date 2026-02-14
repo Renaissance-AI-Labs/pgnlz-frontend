@@ -132,7 +132,11 @@ export default {
 .language-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.language-list > * + * {
+  margin-top: 0.5rem;
 }
 
 .lang-option {
@@ -160,7 +164,11 @@ export default {
 .lang-info {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.lang-info > * + * {
+    margin-left: 0.8rem;
 }
 
 .lang-flag {

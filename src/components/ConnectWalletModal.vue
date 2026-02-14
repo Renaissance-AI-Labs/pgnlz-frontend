@@ -56,7 +56,7 @@
           </div>
           
           <button @click.prevent="handleDisconnect" class="disconnect-btn">
-              <i class="fas fa-sign-out-alt"></i>
+              <!-- <i class="fas fa-sign-out-alt"></i> -->
               {{ t('wallet.disconnect') || 'Disconnect' }}
           </button>
         </div>
@@ -206,7 +206,11 @@ export default {
 .wallet-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    /* gap: 12px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.wallet-list > * + * {
+    margin-top: 12px;
 }
 
 .wallet-option-btn {
@@ -231,7 +235,11 @@ export default {
 .wallet-info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    /* gap: 12px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.wallet-info > * + * {
+    margin-left: 12px;
 }
 
 .wallet-icon {
@@ -264,7 +272,11 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.no-wallet-view > * + * {
+    margin-top: 1rem;
 }
 
 .no-wallet-view i {
@@ -288,12 +300,16 @@ export default {
 .status-indicator {
     display: flex;
     align-items: center;
-    gap: 8px;
+    /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
     background: rgba(0,0,0,0.2);
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+.status-indicator > * + * {
+    margin-left: 8px;
 }
 
 .status-dot {
@@ -357,7 +373,11 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.disconnect-btn > * + * {
+  margin-left: 0.5rem;
 }
 
 .disconnect-btn:hover {

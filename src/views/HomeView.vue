@@ -285,7 +285,11 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.hero-greeting > * + * {
+    margin-left: 0.5rem;
 }
 
 /* Responsive adjustments */
@@ -389,9 +393,13 @@ export default {
 
 .hero-buttons {
     display: flex;
-    gap: 2rem;
+    /* gap: 2rem; Replaced with margin for iOS < 14.5 compatibility */
     margin-bottom: 3rem;
     flex-wrap: wrap;
+}
+
+.hero-buttons > * + * {
+    margin-left: 2rem;
 }
 
 .hero-image-wrapper {

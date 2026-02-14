@@ -214,7 +214,11 @@ watch(() => walletState.isConnected, () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.8rem;
+  /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.lp-card > * + * {
+  margin-top: 0.8rem;
 }
 
 .connect-hint {
@@ -227,7 +231,11 @@ watch(() => walletState.isConnected, () => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.lp-content > * + * {
+  margin-top: 0.8rem;
 }
 
 .info-grid {
@@ -243,14 +251,23 @@ watch(() => walletState.isConnected, () => {
     padding: 0.6rem 0.8rem;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    /* gap: 0.2rem; Replaced with margin for iOS < 14.5 compatibility */
     border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.info-item > * + * {
+    margin-top: 0.2rem;
 }
 
 .info-item.row-layout {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+.info-item.row-layout > * + * {
+    margin-top: 0;
+    margin-left: 0.2rem; /* Assuming gap was horizontal in row layout */
 }
 
 .label {
@@ -276,7 +293,11 @@ watch(() => walletState.isConnected, () => {
 .value-group {
     display: flex;
     align-items: baseline;
-    gap: 0.2rem;
+    /* gap: 0.2rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.value-group > * + * {
+    margin-left: 0.2rem;
 }
 
 .value {
@@ -300,12 +321,16 @@ watch(() => walletState.isConnected, () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
   background: linear-gradient(135deg, #368f9a 0%, #6ba9fa 100%);
   border: none;
   color: #fff;
   box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
   transition: all 0.3s ease;
+}
+
+.action-btn > * + * {
+  margin-left: 0.5rem;
 }
 
 .action-btn:hover:not(:disabled) {

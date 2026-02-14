@@ -750,17 +750,25 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
   /* padding: 0 1.5rem; */
+}
+
+.page-content > * + * {
+  margin-top: 1rem;
 }
 
 .header-section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
   margin-bottom: 1rem;
+}
+
+.header-section > * + * {
+  margin-top: 1.5rem;
 }
 
 .page-title {
@@ -798,15 +806,19 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
+}
+
+.right-section > * + * {
+  margin-top: 1rem;
 }
 
 .nft-showcase {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
   background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(12px);
@@ -823,6 +835,10 @@ export default {
   transition: transform 0.3s ease;
 }
 
+.nft-showcase > * + * {
+  margin-left: 1.5rem;
+}
+
 /* Hover effect only for PC via media query, removing default hover to fix mobile click issue */
 /* .nft-showcase:hover {
   transform: perspective(1000px) rotateY(0deg);
@@ -837,15 +853,19 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 0.5rem;
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
   flex: 1;
+}
+
+.nft-showcase-info > * + * {
+  margin-top: 0.5rem;
 }
 
 .nft-list-section {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   background: rgba(15, 23, 42, 0.4); /* Less opaque */
   backdrop-filter: blur(12px);
   border: 1px solid rgba(192, 132, 252, 0.1);
@@ -853,6 +873,10 @@ export default {
   border-radius: 20px;
   padding: 1.5rem;
   margin-top: 1rem;
+}
+
+.nft-list-section > * + * {
+  margin-top: 1.5rem;
 }
 
 .section-header {
@@ -866,7 +890,7 @@ export default {
 .nft-tips-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
   padding: 12px;
   background: rgba(234, 179, 8, 0.05);
   border: 1px solid rgba(234, 179, 8, 0.1);
@@ -874,15 +898,23 @@ export default {
   /* margin-bottom: 1rem; */
 }
 
+.nft-tips-section > * + * {
+  margin-top: 8px;
+}
+
 .tip-item {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  /* gap: 10px; Replaced with margin for iOS < 14.5 compatibility */
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.4;
   text-align: left;
   line-height: normal;
+}
+
+.tip-item > * + * {
+  margin-left: 10px;
 }
 
 .tip-icon {
@@ -972,7 +1004,11 @@ export default {
 .nft-grid-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* Reduced gap for PC as well */
+  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.nft-grid-list > * + * {
+  margin-top: 0.5rem;
 }
 
 .grid-header {
@@ -1135,17 +1171,25 @@ export default {
 .reward-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  /* gap: 6px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.reward-list > * + * {
+  margin-left: 6px;
 }
 
 .reward-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
   background: rgba(0, 0, 0, 0.2);
   padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reward-tag > * + * {
+  margin-left: 4px;
 }
 
 .reward-tag .amount {
@@ -1214,7 +1258,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  /* gap: 6px; Replaced with margin for iOS < 14.5 compatibility */
   padding: 6px 10px;
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.2);
@@ -1226,6 +1270,10 @@ export default {
   width: 100%; /* Match button width */
   text-transform: uppercase;
   height: 32px; /* Fixed height to match button */
+}
+
+.status-badge > * + * {
+  margin-left: 6px;
 }
 
 .status-badge.active .dot {
@@ -1268,7 +1316,11 @@ export default {
   .header-actions {
     width: 100%;
     display: flex;
-    gap: 10px;
+    /* gap: 10px; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .header-actions > * + * {
+    margin-left: 10px;
   }
 
   .harvest-all-btn {
@@ -1283,18 +1335,26 @@ export default {
   }
   
   .nft-grid-list {
-    gap: 0.5rem;
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .nft-grid-list > * + * {
+    margin-top: 0.5rem;
   }
 
   .grid-item {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    /* gap: 0.5rem; */
+    /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
     padding: 0.8rem 0.5rem;
     background: rgba(255, 255, 255, 0.04);
     min-height: 50px;
     justify-content: space-between;
+  }
+
+  .grid-item > * + * {
+    margin-left: 0.5rem; /* Or margin-top depending on wrap */
   }
   
   .grid-item:hover {
@@ -1327,7 +1387,11 @@ export default {
   .reward-list-item {
     /* flex-direction: column; */
     /* align-items: flex-start; */
-    gap: 4px;
+    /* gap: 4px; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .reward-list-item > * + * {
+    margin-left: 4px;
   }
   
   .reward-val {
@@ -1362,7 +1426,11 @@ export default {
   .reward-list {
     display: flex;
     flex-wrap: nowrap;
-    gap: 6px;
+    /* gap: 6px; Replaced with margin for iOS < 14.5 compatibility */
+  }
+
+  .reward-list > * + * {
+    margin-left: 6px;
   }
 
   .reward-tag {
@@ -1406,16 +1474,24 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  /* gap: 1.5rem; Replaced with margin for iOS < 14.5 compatibility */
   opacity: 0.8;
+}
+
+.coming-soon-section > * + * {
+  margin-top: 1.5rem;
 }
 
 .divider {
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 1rem;
+  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
   opacity: 0.3;
+}
+
+.divider > * + * {
+  margin-left: 1rem;
 }
 
 .line {
@@ -1518,7 +1594,11 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  /* gap: 2px; Replaced with margin for iOS < 14.5 compatibility */
+}
+
+.nft-balance-info > * + * {
+  margin-top: 2px;
 }
 
 .nft-balance-info .balance-label {
@@ -1788,10 +1868,14 @@ h1 {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  /* gap: 20px; Replaced with margin for iOS < 14.5 compatibility */
   transform: translateY(0);
   transition: all 0.3s ease;
   overflow: hidden;
+}
+
+.activation-modal > * + * {
+  margin-top: 20px;
 }
 
 .modal-header {
@@ -1829,9 +1913,13 @@ h1 {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  /* gap: 20px; Replaced with margin for iOS < 14.5 compatibility */
   align-items: flex-start;
   text-align: left;
+}
+
+.modal-body > * + * {
+  margin-top: 20px;
 }
 
 .activation-tip {
@@ -1850,8 +1938,12 @@ h1 {
 .progress-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
   width: 100%;
+}
+
+.progress-item > * + * {
+  margin-top: 8px;
 }
 
 .progress-label {
@@ -1893,9 +1985,13 @@ h1 {
   padding: 0;
   border-top: none;
   display: flex;
-  gap: 12px;
+  /* gap: 12px; Replaced with margin for iOS < 14.5 compatibility */
   justify-content: space-between;
   margin-top: 10px;
+}
+
+.modal-footer > * + * {
+  margin-left: 12px;
 }
 
 .confirm-btn {
@@ -1955,9 +2051,13 @@ h1 {
 .reactivate-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
+    /* gap: 8px; Replaced with margin for iOS < 14.5 compatibility */
     justify-content: flex-end;
     width: 100%;
+}
+
+.reactivate-wrapper > * + * {
+    margin-left: 8px;
 }
 
 .reactivate-wrapper .action-btn {
