@@ -27,7 +27,7 @@
                         © 2026 PGNLZ MAX. ALL RIGHTS RESERVED.
                     </div>
                     <div class="version-badge">
-                        <span class="ver-label">{{ envLabel }}-1.1.0</span>
+                        <span class="ver-label">{{ envLabel }}-1.1.1</span>
                     </div>
                 </div>
             </div>

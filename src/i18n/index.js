@@ -162,7 +162,7 @@ const languagePacks = {
     'nft.tips.claim': 'Please claim your NFT rewards in time. Rewards overflowing after the progress bar is full cannot be retrieved.',
     'nft.tips.inactive': 'After the reward progress bar is full, the NFT will become inactive, and no rewards can be accumulated at this time.',
     'nft.tips.activate': 'Activating the NFT will automatically claim its rewards and reset the reward progress bar.',
-    'nft.tips.combined': 'After reaching the reward cap, the NFT will stop accumulating rewards. The excess part and the output during the inactive period cannot be claimed. It is recommended to activate immediately after reaching the cap.',
+    'nft.tips.combined': 'After reaching the reward cap, the NFT will stop accumulating rewards. The excess part and the output during the inactive period cannot be claimed. It is recommended to activate immediately after reaching the cap. Activation costs 500 USDT.',
     'nft.pendingRewardsTitle': 'PENDING REWARDS',
 
     // Team / Friend Page
@@ -350,7 +350,7 @@ const languagePacks = {
      'nft.tips.claim': '请及时领取您的 NFT 收益，收益进度条满后的溢出收益将无法获取',
      'nft.tips.inactive': '收益进度条满后 NFT 将转为未激活状态，此时无法累计任何收益',
      'nft.tips.activate': '激活 NFT 行为将会自动领取该 NFT 的收益并重置收益进度条',
-     'nft.tips.combined': '到收益上限后，NFT 将停止为用户累积收益。超出部分及未激活期间的产出将无法领取，建议到达上限后第一时间激活。',
+     'nft.tips.combined': '到收益上限后，NFT 将停止为用户累积收益。超出部分及未激活期间的产出将无法领取，建议到达上限后第一时间激活，激活需 500 USDT。',
      'nft.pendingRewardsTitle': '待领取收益',
 
      // Team / Friend Page
@@ -540,7 +540,7 @@ const languagePacks = {
      'nft.tips.claim': '請及時領取您的 NFT 收益，收益進度條滿後的溢出收益將無法獲取',
      'nft.tips.inactive': '收益進度條滿後 NFT 將轉為未激活狀態，此時無法累計任何收益',
      'nft.tips.activate': '激活 NFT 行為將會自動領取該 NFT 的收益並重置收益進度條',
-     'nft.tips.combined': '到收益上限後，NFT 將停止為用戶累積收益。超出部分及未激活期間的產出將無法領取，建議到達上限後第一時間激活。',
+     'nft.tips.combined': '到收益上限後，NFT 將停止為用戶累積收益。超出部分及未激活期間的產出將無法領取，建議到達上限後第一時間激活，激活需 500 USDT。',
      'nft.pendingRewardsTitle': '待領取收益',
 
      // Team / Friend Page
