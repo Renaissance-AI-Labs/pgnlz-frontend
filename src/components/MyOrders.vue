@@ -5,17 +5,17 @@
     <div class="tabs">
         <button 
             class="tab-btn" 
-            :class="{ active: activeTab === 0 }" 
-            @click="switchTab(0)"
-        >
-            {{ t('orders.tab.queued') }}
-        </button>
-        <button 
-            class="tab-btn" 
             :class="{ active: activeTab === 1 }" 
             @click="switchTab(1)"
         >
             {{ t('orders.tab.processing') }}
+        </button>
+        <button 
+            class="tab-btn" 
+            :class="{ active: activeTab === 0 }" 
+            @click="switchTab(0)"
+        >
+            {{ t('orders.tab.queued') }}
         </button>
         <button 
             class="tab-btn" 
@@ -204,7 +204,7 @@ import { showToast } from '@/services/notification';
 
 const props = defineProps({});
 
-const activeTab = ref(0); // 0: Queued, 1: Running, 2: Claimable, 3: Completed
+const activeTab = ref(1); // 0: Queued, 1: Running, 2: Claimable, 3: Completed
 const orders = ref([]);
 const loading = ref(false);
 const processing = ref(false);
@@ -574,7 +574,7 @@ const confirmUnstake = async () => {
 
 onMounted(() => {
     if (walletState.isConnected) {
-        fetchOrders(0, true);
+        fetchOrders(1, true);
     }
 });
 
@@ -583,7 +583,7 @@ watch(() => walletState.isConnected, (newVal) => {
         orders.value = [];
         nextCursor.value = BigInt(0);
         hasMore.value = false;
-        fetchOrders(0, true);
+        fetchOrders(1, true);
     } else {
         orders.value = [];
     }
