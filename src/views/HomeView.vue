@@ -146,10 +146,10 @@ export default {
     };
 
     onMounted(() => {
-        const hasVisited = sessionStorage.getItem('hasVisited');
-        if (!hasVisited) {
-            showModal.value = true;
-        }
+        // const hasVisited = sessionStorage.getItem('hasVisited');
+        // if (!hasVisited) {
+        //     showModal.value = true;
+        // }
 
         // Simple particle generator logic
         const particlesContainer = document.getElementById('particles');
