@@ -104,23 +104,41 @@ const waitingCount = computed(() => {
 });
 
 const formattedDailyQuota = computed(() => {
-  if (dailyQuota.value === ethers.MaxUint256) {
-    return t('dashboard.unlimited');
+  try {
+    if (dailyQuota.value === undefined || dailyQuota.value === null) return '0.0';
+    if (dailyQuota.value === ethers.MaxUint256) {
+      return t('dashboard.unlimited');
+    }
+    return ethers.formatEther(dailyQuota.value);
+  } catch (e) {
+    console.error('Error formatting daily quota:', e);
+    return '0.0';
   }
-  return ethers.formatEther(dailyQuota.value);
 });
 
 const formattedTodayUsed = computed(() => {
-  return ethers.formatEther(queueInfo.value.todayUsedQuota);
+  try {
+    if (!queueInfo.value || queueInfo.value.todayUsedQuota === undefined) return '0.0';
+    return ethers.formatEther(queueInfo.value.todayUsedQuota);
+  } catch (e) {
+    console.error('Error formatting today used:', e);
+    return '0.0';
+  }
 });
 
 const formattedRemainingQuota = computed(() => {
-  if (dailyQuota.value === ethers.MaxUint256) {
-    return t('dashboard.unlimited');
+  try {
+    if (dailyQuota.value === undefined || !queueInfo.value) return '0.0';
+    if (dailyQuota.value === ethers.MaxUint256) {
+      return t('dashboard.unlimited');
+    }
+    const remaining = dailyQuota.value - queueInfo.value.todayUsedQuota;
+    const val = remaining > BigInt(0) ? remaining : BigInt(0);
+    return ethers.formatEther(val);
+  } catch (e) {
+    console.error('Error formatting remaining quota:', e);
+    return '0.0';
   }
-  const remaining = dailyQuota.value - queueInfo.value.todayUsedQuota;
-  const val = remaining > BigInt(0) ? remaining : BigInt(0);
-  return ethers.formatEther(val);
 });
 
 const progressPercentage = computed(() => {
@@ -430,14 +448,23 @@ watch(() => walletState.isConnected, (newVal) => {
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 0.8rem;
-    gap: 0.5rem;
+    /* gap: 0.5rem; */
     margin-bottom: 1rem;
+  }
+  
+  .dashboard-container > * + * {
+    margin-top: 0.5rem;
   }
 
   .stats-wrapper {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    /* gap: 0.5rem; */
+  }
+  
+  .stats-wrapper > * {
+    flex: 1 1 30%; /* Approx 1/3 width */
+    margin: 0.25rem;
   }
 
   .stat-item {
