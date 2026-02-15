@@ -125,7 +125,13 @@ const selectAmount = (amount) => {
 };
 
 const formatAmount = (amount) => {
-    return ethers.formatEther(amount).split('.')[0];
+    try {
+        if (amount === undefined || amount === null) return '0';
+        return ethers.formatEther(amount).split('.')[0];
+    } catch (e) {
+        console.error("Error formatting amount:", e);
+        return '0';
+    }
 };
 
 const updateData = async () => {
@@ -443,11 +449,16 @@ watch(() => walletState.isConnected, () => {
 }
 
 .amount-selection {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  /* gap: 0.6rem; Replaced with margin */
   width: 100%;
   margin: 0.5rem 0;
+}
+
+.amount-selection > * {
+  margin: 0.3rem;
+  flex: 1 1 80px; /* Min width 80px, grow to fill */
 }
 
 .amount-btn {
@@ -636,11 +647,18 @@ watch(() => walletState.isConnected, () => {
   }
   
   .amount-selection {
-      grid-template-columns: repeat(3, 1fr); /* Force 3 columns on mobile */
+      /* grid-template-columns: repeat(3, 1fr);  Removed grid */
+      justify-content: center;
   }
 
-  .amount-selection.single-mode {
-      grid-template-columns: 1fr;
+  .amount-selection > * {
+      flex: 1 1 30%; /* Force 3 columns on mobile */
+      max-width: 32%;
+  }
+
+  .amount-selection.single-mode > * {
+      flex: 1 1 100%;
+      max-width: 100%;
   }
 }
 

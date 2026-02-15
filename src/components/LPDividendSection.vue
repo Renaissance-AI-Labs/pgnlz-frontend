@@ -72,14 +72,19 @@ const ERC20_ABI = [
 ];
 
 const formatAmount = (amount) => {
-    if (!amount) return '0.00';
-    // Format to 2 decimal places for compactness, or 4 if small
-    const formatted = ethers.formatEther(amount);
-    const parts = formatted.split('.');
-    if (parts.length > 1) {
-        return `${parts[0]}.${parts[1].substring(0, 2)}`;
+    try {
+        if (!amount) return '0.00';
+        // Format to 2 decimal places for compactness, or 4 if small
+        const formatted = ethers.formatEther(amount);
+        const parts = formatted.split('.');
+        if (parts.length > 1) {
+            return `${parts[0]}.${parts[1].substring(0, 2)}`;
+        }
+        return parts[0];
+    } catch (e) {
+        console.error("Error formatting LP amount:", e);
+        return '0.00';
     }
-    return parts[0];
 };
 
 const updateData = async () => {
@@ -239,10 +244,15 @@ watch(() => walletState.isConnected, () => {
 }
 
 .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    /* gap: 0.6rem; Replaced with margin */
     width: 100%;
+}
+
+.info-grid > * {
+    flex: 1 1 45%; /* Approx 50% width */
+    margin: 0.3rem;
 }
 
 .info-item {
@@ -370,7 +380,14 @@ watch(() => walletState.isConnected, () => {
   }
   
   .info-grid {
-      grid-template-columns: 1fr; /* Stack on mobile */
+      /* grid-template-columns: 1fr; Stack on mobile */
+      flex-direction: column;
+  }
+  
+  .info-grid > * {
+      flex: 1 1 100%;
+      max-width: 100%;
+      margin: 0.3rem 0;
   }
 
   .action-btn {

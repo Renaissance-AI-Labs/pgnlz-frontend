@@ -232,7 +232,7 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 20;
+    z-index: 1;
     font-family: var(--font-code);
     font-size: 8rem;
     font-weight: 800;
@@ -258,7 +258,7 @@ export default {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    z-index: 5;
+    z-index: 10;
     max-width: 800px;
 }
 
