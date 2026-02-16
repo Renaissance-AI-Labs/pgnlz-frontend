@@ -37,10 +37,9 @@
     </div>
 
     <!-- Hero Section -->
-    <section class="hero-section">
+    <!-- <section class="hero-section">
       <div class="hero-container">
         
-        <!-- Combined Visual & Title Area -->
         <div class="hero-header-visual">
           <div class="hero-image-wrapper">
             <div class="hero-image-container">
@@ -59,7 +58,6 @@
                   </div>
                 </div>
               </div>
-              <!-- Orbital System -->
               <div class="orbital-system">
                 <div class="orbit-ring ring-1">
                     <div class="orbit-object"></div>
@@ -79,36 +77,14 @@
           </h1>
         </div>
 
-        <!-- Content Below -->
         <div class="hero-content-bottom">
-          <!-- <div class="hero-greeting">
-            <span class="greeting-text">Hello, Welcome to</span>
-            <span class="greeting-cursor">|</span>
-          </div> -->
-          
           <div class="hero-title">
-            <!-- <span class="title-prefix">//</span> -->
             <span class="title-text">{{ t('home.subtitle') }}</span>
           </div>
-          
-          <!-- <p class="hero-description">
-            Passionate developers creating exceptional digital experiences with modern technologies.
-          </p> -->
-          
-          <!-- <div class="hero-buttons">
-            <a href="#contact" class="btn btn-primary">
-              <span>Get In Touch</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-            <a href="#projects" class="btn btn-secondary">
-              <span>View Projects</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-            </a>
-          </div> -->
         </div>
 
       </div>
-    </section>
+    </section> -->
 
     <!-- Global Dashboard -->
     <GlobalDashboard />
@@ -454,9 +430,6 @@ export default {
         0 0 60px rgba(192, 132, 252, 0.1);
     overflow: hidden;
     background: var(--bg-card);
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
-    transform: translateZ(0); /* Fix for Safari overflow:hidden border-radius bug */
 }
 
 .profile-image {
@@ -479,16 +452,7 @@ export default {
     background: radial-gradient(circle at 30% 30%, rgba(192, 132, 252, 0.1), transparent 60%);
 }
 
-.cyber-core-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.cyber-core {
+.tech-core {
   width: 40px;
   height: 40px;
   background: var(--primary);
@@ -499,54 +463,28 @@ export default {
   z-index: 2;
 }
 
-.cyber-ring {
-    position: absolute;
-    border-radius: 50%;
-    z-index: 1;
-}
-
-.ring-outer {
+.tech-ring-outer {
+  position: absolute;
   width: 80%;
   height: 80%;
   border: 1px solid rgba(192, 132, 252, 0.3);
   border-top: 1px solid var(--cyan);
   border-bottom: 1px solid var(--purple);
+  border-radius: 50%;
   animation: spin 8s linear infinite;
+  z-index: 1;
 }
 
-.ring-middle {
-    width: 70%;
-    height: 70%;
-    border: 1px dashed rgba(192, 132, 252, 0.2);
-    animation: spin 12s linear infinite reverse;
-}
-
-.ring-inner {
+.tech-ring-inner {
+  position: absolute;
   width: 60%;
   height: 60%;
   border: 1px solid rgba(192, 132, 252, 0.2);
   border-left: 2px solid var(--accent);
   border-right: 2px solid var(--primary);
+  border-radius: 50%;
   animation: spin 6s linear infinite reverse;
-}
-
-.core-glitch {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: white;
-    opacity: 0;
-    animation: glitch 3s infinite;
-}
-
-@keyframes glitch {
-    0% { opacity: 0; }
-    98% { opacity: 0; }
-    99% { opacity: 0.5; transform: scale(1.2); }
-    100% { opacity: 0; transform: scale(1); }
+  z-index: 1;
 }
 
 @keyframes spin {
