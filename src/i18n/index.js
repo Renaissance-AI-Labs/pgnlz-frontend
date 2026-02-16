@@ -32,10 +32,10 @@ const languagePacks = {
     
     // Dashboard
     'dashboard.dailyQuota': 'Daily Mint Quota(U)',
-    'dashboard.todayUsed': 'Today\'s Used Quota(U)',
-    'dashboard.queueCount': 'Remaining Quota Today(U)',
+    'dashboard.todayUsed': 'Today\'s Processed Quota(U)',
+    'dashboard.queueCount': 'Today\'s Pending Quota(U)',
     'dashboard.queueRange': 'Current Queue Head/Tail',
-        'dashboard.progress': 'Today\'s Quota Progress',
+        'dashboard.progress': 'Today\'s Quota Processing Progress',
     'dashboard.queueProgress': 'Global Queue Progress',
     'dashboard.processed': 'Processed',
     'dashboard.totalQueued': 'Total',
@@ -225,10 +225,10 @@ const languagePacks = {
 
      // Dashboard
     'dashboard.dailyQuota': '今日铸币额度(U)',
-    'dashboard.todayUsed': '今日已用额度(U)',
-    'dashboard.queueCount': '今日剩余额度(U)',
+    'dashboard.todayUsed': '今日已处理额度(U)',
+    'dashboard.queueCount': '今日待处理额度(U)',
     'dashboard.queueRange': '当前排队头/尾',
-    'dashboard.progress': '今日额度进度',
+    'dashboard.progress': '今日额度处理进度',
     'dashboard.queueProgress': '全局排队进度',
     'dashboard.processed': '已处理单数',
     'dashboard.totalQueued': '总排队数',
@@ -414,10 +414,10 @@ const languagePacks = {
 
      // Dashboard
     'dashboard.dailyQuota': '今日鑄幣額度(U)',
-    'dashboard.todayUsed': '今日已用額度(U)',
-    'dashboard.queueCount': '今日剩餘額度(U)',
+    'dashboard.todayUsed': '今日已處理額度(U)',
+    'dashboard.queueCount': '今日待處理額度(U)',
     'dashboard.queueRange': '當前排隊頭/尾',
-    'dashboard.progress': '今日額度進度',
+    'dashboard.progress': '今日額度處理進度',
     'dashboard.queueProgress': '全局排隊進度',
     'dashboard.processed': '已處理單數',
     'dashboard.totalQueued': '總排隊數',
@@ -603,10 +603,10 @@ const languagePacks = {
 
      // Dashboard
     'dashboard.dailyQuota': '本日のミント枠(U)',
-    'dashboard.todayUsed': '本日の使用済み枠(U)',
-    'dashboard.queueCount': '本日の残り枠(U)',
+    'dashboard.todayUsed': '本日の処理済み枠(U)',
+    'dashboard.queueCount': '本日の処理待ち枠(U)',
      'dashboard.queueRange': '現在の待機先頭/末尾',
-         'dashboard.progress': '本日の枠進捗',
+         'dashboard.progress': '本日の枠処理進捗',
     'dashboard.queueProgress': '全体待機進捗',
     'dashboard.processed': '処理済み',
     'dashboard.totalQueued': '総待機数',
@@ -793,10 +793,10 @@ const languagePacks = {
 
      // Dashboard
     'dashboard.dailyQuota': '오늘의 민팅 한도(U)',
-    'dashboard.todayUsed': '오늘 사용된 한도(U)',
-    'dashboard.queueCount': '오늘 남은 한도(U)',
+    'dashboard.todayUsed': '오늘 처리된 한도(U)',
+    'dashboard.queueCount': '오늘 처리 대기 한도(U)',
      'dashboard.queueRange': '현재 대기 선두/후미',
-         'dashboard.progress': '오늘의 한도 진행률',
+         'dashboard.progress': '오늘의 한도 처리 진행률',
     'dashboard.queueProgress': '전체 대기 진행률',
     'dashboard.processed': '처리됨',
     'dashboard.totalQueued': '총 대기',
