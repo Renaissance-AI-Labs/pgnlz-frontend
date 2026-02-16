@@ -125,7 +125,12 @@ const selectAmount = (amount) => {
 };
 
 const formatAmount = (amount) => {
-    return ethers.formatEther(amount).split('.')[0];
+    try {
+        const val = parseFloat(ethers.formatEther(amount));
+        return val.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    } catch (e) {
+        return '0';
+    }
 };
 
 const updateData = async () => {

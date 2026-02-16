@@ -103,15 +103,24 @@ const waitingCount = computed(() => {
     return val > 0 ? val : 0;
 });
 
+const formatDecimal = (val) => {
+    try {
+        const num = parseFloat(ethers.formatEther(val));
+        return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    } catch (e) {
+        return '0';
+    }
+};
+
 const formattedDailyQuota = computed(() => {
   if (dailyQuota.value === ethers.MaxUint256) {
     return t('dashboard.unlimited');
   }
-  return ethers.formatEther(dailyQuota.value);
+  return formatDecimal(dailyQuota.value);
 });
 
 const formattedTodayUsed = computed(() => {
-  return ethers.formatEther(queueInfo.value.todayUsedQuota);
+  return formatDecimal(queueInfo.value.todayUsedQuota);
 });
 
 const formattedRemainingQuota = computed(() => {
@@ -120,7 +129,7 @@ const formattedRemainingQuota = computed(() => {
   }
   const remaining = dailyQuota.value - queueInfo.value.todayUsedQuota;
   const val = remaining > BigInt(0) ? remaining : BigInt(0);
-  return ethers.formatEther(val);
+  return formatDecimal(val);
 });
 
 const progressPercentage = computed(() => {
@@ -195,16 +204,24 @@ const fetchData = async () => {
 
     // Fetch Queue Info
     // StakingView.getQueueInfo() -> tuple
-    const info = await stakingViewContract.getQueueInfo();
-    // Tuple: [currentDailyQuota, todayUsedQuota, totalQueuedCount, headIndex, tailIndex, nextBatchSize]
-    queueInfo.value = {
-      currentDailyQuota: info[0],
-      todayUsedQuota: info[1],
-      totalQueuedCount: Number(info[2]),
-      headIndex: Number(info[3]),
-      tailIndex: Number(info[4]),
-      nextBatchSize: Number(info[5])
-    };
+    try {
+        const info = await stakingViewContract.getQueueInfo();
+        console.log("Queue Info:", info);
+        // Tuple: [currentDailyQuota, todayUsedQuota, totalQueuedCount, headIndex, tailIndex, nextBatchSize]
+        if (info) {
+            queueInfo.value = {
+                currentDailyQuota: info[0],
+                todayUsedQuota: info[1],
+                totalQueuedCount: Number(info[2]),
+                headIndex: Number(info[3]),
+                tailIndex: Number(info[4]),
+                nextBatchSize: Number(info[5])
+            };
+        }
+    } catch (e) {
+        console.warn("Failed to fetch queue info from StakingView, trying Staking contract fallback if available or ignoring.");
+        console.error(e);
+    }
 
   } catch (error) {
     console.error('Failed to fetch dashboard data:', error);
