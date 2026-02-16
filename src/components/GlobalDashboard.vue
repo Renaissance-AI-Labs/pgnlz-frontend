@@ -141,11 +141,8 @@ const formattedRemainingQuota = computed(() => {
 const progressPercentage = computed(() => {
   if (dailyQuota.value === BigInt(0)) return 0;
   if (dailyQuota.value === ethers.MaxUint256) {
-    // If unlimited, maybe show a small percentage or 0, or base it on some other metric?
-    // For "Unlimited", the concept of progress bar is tricky. 
-    // Let's just show 100% or 0%? Or maybe just hide the bar?
-    // The requirement says: "Progress bar display: todayUsed / dailyQuota".
-    // If max, it effectively is 0% used relative to infinity.
+    // For unlimited, we can't show a meaningful percentage based on "total".
+    // If used > 0, maybe show something? But 0 is safest to avoid confusion.
     return 0; 
   }
   
@@ -259,11 +256,11 @@ watch(() => walletState.isConnected, (newVal) => {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
+  gap: 1rem;
 }
 
 .dashboard-container > * + * {
-  margin-top: 1rem;
+  margin-top: 0; /* Remove lobotomized owl selector since we use gap */
 }
 
 .stats-wrapper {
@@ -271,13 +268,12 @@ watch(() => walletState.isConnected, (newVal) => {
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
-  /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
+  gap: 1rem;
 }
 
-/* Add margin to flex items if needed, but justify-around handles spacing mostly. 
-   However, if gap was intended for minimum spacing: */
+/* Remove legacy margin shim */
 .stats-wrapper > * + * {
-    margin-left: 0.5rem;
+    margin-left: 0;
 }
 
 .stat-item {
@@ -450,29 +446,26 @@ watch(() => walletState.isConnected, (newVal) => {
   display: none; /* Hide old text class */
 }
 
-/* Responsive */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 0.8rem;
-    /* gap: 0.5rem; */
+    gap: 0.8rem;
     margin-bottom: 1rem;
-  }
-
-  .dashboard-container > * + * {
-    margin-top: 0.5rem;
   }
 
   .stats-wrapper {
     display: flex;
     flex-wrap: wrap;
-    margin: -0.25rem;
+    gap: 0.5rem;
+    margin: 0;
   }
 
   .stat-item {
-    padding: 0 0.2rem;
-    margin: 0.25rem;
     flex: 1 1 calc(33.333% - 0.5rem);
     min-width: 0;
+    margin: 0;
+    padding: 0 0.2rem;
   }
 
   .stat-item.full-width-mobile {
@@ -481,12 +474,13 @@ watch(() => walletState.isConnected, (newVal) => {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
     padding: 0.4rem;
+    gap: 0.8rem;
+    flex-basis: 100%;
     margin-top: 0.2rem;
-    /* gap: 0.8rem; Replaced with margin for iOS < 14.5 compatibility */
   }
 
   .stat-item.full-width-mobile > * + * {
-    margin-left: 0.8rem;
+    margin-left: 0;
   }
 
   .stat-item.full-width-mobile .item-label {
