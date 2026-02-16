@@ -443,11 +443,10 @@ watch(() => walletState.isConnected, () => {
 }
 
 .amount-selection {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: 0.6rem;
-  width: 100%;
-  margin: 0.5rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0.5rem -0.3rem;
+  width: calc(100% + 0.6rem);
 }
 
 .amount-btn {
@@ -465,6 +464,8 @@ watch(() => walletState.isConnected, () => {
   justify-content: center;
   /* gap: 0.1rem; Replaced with margin for iOS < 14.5 compatibility */
   min-height: 50px;
+  margin: 0.3rem;
+  flex: 1 1 80px;
 }
 
 .amount-btn > * + * {

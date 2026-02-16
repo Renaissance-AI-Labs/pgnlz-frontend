@@ -239,10 +239,10 @@ watch(() => walletState.isConnected, () => {
 }
 
 .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
-    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin: -0.3rem;
+    width: calc(100% + 0.6rem);
 }
 
 .info-item {
@@ -253,6 +253,8 @@ watch(() => walletState.isConnected, () => {
     flex-direction: column;
     /* gap: 0.2rem; Replaced with margin for iOS < 14.5 compatibility */
     border: 1px solid rgba(255, 255, 255, 0.03);
+    margin: 0.3rem;
+    flex: 1 1 calc(50% - 0.6rem);
 }
 
 .info-item > * + * {
@@ -370,7 +372,14 @@ watch(() => walletState.isConnected, () => {
   }
   
   .info-grid {
-      grid-template-columns: 1fr; /* Stack on mobile */
+      /* grid-template-columns: 1fr; */ /* Stack on mobile */
+      margin: 0;
+      width: 100%;
+  }
+  
+  .info-item {
+      margin: 0.3rem 0;
+      flex: 1 1 100%;
   }
 
   .action-btn {

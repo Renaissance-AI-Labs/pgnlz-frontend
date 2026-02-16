@@ -430,18 +430,25 @@ watch(() => walletState.isConnected, (newVal) => {
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 0.8rem;
-    gap: 0.5rem;
+    /* gap: 0.5rem; */
     margin-bottom: 1rem;
   }
 
+  .dashboard-container > * + * {
+    margin-top: 0.5rem;
+  }
+
   .stats-wrapper {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    margin: -0.25rem;
   }
 
   .stat-item {
     padding: 0 0.2rem;
+    margin: 0.25rem;
+    flex: 1 1 calc(33.333% - 0.5rem);
+    min-width: 0;
   }
 
   .stat-item.full-width-mobile {

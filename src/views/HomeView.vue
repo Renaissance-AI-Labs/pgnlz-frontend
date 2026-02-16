@@ -454,6 +454,9 @@ export default {
         0 0 60px rgba(192, 132, 252, 0.1);
     overflow: hidden;
     background: var(--bg-card);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    transform: translateZ(0); /* Fix for Safari overflow:hidden border-radius bug */
 }
 
 .profile-image {
@@ -476,7 +479,16 @@ export default {
     background: radial-gradient(circle at 30% 30%, rgba(192, 132, 252, 0.1), transparent 60%);
 }
 
-.tech-core {
+.cyber-core-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cyber-core {
   width: 40px;
   height: 40px;
   background: var(--primary);
@@ -487,28 +499,54 @@ export default {
   z-index: 2;
 }
 
-.tech-ring-outer {
-  position: absolute;
+.cyber-ring {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.ring-outer {
   width: 80%;
   height: 80%;
   border: 1px solid rgba(192, 132, 252, 0.3);
   border-top: 1px solid var(--cyan);
   border-bottom: 1px solid var(--purple);
-  border-radius: 50%;
   animation: spin 8s linear infinite;
-  z-index: 1;
 }
 
-.tech-ring-inner {
-  position: absolute;
+.ring-middle {
+    width: 70%;
+    height: 70%;
+    border: 1px dashed rgba(192, 132, 252, 0.2);
+    animation: spin 12s linear infinite reverse;
+}
+
+.ring-inner {
   width: 60%;
   height: 60%;
   border: 1px solid rgba(192, 132, 252, 0.2);
   border-left: 2px solid var(--accent);
   border-right: 2px solid var(--primary);
-  border-radius: 50%;
   animation: spin 6s linear infinite reverse;
-  z-index: 1;
+}
+
+.core-glitch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: white;
+    opacity: 0;
+    animation: glitch 3s infinite;
+}
+
+@keyframes glitch {
+    0% { opacity: 0; }
+    98% { opacity: 0; }
+    99% { opacity: 0.5; transform: scale(1.2); }
+    100% { opacity: 0; transform: scale(1); }
 }
 
 @keyframes spin {
