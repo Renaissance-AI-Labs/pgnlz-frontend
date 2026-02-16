@@ -3,7 +3,7 @@
     <div class="stats-wrapper">
       <!-- Item 1: Today's Mint Quota -->
       <div class="stat-item">
-        <div class="item-label">{{ t('dashboard.dailyQuota') }}</div>
+        <div class="item-label">{{ t('dashboard.dailyQuota') || 'Daily Quota' }}</div>
         <div class="item-value highlight-purple">
           {{ formattedDailyQuota }}
         </div>
@@ -64,13 +64,13 @@
         ></div>
       </div>
       <div class="progress-info-row">
-        <span class="p-title">{{ t('dashboard.queueProgress') }}</span>
+        <span class="p-title">{{ t('dashboard.queueProgress') || 'Global Queue' }}</span>
         <span class="p-value">
             <span class="legend-dot processed-dot"></span>
-            {{ t('dashboard.processed') }} {{ queueInfo.headIndex }} 
+            {{ t('dashboard.processed') || 'Processed' }} {{ queueInfo.headIndex }} 
             <span class="divider"> </span>
             <span class="legend-dot waiting-dot"></span>
-            {{ t('dashboard.currentQueued') }} {{ waitingCount }}
+            {{ t('dashboard.currentQueued') || 'Waiting' }} {{ waitingCount }}
         </span>
       </div>
     </div>
@@ -113,10 +113,16 @@ const formatDecimal = (val) => {
 };
 
 const formattedDailyQuota = computed(() => {
-  if (dailyQuota.value === ethers.MaxUint256) {
-    return t('dashboard.unlimited');
+  try {
+    // Check for MaxUint256 or effectively infinite
+    if (dailyQuota.value && (dailyQuota.value === ethers.MaxUint256 || dailyQuota.value.toString() === ethers.MaxUint256.toString())) {
+      return t('dashboard.unlimited');
+    }
+    return formatDecimal(dailyQuota.value);
+  } catch (e) {
+    console.error(e);
+    return '0';
   }
-  return formatDecimal(dailyQuota.value);
 });
 
 const formattedTodayUsed = computed(() => {
@@ -262,7 +268,7 @@ watch(() => walletState.isConnected, (newVal) => {
 
 .stats-wrapper {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: flex-start;
   width: 100%;
   /* gap: 0.5rem; Replaced with margin for iOS < 14.5 compatibility */
@@ -281,6 +287,7 @@ watch(() => walletState.isConnected, (newVal) => {
   justify-content: center;
   text-align: center;
   flex: 1;
+  min-width: 0;
 }
 
 .item-label {
@@ -500,9 +507,9 @@ watch(() => walletState.isConnected, (newVal) => {
     font-size: 0.9rem;
   }
   
-  .progress-section {
-    /* padding-top: 0.4rem; */
-  }
+  /* .progress-section {
+    padding-top: 0.4rem;
+  } */
   
   .progress-text {
     font-size: 0.65rem;
