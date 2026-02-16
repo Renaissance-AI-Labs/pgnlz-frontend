@@ -37,10 +37,9 @@
     </div>
 
     <!-- Hero Section -->
-    <section class="hero-section">
+    <!-- <section class="hero-section">
       <div class="hero-container">
         
-        <!-- Combined Visual & Title Area -->
         <div class="hero-header-visual">
           <div class="hero-image-wrapper">
             <div class="hero-image-container">
@@ -59,7 +58,6 @@
                   </div>
                 </div>
               </div>
-              <!-- Orbital System -->
               <div class="orbital-system">
                 <div class="orbit-ring ring-1">
                     <div class="orbit-object"></div>
@@ -79,36 +77,14 @@
           </h1>
         </div>
 
-        <!-- Content Below -->
         <div class="hero-content-bottom">
-          <!-- <div class="hero-greeting">
-            <span class="greeting-text">Hello, Welcome to</span>
-            <span class="greeting-cursor">|</span>
-          </div> -->
-          
           <div class="hero-title">
-            <!-- <span class="title-prefix">//</span> -->
             <span class="title-text">{{ t('home.subtitle') }}</span>
           </div>
-          
-          <!-- <p class="hero-description">
-            Passionate developers creating exceptional digital experiences with modern technologies.
-          </p> -->
-          
-          <!-- <div class="hero-buttons">
-            <a href="#contact" class="btn btn-primary">
-              <span>Get In Touch</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-            <a href="#projects" class="btn btn-secondary">
-              <span>View Projects</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-            </a>
-          </div> -->
         </div>
 
       </div>
-    </section>
+    </section> -->
 
     <!-- Global Dashboard -->
     <GlobalDashboard />
