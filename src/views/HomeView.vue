@@ -110,14 +110,16 @@
       </div>
     </section>
 
-    <!-- Global Dashboard -->
-    <GlobalDashboard />
+    <div class="home-content-wrapper">
+      <!-- Global Dashboard -->
+      <GlobalDashboard />
 
-    <!-- Staking Section -->
-    <StakingSection />
+      <!-- Staking Section -->
+      <StakingSection />
 
-    <!-- LP Dividend Section -->
-    <LPDividendSection />
+      <!-- LP Dividend Section -->
+      <LPDividendSection />
+    </div>
   </div>
 </template>
 
@@ -195,6 +197,14 @@ export default {
     z-index: 1; /* Above background animation */
 }
 
+.home-content-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .hero-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -248,7 +258,7 @@ export default {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.8));
+    /* filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.8)); Removed for iOS compatibility */
     /* Ensure text fill is visible */
     -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1); 
 }
@@ -360,6 +370,7 @@ export default {
     /* background: rgba(192, 132, 252, 0.05); */
     /* border: 1px solid rgba(192, 132, 252, 0.2); */
     border-radius: 12px;
+    filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.6));
     /* box-shadow: 0 0 20px rgba(192, 132, 252, 0.1), inset 0 0 10px rgba(192, 132, 252, 0.05); */
     /* backdrop-filter: blur(5px); */
 }
@@ -373,7 +384,6 @@ export default {
     font-weight: 800;
     letter-spacing: 1px;
     animation: textShine 30s linear infinite;
-    filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.6));
 }
 
 @keyframes textShine {
