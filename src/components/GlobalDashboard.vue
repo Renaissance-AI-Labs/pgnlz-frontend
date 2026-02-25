@@ -250,6 +250,8 @@ watch(() => walletState.isConnected, (newVal) => {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
   /* gap: 1rem; Replaced with margin for iOS < 14.5 compatibility */
 }
 
