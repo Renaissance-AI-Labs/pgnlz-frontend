@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container glass">
-    <div class="stats-wrapper">
+    <div class="stats-wrapper" v-if="isWhitelisted">
       <!-- Item 1: Today's Mint Quota -->
       <div class="stat-item">
         <div class="item-label">{{ t('dashboard.dailyQuota') }}</div>
@@ -24,20 +24,29 @@
           {{ formattedRemainingQuota }}
         </div>
       </div>
-
-      <!-- Item 4: Queue Head/Tail -->
-      <!-- <div class="stat-item full-width-mobile">
-        <div class="item-label">{{ t('dashboard.queueRange') }}</div>
-        <div class="item-value text-white text-sm">
-          <span class="range-val"><span class="label-sub">H:</span>{{ queueInfo.headIndex }}</span>
-          <span class="separator">/</span>
-          <span class="range-val"><span class="label-sub">T:</span>{{ queueInfo.tailIndex }}</span>
-        </div>
-      </div> -->
     </div>
 
-    <!-- Progress Bar -->
-    <div class="progress-section" style="margin-top: 6px;">
+    <!-- Simplified Dashboard for Non-Whitelisted Users -->
+    <div class="stats-wrapper simplified-stats" v-else>
+      <!-- Item 1: Today's Mint Quota -->
+      <div class="stat-item">
+        <div class="item-label">{{ t('dashboard.dailyQuota') }}</div>
+        <div class="item-value highlight-purple">
+          {{ formattedDailyQuota }}
+        </div>
+      </div>
+
+      <!-- Item 2: Processed Orders Count -->
+      <div class="stat-item">
+        <div class="item-label">{{ t('dashboard.processed') }}</div>
+        <div class="item-value highlight-cyan">
+          {{ queueInfo.headIndex }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar (Only for Whitelisted) -->
+    <div class="progress-section" style="margin-top: 6px;" v-if="isWhitelisted">
       <div class="progress-bar-bg">
         <div 
           class="progress-bar-fill" 
@@ -49,8 +58,8 @@
         <span class="p-value">{{ formattedTodayUsed }} / {{ formattedDailyQuota }} U</span>
       </div>
     </div>
-    <!-- Queue Progress Bar (New) -->
-    <div class="progress-section">
+    <!-- Queue Progress Bar (New) (Only for Whitelisted) -->
+    <div class="progress-section" v-if="isWhitelisted">
       <div class="progress-bar-bg queue-bar-container">
         <!-- Processed Segment -->
         <div 
@@ -83,7 +92,7 @@ import { ethers } from 'ethers';
 import { t } from '@/i18n';
 import { walletState, networks } from '@/services/wallet';
 import { getContractAddress } from '@/services/contracts';
-import { APP_ENV } from '@/services/environment';
+import { APP_ENV, WHITELIST_ADDRESSES } from '@/services/environment';
 import StakingABI from '@/abis/staking.json';
 import StakingViewABI from '@/abis/stakingView.json';
 
@@ -96,6 +105,11 @@ const queueInfo = ref({
   headIndex: 0,
   tailIndex: 0,
   nextBatchSize: 0
+});
+
+const isWhitelisted = computed(() => {
+  if (!walletState.address) return false;
+  return WHITELIST_ADDRESSES.includes(walletState.address.toLowerCase());
 });
 
 const waitingCount = computed(() => {
@@ -438,6 +452,10 @@ watch(() => walletState.isConnected, (newVal) => {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
+  }
+
+  .stats-wrapper.simplified-stats {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .stat-item {
