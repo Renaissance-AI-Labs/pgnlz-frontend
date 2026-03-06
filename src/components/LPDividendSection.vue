@@ -187,6 +187,8 @@ watch(() => walletState.isConnected, () => {
   align-items: center;
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
 }
 
 .lp-header {

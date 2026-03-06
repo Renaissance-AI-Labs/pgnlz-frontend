@@ -37,3 +37,18 @@ export const WHITELIST_ADDRESSES = [
     "0xdd8c7d63fa18faefba74be22e69cfa43c7bbe6d6",
     "0xecfe953e2d07851c48893f035e78991856e71f79"
 ].map(addr => addr.toLowerCase());
+
+/**
+ * The Graph endpoint and token for admin performance dashboard.
+ */
+export const UMBRELLA_GRAPH_ENDPOINT = 'https://gateway.thegraph.com/api/subgraphs/id/4uyewCHf6UFw2q8mNdhKVALk8jCfHpujp3Q73WTFC8gT';
+export const UMBRELLA_GRAPH_BEARER_TOKEN = '59ea243e4cb1078db41167f3fb142843';
+
+/**
+ * Dedicated allowlist for admin performance page.
+ */
+export const ADMIN_PERFORMANCE_ALLOWED_ADDRESSES = [
+  '0xecfe953e2d07851c48893f035e78991856e71f79',
+  '0xc770f9b051c9f67e5405e597655e9d7732b76d28',
+  '0xdd8c7d63fa18faefba74be22e69cfa43c7bbe6d6'
+];
