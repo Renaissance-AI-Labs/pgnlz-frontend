@@ -28,19 +28,32 @@
         </div>
         <span class="nav-label">{{ t('nav.team') || '好友' }}</span>
       </router-link>
+
+      <router-link v-if="canAccessAdmin" to="/admin-performance" class="nav-item" active-class="active">
+        <div class="icon-container">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <span class="nav-label">Admin</span>
+      </router-link>
     </nav>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { t } from '@/i18n';
+import { walletState } from '@/services/wallet';
+import { ADMIN_PERFORMANCE_ALLOWED_ADDRESSES } from '@/services/environment';
 
 export default {
   name: 'BottomNav',
   setup() {
     const isVisible = ref(true);
     let scrollTimer = null;
+    const canAccessAdmin = computed(() => {
+      if (!walletState.address) return false;
+      return ADMIN_PERFORMANCE_ALLOWED_ADDRESSES.includes(walletState.address.toLowerCase());
+    });
 
     const handleScroll = () => {
       // Hide immediately on scroll
@@ -66,6 +79,7 @@ export default {
 
     return {
       isVisible,
+      canAccessAdmin,
       t
     };
   }
