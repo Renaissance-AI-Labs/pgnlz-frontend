@@ -34,8 +34,11 @@ const routes = [
     name: 'AdminPerformance',
     component: AdminPerformanceView,
     beforeEnter: (to, from, next) => {
-      const address = walletState.address?.toLowerCase();
-      if (address && ADMIN_PERFORMANCE_ALLOWED_ADDRESSES.includes(address)) {
+      const connectedAddress = walletState.address?.toLowerCase();
+      const persistedAddress = localStorage.getItem('pgnlz_walletAddress')?.toLowerCase();
+      const candidateAddress = connectedAddress || persistedAddress;
+
+      if (candidateAddress && ADMIN_PERFORMANCE_ALLOWED_ADDRESSES.includes(candidateAddress)) {
         next();
         return;
       }
