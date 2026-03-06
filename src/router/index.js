@@ -6,6 +6,7 @@ import TeamView from '../views/TeamView.vue';
 import AdminPerformanceView from '../views/AdminPerformanceView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { walletState } from '../services/wallet';
+import { ADMIN_PERFORMANCE_ALLOWED_ADDRESSES } from '../services/environment';
 
 const routes = [
   {
@@ -32,6 +33,14 @@ const routes = [
     path: '/admin-performance',
     name: 'AdminPerformance',
     component: AdminPerformanceView,
+    beforeEnter: (to, from, next) => {
+      const address = walletState.address?.toLowerCase();
+      if (address && ADMIN_PERFORMANCE_ALLOWED_ADDRESSES.includes(address)) {
+        next();
+        return;
+      }
+      next('/404');
+    },
   },
   {
     path: '/:pathMatch(.*)*',

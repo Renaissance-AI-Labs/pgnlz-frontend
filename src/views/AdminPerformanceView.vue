@@ -6,13 +6,7 @@
         <p class="page-intro">查询和浏览用户总业绩</p>
       </div>
 
-      <div v-if="!walletState.isConnected" class="state-card">
-        请先连接钱包后访问该页面。
-      </div>
-      <div v-else-if="!isWhitelisted" class="state-card error">
-        当前地址无权限访问管理后台。
-      </div>
-      <div v-else class="content-section">
+      <div class="content-section">
         <div class="panel search-panel">
           <h3 class="panel-title">按地址查询</h3>
           <div class="search-row">
@@ -97,6 +91,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { ethers } from 'ethers';
 import { walletState } from '@/services/wallet';
 import {
@@ -107,6 +102,7 @@ import {
 
 const pageSize = 1000;
 const maxPage = 6;
+const router = useRouter();
 
 const currentPage = ref(1);
 const users = ref([]);
@@ -123,6 +119,12 @@ const isWhitelisted = computed(() => {
   if (!walletState.address) return false;
   return ADMIN_PERFORMANCE_ALLOWED_ADDRESSES.includes(walletState.address.toLowerCase());
 });
+
+const ensureAdminAccess = () => {
+  if (!isWhitelisted.value) {
+    router.replace('/404');
+  }
+};
 
 const currentSkip = computed(() => (currentPage.value - 1) * pageSize);
 
@@ -247,6 +249,7 @@ watch(currentPage, () => {
 watch(
   () => walletState.address,
   () => {
+    ensureAdminAccess();
     currentPage.value = 1;
     users.value = [];
     listError.value = '';
@@ -257,6 +260,7 @@ watch(
 );
 
 onMounted(() => {
+  ensureAdminAccess();
   if (walletState.isConnected && isWhitelisted.value) {
     fetchUsersList();
   }
