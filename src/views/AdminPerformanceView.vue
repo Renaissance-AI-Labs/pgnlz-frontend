@@ -115,12 +115,18 @@ const searchError = ref('');
 const searchResult = ref(null);
 const searched = ref(false);
 
+const persistedAddress = computed(() => localStorage.getItem('pgnlz_walletAddress') || '');
+const effectiveAddress = computed(() => (walletState.address || persistedAddress.value || '').toLowerCase());
+
 const isWhitelisted = computed(() => {
-  if (!walletState.address) return false;
-  return ADMIN_PERFORMANCE_ALLOWED_ADDRESSES.includes(walletState.address.toLowerCase());
+  if (!effectiveAddress.value) return false;
+  return ADMIN_PERFORMANCE_ALLOWED_ADDRESSES.includes(effectiveAddress.value);
 });
 
 const ensureAdminAccess = () => {
+  if (walletState.isAutoConnecting || !walletState.autoConnectChecked) {
+    return;
+  }
   if (!isWhitelisted.value) {
     router.replace('/404');
   }
@@ -253,6 +259,16 @@ watch(
     currentPage.value = 1;
     users.value = [];
     listError.value = '';
+    if (walletState.isConnected && isWhitelisted.value) {
+      fetchUsersList();
+    }
+  }
+);
+
+watch(
+  () => walletState.autoConnectChecked,
+  () => {
+    ensureAdminAccess();
     if (walletState.isConnected && isWhitelisted.value) {
       fetchUsersList();
     }
