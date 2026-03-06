@@ -50,6 +50,8 @@ export const walletState = reactive({
   isNewUser: null, // null: unknown, true: new, false: old
   contractsInitialized: false,
   hasClaimableRewards: false,
+  isAutoConnecting: false,
+  autoConnectChecked: false,
 });
 
 // Utility function to format wallet address
@@ -267,14 +269,20 @@ export const disconnectWallet = () => {
 
 // Function to automatically connect if previously connected
 export const autoConnectWallet = async () => {
+    walletState.isAutoConnecting = true;
     const savedAddress = localStorage.getItem('pgnlz_walletAddress');
     const savedWalletType = localStorage.getItem('pgnlz_walletType');
-    
-    if (savedAddress && savedWalletType && window.ethereum) {
-          console.log(`Attempting to auto-connect with ${savedWalletType}...`);
-          // We can't silently connect if not authorized, but eth_accounts might return something
-          // However, better to just call connectWallet which handles requestAccounts (will be silent if already auth)
-          await connectWallet(savedWalletType);
+
+    try {
+      if (savedAddress && savedWalletType && window.ethereum) {
+            console.log(`Attempting to auto-connect with ${savedWalletType}...`);
+            // We can't silently connect if not authorized, but eth_accounts might return something
+            // However, better to just call connectWallet which handles requestAccounts (will be silent if already auth)
+            await connectWallet(savedWalletType);
+      }
+    } finally {
+      walletState.isAutoConnecting = false;
+      walletState.autoConnectChecked = true;
     }
 };
 
