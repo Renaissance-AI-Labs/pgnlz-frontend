@@ -412,10 +412,6 @@ watch(() => walletState.isConnected, () => {
   margin-top: 1rem; /* Assuming default gap */
 }
 
-.section-title {
-  /* ... */
-}
-
 .stake-card {
   width: 100%;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
@@ -446,13 +442,14 @@ watch(() => walletState.isConnected, () => {
 
 .amount-selection {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.6rem;
   width: 100%;
   margin: 0.5rem 0;
 }
 
 .amount-btn {
+  grid-column: span 2;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-secondary);
@@ -467,6 +464,16 @@ watch(() => walletState.isConnected, () => {
   justify-content: center;
   /* gap: 0.1rem; Replaced with margin for iOS < 14.5 compatibility */
   min-height: 50px;
+}
+
+/* Keep at most 3 cards per row, and stretch the last row if not full */
+.amount-selection > .amount-btn:last-child:nth-child(3n + 1) {
+  grid-column: 1 / -1;
+}
+
+.amount-selection > .amount-btn:nth-last-child(2):nth-child(3n + 1),
+.amount-selection > .amount-btn:last-child:nth-child(3n + 2) {
+  grid-column: span 3;
 }
 
 .amount-btn > * + * {
@@ -637,13 +644,6 @@ watch(() => walletState.isConnected, () => {
     font-size: 0.95rem;
   }
   
-  .amount-selection {
-      grid-template-columns: repeat(3, 1fr); /* Force 3 columns on mobile */
-  }
-
-  .amount-selection.single-mode {
-      grid-template-columns: 1fr;
-  }
 }
 
 .staking-footer-text {
