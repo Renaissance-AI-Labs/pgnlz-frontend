@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue';
 import OrdersView from '../views/OrdersView.vue';
 import NftView from '../views/NftView.vue';
 import TeamView from '../views/TeamView.vue';
+import AdminPerformanceView from '../views/AdminPerformanceView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
 import { walletState } from '../services/wallet';
 
@@ -26,6 +27,11 @@ const routes = [
     path: '/team',
     name: 'Team',
     component: TeamView,
+  },
+  {
+    path: '/admin-performance',
+    name: 'AdminPerformance',
+    component: AdminPerformanceView,
   },
   {
     path: '/:pathMatch(.*)*',
