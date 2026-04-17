@@ -967,6 +967,7 @@ watch(() => walletState.isConnected, (newVal) => {
 }
 
 .btn-harvest {
+    flex: 2;
     background: var(--primary);
     color: #fff;
     box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
